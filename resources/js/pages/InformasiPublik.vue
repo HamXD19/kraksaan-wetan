@@ -34,22 +34,22 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Total Penduduk</p>
-              <p class="text-3xl font-extrabold text-emerald-900 font-mono">{{ (statistik.penduduk || 6842).toLocaleString('id-ID') }}</p>
+              <p class="text-3xl font-black text-emerald-950">{{ (statistik.penduduk || 6842).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">Jiwa Terdaftar</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Laki-Laki</p>
-              <p class="text-3xl font-extrabold text-emerald-700 font-mono">{{ (statistik.laki_laki || 3390).toLocaleString('id-ID') }}</p>
+              <p class="text-3xl font-black text-emerald-700">{{ (statistik.laki_laki || 3390).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">49.5% dari Total</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Perempuan</p>
-              <p class="text-3xl font-extrabold text-emerald-700 font-mono">{{ (statistik.perempuan || 3452).toLocaleString('id-ID') }}</p>
+              <p class="text-3xl font-black text-emerald-700">{{ (statistik.perempuan || 3452).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">50.5% dari Total</p>
             </div>
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kepala Keluarga</p>
-              <p class="text-3xl font-extrabold text-amber-600 font-mono">{{ (statistik.kk || 2185).toLocaleString('id-ID') }}</p>
+              <p class="text-3xl font-black text-amber-600">{{ (statistik.kk || 2185).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">Kartu Keluarga (KK)</p>
             </div>
           </div>
@@ -75,7 +75,7 @@
                 <tr v-for="l in statistik.lingkungan" :key="l.nama" class="hover:bg-slate-50">
                   <td class="py-3 px-4 font-bold text-slate-900">{{ l.nama }}</td>
                   <td class="py-3 px-4 text-center font-semibold text-emerald-700">{{ l.rt }} RT</td>
-                  <td class="py-3 px-4 text-center font-mono font-semibold">{{ l.penduduk }} Jiwa</td>
+                  <td class="py-3 px-4 text-center font-bold text-slate-800">{{ l.penduduk }} Jiwa</td>
                   <td class="py-3 px-4 text-slate-500">Kawasan pemukiman & sentra aktivitas masyarakat</td>
                 </tr>
               </tbody>
@@ -118,19 +118,19 @@
               <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-emerald-800/50 p-4 rounded-2xl border border-emerald-700/50">
                   <p class="text-[11px] font-bold uppercase text-emerald-300 tracking-wider">Pagu Rencana</p>
-                  <p class="text-base sm:text-xl font-black mt-1 font-mono">{{ formatRupiah(transparansiSummary.total_rencana) }}</p>
+                  <p class="text-base sm:text-xl font-black mt-1">{{ formatRupiah(transparansiSummary.total_rencana) }}</p>
                 </div>
                 <div class="bg-emerald-800/50 p-4 rounded-2xl border border-emerald-700/50">
                   <p class="text-[11px] font-bold uppercase text-emerald-300 tracking-wider">Realisasi</p>
-                  <p class="text-base sm:text-xl font-black mt-1 font-mono text-emerald-200">{{ formatRupiah(transparansiSummary.total_realisasi) }}</p>
+                  <p class="text-base sm:text-xl font-black mt-1 text-emerald-200">{{ formatRupiah(transparansiSummary.total_realisasi) }}</p>
                 </div>
                 <div class="bg-emerald-800/50 p-4 rounded-2xl border border-emerald-700/50">
                   <p class="text-[11px] font-bold uppercase text-amber-300 tracking-wider">Sisa Pagu</p>
-                  <p class="text-base sm:text-xl font-black mt-1 font-mono text-amber-300">{{ formatRupiah(transparansiSummary.total_sisa) }}</p>
+                  <p class="text-base sm:text-xl font-black mt-1 text-amber-300">{{ formatRupiah(transparansiSummary.total_sisa) }}</p>
                 </div>
                 <div class="bg-emerald-800/50 p-4 rounded-2xl border border-emerald-700/50">
                   <p class="text-[11px] font-bold uppercase text-emerald-300 tracking-wider">Serapan Anggaran</p>
-                  <p class="text-base sm:text-xl font-black mt-1 font-mono text-amber-300">{{ transparansiSummary.persentase_total }}%</p>
+                  <p class="text-base sm:text-xl font-black mt-1 text-amber-300">{{ transparansiSummary.persentase_total }}%</p>
                   <div class="w-full bg-emerald-950/80 h-1.5 rounded-full mt-2 overflow-hidden">
                     <div class="bg-amber-400 h-full rounded-full" :style="{ width: Math.min(transparansiSummary.persentase_total || 0, 100) + '%' }"></div>
                   </div>

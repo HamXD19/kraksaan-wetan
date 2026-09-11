@@ -37,7 +37,7 @@
           <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pagu Rencana</p>
           <span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-600">Tahun {{ filterTahun }}</span>
         </div>
-        <p class="text-xl sm:text-2xl font-black text-slate-900 mt-2 font-mono">
+        <p class="text-xl sm:text-2xl font-black text-slate-900 mt-2">
           {{ formatRupiah(summary.total_rencana) }}
         </p>
         <p class="text-[11px] text-slate-500 mt-1">Total alokasi anggaran kegiatan</p>
@@ -49,7 +49,7 @@
           <p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Realisasi Terserap</p>
           <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-[10px] font-bold text-emerald-800">Tersalurkan</span>
         </div>
-        <p class="text-xl sm:text-2xl font-black text-emerald-700 mt-2 font-mono">
+        <p class="text-xl sm:text-2xl font-black text-emerald-700 mt-2">
           {{ formatRupiah(summary.total_realisasi) }}
         </p>
         <div class="w-full bg-slate-100 h-1.5 rounded-full mt-2 overflow-hidden">
@@ -69,7 +69,7 @@
           <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Sisa Pagu</p>
           <span class="px-2 py-0.5 rounded-md bg-amber-100 text-[10px] font-bold text-amber-800">Saldo</span>
         </div>
-        <p class="text-xl sm:text-2xl font-black text-amber-700 mt-2 font-mono">
+        <p class="text-xl sm:text-2xl font-black text-amber-700 mt-2">
           {{ formatRupiah(summary.total_sisa) }}
         </p>
         <p class="text-[11px] text-slate-500 mt-1">Dana belum terserap / termin lanjutan</p>
@@ -156,7 +156,7 @@
               <td class="py-3.5 px-4 max-w-xs sm:max-w-sm">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded bg-slate-100 font-mono font-bold text-[10px] text-slate-600">
+                    <span class="px-2 py-0.5 rounded bg-slate-100 font-bold text-[10px] text-slate-600">
                       {{ item.tahun }}
                     </span>
                     <span class="text-[10px] font-semibold text-slate-400 truncate">
@@ -190,11 +190,11 @@
                 <div class="space-y-1">
                   <div class="flex items-center justify-between gap-3">
                     <span class="text-[10px] text-slate-400">Pagu:</span>
-                    <span class="font-mono font-bold text-slate-800">{{ formatRupiah(item.anggaran_rencana) }}</span>
+                    <span class="font-bold text-slate-800">{{ formatRupiah(item.anggaran_rencana) }}</span>
                   </div>
                   <div class="flex items-center justify-between gap-3">
                     <span class="text-[10px] text-emerald-600 font-semibold">Realisasi:</span>
-                    <span class="font-mono font-bold text-emerald-700">{{ formatRupiah(item.anggaran_realisasi) }}</span>
+                    <span class="font-bold text-emerald-700">{{ formatRupiah(item.anggaran_realisasi) }}</span>
                   </div>
                   <!-- Mini Progress Bar -->
                   <div class="w-36 bg-slate-100 h-1.5 rounded-full overflow-hidden">
@@ -234,7 +234,7 @@
                   >
                     {{ item.status }}
                   </span>
-                  <span class="font-mono text-[11px] font-bold text-slate-700">
+                  <span class="text-[11px] font-bold text-slate-700">
                     Fisik: {{ item.progres_fisik }}%
                   </span>
                 </div>

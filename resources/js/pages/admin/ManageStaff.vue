@@ -43,7 +43,7 @@
       <!-- Total Staf -->
       <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
         <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Akun</p>
-        <p class="text-2xl font-black text-slate-900 mt-1 font-mono">{{ counts.total || 0 }}</p>
+        <p class="text-2xl font-black text-slate-900 mt-1">{{ counts.total || 0 }}</p>
         <p class="text-[10px] text-slate-500 mt-0.5">Seluruh pengguna</p>
       </div>
 
@@ -53,7 +53,7 @@
           <p class="text-[10px] font-bold uppercase tracking-wider text-purple-700">Super Admin</p>
           <span class="w-2 h-2 rounded-full bg-purple-600"></span>
         </div>
-        <p class="text-2xl font-black text-purple-900 mt-1 font-mono">{{ counts.super_admin || 0 }}</p>
+        <p class="text-2xl font-black text-purple-900 mt-1">{{ counts.super_admin || 0 }}</p>
         <p class="text-[10px] text-purple-600 mt-0.5">Kendali Penuh</p>
       </div>
 
@@ -63,7 +63,7 @@
           <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">Konten & Humas</p>
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
         </div>
-        <p class="text-2xl font-black text-emerald-900 mt-1 font-mono">{{ counts.staff_konten || 0 }}</p>
+        <p class="text-2xl font-black text-emerald-900 mt-1">{{ counts.staff_konten || 0 }}</p>
         <p class="text-[10px] text-emerald-600 mt-0.5">Berita, Pengumuman, Galeri</p>
       </div>
 
@@ -73,7 +73,7 @@
           <p class="text-[10px] font-bold uppercase tracking-wider text-blue-700">Pelayanan</p>
           <span class="w-2 h-2 rounded-full bg-blue-600"></span>
         </div>
-        <p class="text-2xl font-black text-blue-900 mt-1 font-mono">{{ counts.staff_pelayanan || 0 }}</p>
+        <p class="text-2xl font-black text-blue-900 mt-1">{{ counts.staff_pelayanan || 0 }}</p>
         <p class="text-[10px] text-blue-600 mt-0.5">Layanan, Pengajuan, Pesan</p>
       </div>
 
@@ -83,7 +83,7 @@
           <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Administrasi</p>
           <span class="w-2 h-2 rounded-full bg-amber-600"></span>
         </div>
-        <p class="text-2xl font-black text-amber-900 mt-1 font-mono">{{ counts.staff_administrasi || 0 }}</p>
+        <p class="text-2xl font-black text-amber-900 mt-1">{{ counts.staff_administrasi || 0 }}</p>
         <p class="text-[10px] text-amber-600 mt-0.5">LKK & Statistik Wilayah</p>
       </div>
     </div>

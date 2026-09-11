@@ -124,7 +124,7 @@
               </td>
 
               <!-- Urutan -->
-              <td class="py-3 px-4 text-center font-mono font-bold text-slate-700">
+              <td class="py-3 px-4 text-center font-bold text-slate-700">
                 {{ item.urutan ?? 0 }}
               </td>
 
@@ -333,7 +333,7 @@
                 :key="idx" 
                 class="flex items-center gap-2"
               >
-                <span class="w-5 text-center text-slate-400 font-mono text-xs font-bold">{{ idx + 1 }}.</span>
+                <span class="w-5 text-center text-slate-400 text-xs font-bold">{{ idx + 1 }}.</span>
                 <input 
                   type="text" 
                   v-model="form.program_kerja[idx]" 

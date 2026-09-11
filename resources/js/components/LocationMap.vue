@@ -53,7 +53,7 @@
               </div>
               <div>
                 <p class="font-bold text-white text-sm">Titik Koordinat GPS</p>
-                <p class="text-emerald-100/80 font-mono text-[11px] select-all">-7.757241, 113.426526</p>
+                <p class="text-emerald-100/90 text-[11px] font-medium tracking-wide select-all">-7.757241, 113.426526</p>
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@
               <span class="w-2 h-2 rounded-full bg-rose-600 animate-pulse"></span>
               <p class="text-xs font-bold text-slate-900 leading-none">Kantor Kelurahan Kraksaan Wetan</p>
             </div>
-            <p class="text-[10px] text-slate-500 font-mono mt-1">Koordinat: -7.757241, 113.426526</p>
+            <p class="text-[10px] text-slate-600 font-medium mt-1">Koordinat: -7.757241, 113.426526</p>
           </div>
         </div>
       </div>

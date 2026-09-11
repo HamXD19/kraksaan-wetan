@@ -12,7 +12,7 @@
           {{ label }}
         </p>
         <div class="flex items-baseline gap-1.5">
-          <span class="text-3xl sm:text-4xl font-extrabold text-emerald-900 tracking-tight font-mono">
+          <span class="text-3xl sm:text-4xl font-black text-emerald-950 tracking-tight">
             {{ displayValue }}
           </span>
           <span v-if="unit" class="text-xs font-medium text-slate-500">

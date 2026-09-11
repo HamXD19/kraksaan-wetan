@@ -69,7 +69,7 @@
         <div v-if="isSuperAdmin()" class="bg-white p-5 rounded-2xl border border-purple-200 bg-purple-50/20 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-purple-700">Akun Staf</p>
-            <p class="text-3xl font-extrabold text-purple-900 font-mono mt-1">{{ dashboard.counts?.staff || 0 }}</p>
+            <p class="text-3xl font-extrabold text-purple-900 mt-1">{{ dashboard.counts?.staff || 0 }}</p>
             <router-link to="/admin/staff" class="text-[11px] font-semibold text-purple-700 hover:underline mt-1 block">Kelola Akun Staf &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
@@ -81,7 +81,7 @@
         <div v-if="canAccess('staff_konten')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Berita</p>
-            <p class="text-3xl font-extrabold text-slate-900 font-mono mt-1">{{ dashboard.counts?.berita || 0 }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ dashboard.counts?.berita || 0 }}</p>
             <router-link to="/admin/berita" class="text-[11px] font-semibold text-emerald-700 hover:underline mt-1 block">Kelola Berita &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
@@ -93,7 +93,7 @@
         <div v-if="canAccess('staff_konten')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pengumuman</p>
-            <p class="text-3xl font-extrabold text-slate-900 font-mono mt-1">{{ dashboard.counts?.pengumuman || 0 }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ dashboard.counts?.pengumuman || 0 }}</p>
             <router-link to="/admin/pengumuman" class="text-[11px] font-semibold text-emerald-700 hover:underline mt-1 block">Kelola Pengumuman &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center">
@@ -105,7 +105,7 @@
         <div v-if="canAccess('staff_konten')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Galeri Foto</p>
-            <p class="text-3xl font-extrabold text-slate-900 font-mono mt-1">{{ dashboard.counts?.galeri || 0 }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ dashboard.counts?.galeri || 0 }}</p>
             <router-link to="/admin/galeri" class="text-[11px] font-semibold text-emerald-700 hover:underline mt-1 block">Kelola Galeri &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center">
@@ -117,7 +117,7 @@
         <div v-if="canAccess('staff_pelayanan')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Layanan Warga</p>
-            <p class="text-3xl font-extrabold text-slate-900 font-mono mt-1">{{ dashboard.counts?.layanan || 0 }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ dashboard.counts?.layanan || 0 }}</p>
             <router-link to="/admin/layanan" class="text-[11px] font-semibold text-emerald-700 hover:underline mt-1 block">Kelola Layanan &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
@@ -129,7 +129,7 @@
         <div v-if="canAccess('staff_administrasi')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Lembaga (LKK)</p>
-            <p class="text-3xl font-extrabold text-slate-900 font-mono mt-1">{{ dashboard.counts?.lembaga || 0 }}</p>
+            <p class="text-3xl font-extrabold text-slate-900 mt-1">{{ dashboard.counts?.lembaga || 0 }}</p>
             <router-link to="/admin/lembaga" class="text-[11px] font-semibold text-emerald-700 hover:underline mt-1 block">Kelola Lembaga &rarr;</router-link>
           </div>
           <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">

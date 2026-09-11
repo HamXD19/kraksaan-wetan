@@ -100,7 +100,7 @@
               <tr v-for="l in lingkunganList" :key="l.id" class="hover:bg-slate-50">
                 <td class="py-3 px-4 font-bold text-slate-900">{{ l.nama }}</td>
                 <td class="py-3 px-4 text-center font-semibold text-emerald-700">{{ l.rt }} RT</td>
-                <td class="py-3 px-4 text-center font-mono font-semibold">{{ (l.penduduk || 0).toLocaleString('id-ID') }} Jiwa</td>
+                <td class="py-3 px-4 text-center font-semibold text-slate-800">{{ (l.penduduk || 0).toLocaleString('id-ID') }} Jiwa</td>
                 <td class="py-3 px-4 text-right whitespace-nowrap">
                   <button @click="openLingkunganModal(l)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-semibold mr-1">Edit</button>
                   <button @click="deleteLingkungan(l.id)" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold">Hapus</button>

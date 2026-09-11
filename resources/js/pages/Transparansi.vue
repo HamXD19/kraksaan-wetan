@@ -60,7 +60,7 @@
               <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
             </div>
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pagu Rencana</p>
-            <h3 class="text-2xl font-black text-slate-900 mt-1 font-mono tracking-tight">
+            <h3 class="text-2xl font-black text-slate-900 mt-1 tracking-tight">
               {{ formatRupiah(summary.total_rencana) }}
             </h3>
             <p class="text-[11px] text-slate-500 mt-1">Total alokasi pagu tahun {{ selectedTahun }}</p>
@@ -72,7 +72,7 @@
               <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Realisasi Anggaran</p>
-            <h3 class="text-2xl font-black text-emerald-700 mt-1 font-mono tracking-tight">
+            <h3 class="text-2xl font-black text-emerald-700 mt-1 tracking-tight">
               {{ formatRupiah(summary.total_realisasi) }}
             </h3>
             <p class="text-[11px] text-emerald-600 font-semibold mt-1">Terserap untuk pembangunan warga</p>
@@ -84,7 +84,7 @@
               <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
             </div>
             <p class="text-xs font-bold uppercase tracking-wider text-amber-700">Sisa Pagu</p>
-            <h3 class="text-2xl font-black text-amber-700 mt-1 font-mono tracking-tight">
+            <h3 class="text-2xl font-black text-amber-700 mt-1 tracking-tight">
               {{ formatRupiah(summary.total_sisa) }}
             </h3>
             <p class="text-[11px] text-slate-500 mt-1">Termin lanjutan & kegiatan berjalan</p>
@@ -97,7 +97,7 @@
                 <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Serapan Anggaran</span>
                 <span class="px-2 py-0.5 rounded-full bg-emerald-800 text-[10px] font-bold text-emerald-200">Real-Time</span>
               </div>
-              <p class="text-3xl sm:text-4xl font-black text-white mt-2 font-mono">
+              <p class="text-3xl sm:text-4xl font-black text-white mt-2">
                 {{ summary.persentase_total }}%
               </p>
             </div>
@@ -138,7 +138,7 @@
             >
               <div class="flex items-center justify-between">
                 <h3 class="font-bold text-slate-900 text-xs sm:text-sm">{{ b.kategori }}</h3>
-                <span class="text-xs font-mono font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                <span class="text-xs font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
                   {{ b.persentase }}%
                 </span>
               </div>
@@ -151,7 +151,7 @@
                     :style="{ width: Math.min(b.persentase || 0, 100) + '%' }"
                   ></div>
                 </div>
-                <div class="flex items-center justify-between text-[11px] font-mono">
+                <div class="flex items-center justify-between text-[11px]">
                   <span class="text-slate-500">Rencana: <strong class="text-slate-800">{{ formatRupiah(b.rencana) }}</strong></span>
                   <span class="text-emerald-700">Terserap: <strong>{{ formatRupiah(b.realisasi) }}</strong></span>
                 </div>
@@ -200,7 +200,7 @@
                 <!-- Header Card: Tahun, Kategori, Status -->
                 <div class="flex items-start justify-between gap-2">
                   <div class="flex items-center gap-2">
-                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 font-mono font-bold text-xs text-slate-700">
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 font-bold text-xs text-slate-700">
                       TA {{ item.tahun }}
                     </span>
                     <span 
@@ -242,7 +242,7 @@
                 <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
                   <div class="flex items-center justify-between text-xs">
                     <span class="font-bold text-slate-700">Sumber: {{ item.sumber_dana }}</span>
-                    <span class="font-mono font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">
+                    <span class="font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded text-[11px]">
                       {{ item.persentase_realisasi }}% Serapan
                     </span>
                   </div>
@@ -254,7 +254,7 @@
                     ></div>
                   </div>
 
-                  <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-200/60 font-mono">
+                  <div class="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-slate-200/60">
                     <div>
                       <span class="text-slate-400 block text-[10px]">Pagu Rencana:</span>
                       <strong class="text-slate-800">{{ formatRupiah(item.anggaran_rencana) }}</strong>
