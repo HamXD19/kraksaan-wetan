@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 900" fill="none" class="w-full h-full">
+  <defs>
+    <!-- Sky & Ambient Gradients -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22" stop-opacity="0.95"/>
+      <stop offset="40%" stop-color="#064e3b" stop-opacity="0.9"/>
+      <stop offset="75%" stop-color="#047857" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0.85"/>
+    </linearGradient>
+
+    <!-- Sunrise / Morning Glow behind Bromo -->
+    <radialGradient id="bromoGlow" cx="45%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.35"/>
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#064e3b" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Waterfall Mist Glow -->
+    <radialGradient id="waterfallGlow" cx="88%" cy="60%" r="35%">
+      <stop offset="0%" stop-color="#6ee7b7" stop-opacity="0.3"/>
+      <stop offset="60%" stop-color="#047857" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Mountain Layer Gradients -->
+    <linearGradient id="semeruGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#065f46" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0.7"/>
+    </linearGradient>
+
+    <linearGradient id="bromoMidGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#047857" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <linearGradient id="batokGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#059669" stop-opacity="0.75"/>
+      <stop offset="60%" stop-color="#047857" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="cliffGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#047857" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#064e3b" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="1"/>
+    </linearGradient>
+
+    <linearGradient id="waterfallStream" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a7f3d0" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#6ee7b7" stop-opacity="0.9"/>
+      <stop offset="90%" stop-color="#34d399" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#065f46" stop-opacity="0.2"/>
+    </linearGradient>
+
+    <linearGradient id="foreSandGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#022c22" stop-opacity="1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base Ambient -->
+  <rect width="1920" height="900" fill="url(#skyGrad)"/>
+  <rect width="1920" height="900" fill="url(#bromoGlow)"/>
+  <rect width="1920" height="900" fill="url(#waterfallGlow)"/>
+
+  <!-- Stars / Morning Dust Particles -->
+  <g opacity="0.4">
+    <circle cx="120" cy="90" r="1.5" fill="#fef08a"/>
+    <circle cx="340" cy="140" r="2" fill="#fef08a"/>
+    <circle cx="580" cy="80" r="1.5" fill="#fef08a"/>
+    <circle cx="820" cy="110" r="2.5" fill="#fef08a"/>
+    <circle cx="1050" cy="65" r="1.5" fill="#fef08a"/>
+    <circle cx="1280" cy="95" r="2" fill="#fef08a"/>
+    <circle cx="1450" cy="130" r="1.5" fill="#fef08a"/>
+    <circle cx="260" cy="210" r="1.5" fill="#fef08a"/>
+    <circle cx="700" cy="180" r="1" fill="#fef08a"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 1: Mount Semeru Peak & Horizon                         -->
+  <!-- ============================================================ -->
+  <path d="M 460 620 L 610 240 Q 640 200 670 240 L 830 620 Z" fill="url(#semeruGrad)"/>
+  <!-- Semeru Volcanic Steam / Ash Puff -->
+  <path d="M 635 220 C 625 180, 645 150, 665 140 C 690 130, 715 155, 710 185 C 725 175, 745 180, 750 200 C 755 220, 735 235, 710 235 Z" fill="#fef08a" opacity="0.18"/>
+  <path d="M 650 190 C 640 160, 660 140, 675 130 C 695 120, 715 140, 710 165 Z" fill="#6ee7b7" opacity="0.15"/>
+
+  <!-- Distant Mountain Ranges (Tengger Caldera Rim in Background) -->
+  <path d="M 0 540 Q 180 480 340 510 T 700 490 T 1100 520 T 1500 500 T 1920 530 L 1920 900 L 0 900 Z" fill="#064e3b" opacity="0.45"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 2: Mount Bromo Caldera & Active Crater                 -->
+  <!-- ============================================================ -->
+  <path d="M 120 700 L 260 480 Q 300 450 360 460 L 460 470 Q 520 460 560 500 L 680 720 Z" fill="url(#bromoMidGrad)"/>
+  <ellipse cx="410" cy="465" rx="85" ry="18" fill="#022c22" opacity="0.8"/>
+  <!-- Bromo Smoke Column (Active Crater) -->
+  <path d="M 370 460 C 350 400, 320 330, 360 260 C 390 210, 440 180, 480 220 C 510 250, 490 310, 460 360 C 440 395, 450 430, 440 460 Z" fill="#fef08a" opacity="0.16"/>
+  <path d="M 390 450 C 375 390, 360 320, 395 270 C 420 235, 460 220, 475 255 C 490 285, 470 340, 445 390 C 430 420, 435 440, 425 455 Z" fill="#6ee7b7" opacity="0.2"/>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 3: Mount Batok Cone with Iconic Fluted Ridges          -->
+  <!-- ============================================================ -->
+  <path d="M 440 760 L 610 390 Q 645 340 680 390 L 880 760 Z" fill="url(#batokGrad)"/>
+  <path d="M 645 365 Q 630 450 580 580 T 520 750" stroke="#047857" stroke-width="6" opacity="0.4" stroke-linecap="round"/>
+  <path d="M 650 365 Q 640 470 610 600 T 570 750" stroke="#022c22" stroke-width="8" opacity="0.5" stroke-linecap="round"/>
+  <path d="M 655 365 Q 655 480 645 610 T 630 760" stroke="#059669" stroke-width="6" opacity="0.45" stroke-linecap="round"/>
+  <path d="M 660 365 Q 675 480 690 610 T 710 760" stroke="#022c22" stroke-width="8" opacity="0.5" stroke-linecap="round"/>
+  <path d="M 665 365 Q 695 470 740 600 T 780 750" stroke="#047857" stroke-width="6" opacity="0.4" stroke-linecap="round"/>
+  <path d="M 670 365 Q 720 460 785 580 T 840 740" stroke="#065f46" stroke-width="5" opacity="0.4" stroke-linecap="round"/>
+
+  <!-- Sun Rays Radiating from behind Batok/Bromo -->
+  <g opacity="0.12" stroke="#f59e0b" stroke-width="2">
+    <line x1="645" y1="365" x2="300" y2="100"/>
+    <line x1="645" y1="365" x2="450" y2="60"/>
+    <line x1="645" y1="365" x2="645" y2="40"/>
+    <line x1="645" y1="365" x2="840" y2="70"/>
+    <line x1="645" y1="365" x2="1000" y2="120"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 4: Sea of Sand (Lautan Pasir) Waves                   -->
+  <!-- ============================================================ -->
+  <path d="M 0 740 Q 250 680 500 730 T 1000 700 T 1400 740 L 1400 900 L 0 900 Z" fill="url(#foreSandGrad)" opacity="0.85"/>
+  <path d="M 0 790 Q 300 750 650 780 T 1300 770 L 1300 900 L 0 900 Z" fill="#022c22" opacity="0.95"/>
+
+  <!-- Tengger Pine Trees on the ridge -->
+  <g fill="#022c22" opacity="0.7">
+    <path d="M 40 730 L 48 700 L 52 700 L 60 730 Z"/>
+    <path d="M 65 725 L 75 685 L 80 685 L 90 725 Z"/>
+    <path d="M 95 735 L 102 708 L 105 708 L 112 735 Z"/>
+    <path d="M 125 730 L 132 695 L 136 695 L 144 730 Z"/>
+    <path d="M 870 760 L 878 725 L 882 725 L 890 760 Z"/>
+    <path d="M 895 755 L 905 715 L 910 715 L 920 755 Z"/>
+  </g>
+
+  <!-- ============================================================ -->
+  <!-- LAYER 5: Air Terjun Madakaripura (Canyon Cliffs)            -->
+  <!-- ============================================================ -->
+  <path d="M 1320 260 Q 1380 320 1360 480 Q 1340 620 1390 740 Q 1420 800 1480 840 L 1920 840 L 1920 220 Q 1700 210 1520 230 Q 1400 240 1320 260 Z" fill="url(#cliffGrad)"/>
+
+  <!-- Cliff Terraces -->
+  <path d="M 1440 280 Q 1490 380 1460 520 Q 1440 640 1500 760 L 1920 760 L 1920 240 Q 1650 245 1440 280 Z" fill="#022c22" opacity="0.6"/>
+  <path d="M 1580 320 Q 1620 440 1590 600 Q 1570 700 1620 800 L 1920 800 L 1920 280 Q 1750 300 1580 320 Z" fill="#064e3b" opacity="0.5"/>
+
+  <!-- Madakaripura Primary Waterfall Plunge -->
+  <path d="M 1530 250 Q 1535 450 1538 680 Q 1540 780 1542 850" stroke="url(#waterfallStream)" stroke-width="18" stroke-linecap="round"/>
+  <path d="M 1533 250 Q 1537 450 1539 680 Q 1541 780 1543 850" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <path d="M 1535 250 Q 1538 450 1540 680 Q 1541 780 1542 850" stroke="#ecfdf5" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+
+  <!-- Secondary & Curtain Waterfall Streams -->
+  <path d="M 1480 310 Q 1485 490 1490 720 Q 1492 790 1495 850" stroke="url(#waterfallStream)" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 1482 310 Q 1486 490 1491 720 Q 1493 790 1496 850" stroke="#ffffff" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+
+  <path d="M 1600 340 Q 1603 520 1608 720 Q 1610 800 1612 860" stroke="url(#waterfallStream)" stroke-width="10" stroke-linecap="round" opacity="0.65"/>
+  <path d="M 1602 340 Q 1604 520 1609 720" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.75"/>
+
+  <path d="M 1670 380 Q 1672 540 1675 750" stroke="url(#waterfallStream)" stroke-width="6" stroke-linecap="round" opacity="0.5"/>
+  <path d="M 1410 390 Q 1415 530 1420 710" stroke="url(#waterfallStream)" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Waterfall Mist Basin at Bottom -->
+  <ellipse cx="1540" cy="850" rx="140" ry="45" fill="#6ee7b7" opacity="0.4"/>
+  <ellipse cx="1540" cy="840" rx="90" ry="25" fill="#ffffff" opacity="0.5"/>
+  <ellipse cx="1490" cy="855" rx="70" ry="20" fill="#a7f3d0" opacity="0.4"/>
+
+  <!-- Overhanging Canyon Foliage / Vines / Ferns -->
+  <g fill="#022c22" opacity="0.85">
+    <path d="M 1920 150 Q 1750 140 1600 190 Q 1480 230 1380 260 L 1920 260 Z"/>
+    <path d="M 1460 260 Q 1465 295 1462 330 Q 1468 310 1475 260" stroke="#047857" stroke-width="3" fill="none"/>
+    <path d="M 1520 250 Q 1523 285 1519 320" stroke="#059669" stroke-width="2.5" fill="none"/>
+    <path d="M 1570 260 Q 1575 305 1572 345" stroke="#047857" stroke-width="3" fill="none"/>
+    <path d="M 1650 270 Q 1653 320 1648 370" stroke="#065f46" stroke-width="3.5" fill="none"/>
+    <path d="M 1720 260 Q 1724 300 1720 340" stroke="#047857" stroke-width="2.5" fill="none"/>
+  </g>
+
+  <!-- Bottom Blending to Emerald-950 -->
+  <rect y="840" width="1920" height="60" fill="url(#foreSandGrad)" opacity="0.95"/>
+</svg>
