@@ -28,22 +28,10 @@
           <!-- Official Probolinggo Crest Badge / Custom Logo -->
           <div class="w-12 h-14 md:w-14 md:h-16 flex-shrink-0 flex items-center justify-center">
             <img 
-              v-if="profil?.logo" 
-              :src="profil.logo" 
-              :alt="profil?.nama || 'Logo Kelurahan'" 
+              :src="profil?.logo || '/images/logo-probolinggo.png'" 
+              :alt="profil?.nama || 'Logo Kelurahan Kraksaan Wetan'" 
               class="w-full h-full object-contain drop-shadow-sm transition-transform group-hover:scale-105" 
             />
-            <svg v-else viewBox="0 0 80 96" class="w-full h-full drop-shadow-sm transition-transform group-hover:scale-105" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M40 2L76 18V50C76 72 40 94 40 94C40 94 4 72 4 50V18L40 2Z" fill="#065f46" stroke="#f59e0b" stroke-width="3"/>
-              <path d="M40 8L70 21V48C70 66 40 86 40 86C40 86 10 66 10 48V21L40 8Z" fill="#047857"/>
-              <!-- Stylized Mountain Bromo & Rice/Cotton element -->
-              <path d="M22 56L40 32L58 56H22Z" fill="#f8fafc"/>
-              <path d="M32 56L40 44L48 56H32Z" fill="#e2e8f0"/>
-              <circle cx="40" cy="26" r="5" fill="#f59e0b"/>
-              <path d="M20 62C20 62 30 58 40 58C50 58 60 62 60 62" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
-              <path d="M26 68C26 68 33 65 40 65C47 65 54 68 54 68" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
-              <text x="40" y="80" text-anchor="middle" fill="#fef08a" font-size="7" font-weight="bold" letter-spacing="1">PROBOLINGGO</text>
-            </svg>
           </div>
           
           <div>

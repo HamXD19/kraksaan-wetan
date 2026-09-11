@@ -13,17 +13,10 @@
             <!-- Emblem / Logo Kelurahan / Pemkab -->
             <div class="w-12 h-14 shrink-0 flex items-center justify-center">
               <img 
-                v-if="profil?.logo" 
-                :src="profil.logo" 
-                :alt="profil?.nama || 'Logo Kelurahan'" 
+                :src="profil?.logo || '/images/logo-probolinggo.png'" 
+                :alt="profil?.nama || 'Logo Kelurahan Kraksaan Wetan'" 
                 class="w-full h-full object-contain drop-shadow-sm" 
               />
-              <svg v-else viewBox="0 0 80 96" class="w-full h-full drop-shadow-sm" fill="none">
-                <path d="M40 2L76 18V50C76 72 40 94 40 94C40 94 4 72 4 50V18L40 2Z" fill="#047857" stroke="#f59e0b" stroke-width="3"/>
-                <path d="M22 56L40 32L58 56H22Z" fill="#f8fafc"/>
-                <circle cx="40" cy="26" r="5" fill="#f59e0b"/>
-                <text x="40" y="80" text-anchor="middle" fill="#fef08a" font-size="8" font-weight="bold">PROBOLINGGO</text>
-              </svg>
             </div>
             <div>
               <span class="text-[11px] font-semibold text-emerald-300 uppercase tracking-wider block">Pemerintah Kab. Probolinggo</span>
