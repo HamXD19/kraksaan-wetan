@@ -152,6 +152,54 @@
             </div>
           </div>
 
+          <!-- Kode Acak Keamanan (Captcha Verifikasi Profesional) -->
+          <div class="space-y-1.5 pt-0.5">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold text-emerald-100/90 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                <span>Kode Acak Keamanan</span>
+              </label>
+              <span class="text-[10px] text-emerald-300/70 font-medium">Verifikasi Portal</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center">
+              <!-- Visual Captcha Display with Refresh Button -->
+              <div class="flex items-center gap-1.5 p-1 bg-[#0f241d] rounded-2xl border border-emerald-700/50 shadow-inner flex-shrink-0">
+                <div 
+                  class="flex items-center justify-center overflow-hidden min-w-[150px] h-[46px]" 
+                  v-html="captchaSvg || '<div class=\'text-xs text-emerald-400/50 py-2 px-4 animate-pulse\'>Memuat kode...</div>'"
+                ></div>
+                <button 
+                  type="button" 
+                  @click="loadCaptcha" 
+                  :disabled="loadingCaptcha"
+                  class="p-2.5 rounded-xl bg-emerald-800/60 hover:bg-emerald-700 active:bg-emerald-900 text-emerald-200 hover:text-white transition cursor-pointer flex items-center justify-center flex-shrink-0"
+                  title="Acak Ulang Kode Keamanan"
+                >
+                  <svg :class="{ 'animate-spin': loadingCaptcha }" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+              </div>
+
+              <!-- Captcha Input Field -->
+              <div class="flex-1 relative">
+                <input 
+                  type="text" 
+                  v-model="captchaInput" 
+                  required 
+                  maxlength="5"
+                  autocomplete="off"
+                  autocapitalize="characters"
+                  spellcheck="false"
+                  placeholder="Ketik kode di samping" 
+                  class="w-full h-[46px] px-3.5 rounded-2xl bg-[#112921]/90 border border-emerald-700/50 text-white placeholder-emerald-400/40 text-xs sm:text-sm text-center uppercase tracking-widest font-mono font-bold focus:outline-hidden focus:border-teal-400 focus:ring-2 focus:ring-teal-500/30 transition shadow-inner"
+                />
+              </div>
+            </div>
+            <p class="text-[10px] text-emerald-300/60 pl-1">
+              *Masukkan 5 karakter kode acak di atas (huruf besar/kecil dianggap sama).
+            </p>
+          </div>
+
           <!-- Submit Button (Reference Teal Pill Shape) -->
           <div class="pt-2">
             <button 
@@ -266,7 +314,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { AdminService } from '../../services/api';
 
@@ -277,25 +325,61 @@ const showPassword = ref(false);
 const loading = ref(false);
 const errorMsg = ref('');
 
+// Captcha Security Code State
+const captchaSvg = ref('');
+const captchaKey = ref('');
+const captchaInput = ref('');
+const loadingCaptcha = ref(false);
+
 const showForgotModal = ref(false);
 const showHelpModal = ref(false);
 const showTermsModal = ref(false);
 
+const loadCaptcha = async () => {
+  loadingCaptcha.value = true;
+  try {
+    const res = await AdminService.getCaptcha();
+    if (res && res.key && res.svg) {
+      captchaKey.value = res.key;
+      captchaSvg.value = res.svg;
+    }
+  } catch (err) {
+    console.warn('Gagal memuat kode keamanan captcha:', err);
+  } finally {
+    loadingCaptcha.value = false;
+  }
+};
+
+onMounted(() => {
+  loadCaptcha();
+});
+
 const handleLogin = async () => {
+  if (!captchaInput.value || captchaInput.value.trim().length < 5) {
+    errorMsg.value = 'Silakan masukkan 5 karakter kode acak keamanan (Captcha).';
+    return;
+  }
+
   loading.value = true;
   errorMsg.value = '';
   try {
     const res = await AdminService.login({ 
       email: email.value, 
-      password: password.value 
+      password: password.value,
+      captcha: captchaInput.value.trim(),
+      captcha_key: captchaKey.value
     });
     if (res.status === 'success') {
       router.push('/admin');
     } else {
       errorMsg.value = res.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.';
+      captchaInput.value = '';
+      loadCaptcha();
     }
   } catch (err) {
-    errorMsg.value = err.response?.data?.message || 'Email atau kata sandi tidak sesuai.';
+    errorMsg.value = err.response?.data?.message || 'Email, kata sandi, atau kode keamanan tidak sesuai.';
+    captchaInput.value = '';
+    loadCaptcha();
   } finally {
     loading.value = false;
   }

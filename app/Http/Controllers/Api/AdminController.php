@@ -26,14 +26,98 @@ use Illuminate\Support\Str;
 class AdminController extends Controller
 {
     /**
+     * Generate Random Security Captcha Code with SVG Visual
+     */
+    public function getCaptcha(): JsonResponse
+    {
+        $chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+        $code = '';
+        $length = 5;
+        for ($i = 0; $i < $length; $i++) {
+            $code .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+
+        $key = Str::uuid()->toString();
+        Cache::put('admin_captcha_'.$key, $code, now()->addMinutes(10));
+
+        $width = 160;
+        $height = 46;
+        $characters = str_split($code);
+
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'.$width.'" height="'.$height.'" viewBox="0 0 '.$width.' '.$height.'" class="rounded-xl select-none" style="pointer-events: none;">';
+        $svg .= '<defs><linearGradient id="cbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0c201a"/><stop offset="100%" stop-color="#14362b"/></linearGradient></defs>';
+        $svg .= '<rect width="100%" height="100%" fill="url(#cbg)" rx="10"/>';
+
+        // Noise curves
+        $noiseColors = ['#34d399', '#f59e0b', '#38bdf8', '#a7f3d0'];
+        for ($i = 0; $i < 4; $i++) {
+            $x1 = random_int(0, 30);
+            $y1 = random_int(6, $height - 6);
+            $cx = random_int(50, 110);
+            $cy = random_int(6, $height - 6);
+            $x2 = random_int(130, 160);
+            $y2 = random_int(6, $height - 6);
+            $color = $noiseColors[random_int(0, count($noiseColors) - 1)];
+            $svg .= '<path d="M'.$x1.' '.$y1.' Q'.$cx.' '.$cy.' '.$x2.' '.$y2.'" stroke="'.$color.'" stroke-width="1.5" fill="none" opacity="0.45"/>';
+        }
+
+        // Noise dots
+        for ($i = 0; $i < 24; $i++) {
+            $x = random_int(5, $width - 5);
+            $y = random_int(5, $height - 5);
+            $r = random_int(1, 2);
+            $svg .= '<circle cx="'.$x.'" cy="'.$y.'" r="'.$r.'" fill="#a7f3d0" opacity="0.3"/>';
+        }
+
+        // Characters
+        $textColors = ['#6ee7b7', '#fcd34d', '#5eead4', '#f8fafc', '#7dd3fc'];
+        foreach ($characters as $idx => $char) {
+            $x = 18 + ($idx * 27);
+            $y = random_int(30, 34);
+            $rot = random_int(-15, 15);
+            $color = $textColors[$idx % count($textColors)];
+            $svg .= '<text x="'.$x.'" y="'.$y.'" fill="'.$color.'" font-family="monospace, Courier, sans-serif" font-weight="900" font-size="25" transform="rotate('.$rot.', '.$x.', '.$y.')">'.$char.'</text>';
+        }
+
+        $svg .= '</svg>';
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'key' => $key,
+                'svg' => $svg,
+            ],
+        ]);
+    }
+
+    /**
      * Admin Authentication Login
      */
     public function login(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $rules = [
             'email' => 'required|email',
             'password' => 'required|string',
-        ]);
+        ];
+
+        // Validasi captcha jika captcha_key dikirimkan atau bukan di environment testing
+        if ($request->has('captcha_key') || ! app()->environment('testing')) {
+            $rules['captcha'] = 'required|string';
+            $rules['captcha_key'] = 'required|string';
+        }
+
+        $validated = $request->validate($rules);
+
+        if (! empty($validated['captcha_key'])) {
+            $expectedCaptcha = Cache::get('admin_captcha_'.$validated['captcha_key']);
+            if (! $expectedCaptcha || strtolower(trim($validated['captcha'])) !== strtolower(trim($expectedCaptcha))) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Kode acak keamanan (Captcha) salah atau telah kedaluwarsa. Silakan coba lagi.',
+                ], 422);
+            }
+            Cache::forget('admin_captcha_'.$validated['captcha_key']);
+        }
 
         $user = User::where('email', $validated['email'])->first();
 

@@ -54,6 +54,7 @@ Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 
 // Admin CMS Endpoints
 Route::prefix('admin')->group(function () {
+    Route::get('/captcha', [AdminController::class, 'getCaptcha']);
     Route::post('/login', [AdminController::class, 'login']);
 
     Route::middleware('admin.auth')->group(function () {

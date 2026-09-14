@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -53,6 +54,64 @@ class AdminAuthTest extends TestCase
 
         $response->assertStatus(401)
             ->assertJsonPath('status', 'error');
+    }
+
+    public function test_admin_captcha_endpoint_generates_key_and_svg(): void
+    {
+        $response = $this->getJson('/api/admin/captcha');
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonStructure([
+                'status',
+                'data' => ['key', 'svg'],
+            ]);
+
+        $this->assertNotEmpty($response->json('data.key'));
+        $this->assertStringContainsString('<svg', $response->json('data.svg'));
+    }
+
+    public function test_admin_login_with_invalid_captcha_returns_422(): void
+    {
+        $this->getOrCreateAdmin();
+
+        $captchaRes = $this->getJson('/api/admin/captcha');
+        $key = $captchaRes->json('data.key');
+
+        $response = $this->postJson('/api/admin/login', [
+            'email' => 'admin@kraksaanwetan.go.id',
+            'password' => 'password123',
+            'captcha_key' => $key,
+            'captcha' => 'WRONG',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('status', 'error')
+            ->assertJsonFragment([
+                'message' => 'Kode acak keamanan (Captcha) salah atau telah kedaluwarsa. Silakan coba lagi.',
+            ]);
+    }
+
+    public function test_admin_login_with_valid_captcha_succeeds(): void
+    {
+        $this->getOrCreateAdmin();
+
+        $captchaRes = $this->getJson('/api/admin/captcha');
+        $key = $captchaRes->json('data.key');
+        $expectedCode = Cache::get('admin_captcha_'.$key);
+
+        $response = $this->postJson('/api/admin/login', [
+            'email' => 'admin@kraksaanwetan.go.id',
+            'password' => 'password123',
+            'captcha_key' => $key,
+            'captcha' => strtolower($expectedCode),
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonStructure([
+                'data' => ['token', 'user'],
+            ]);
     }
 
     public function test_admin_protected_endpoints_reject_unauthenticated_requests(): void

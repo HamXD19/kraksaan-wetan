@@ -210,6 +210,11 @@ export const AdminService = {
         return currentRole === allowedRoles;
     },
 
+    async getCaptcha() {
+        const res = await apiClient.get('/admin/captcha');
+        return res.data?.data || res.data;
+    },
+
     async login(credentials) {
         const res = await apiClient.post('/admin/login', credentials);
         if (res.data?.data?.token) {
