@@ -32,70 +32,72 @@
 
       <div v-else-if="galeri.id" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Kolom Kiri (Sidebar): Foto Terkini Lainnya (lg:col-span-4) -->
+        <!-- Kolom Kiri (Sidebar): Khusus Video Dokumentasi (lg:col-span-4) -->
         <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 order-2 lg:order-1">
-          <!-- Widget Foto & Video Dokumentasi Lainnya -->
+          <!-- Widget Khusus Video Dokumentasi -->
           <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                <span>Dokumentasi Lainnya</span>
-              </h3>
-              <router-link to="/galeri" class="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold transition">
-                Indeks Galeri &rarr;
+              <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse"></span>
+                <h3 class="text-base font-black text-slate-900">Video Dokumentasi</h3>
+              </div>
+              <router-link to="/galeri" class="text-[11px] text-rose-600 hover:text-rose-800 font-bold transition">
+                Semua Video &rarr;
               </router-link>
             </div>
 
-            <!-- List Foto & Video Terkait Lainnya -->
+            <!-- List Khusus Video Dokumentasi -->
             <div class="divide-y divide-slate-100 space-y-3">
               <article 
-                v-for="item in galeriLainnya" 
+                v-for="item in videoLainnya" 
                 :key="item.id"
                 class="pt-3 first:pt-0 group"
               >
                 <router-link :to="`/galeri/${item.id}`" class="flex items-start gap-3 transition-transform duration-200 group-hover:translate-x-1">
-                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70 relative">
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-900 shrink-0 border border-slate-200/70 relative">
                     <img 
                       :src="item.gambar" 
                       :alt="item.judul" 
-                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                       loading="lazy"
                     />
-                    <!-- Mini play button overlay if video -->
-                    <div v-if="item.tipe === 'video'" class="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <div class="w-6 h-6 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-xs">
-                        <svg class="w-3 h-3 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <!-- Red Play Button Overlay for Video -->
+                    <div class="absolute inset-0 bg-black/35 flex items-center justify-center group-hover:bg-black/20 transition-colors">
+                      <div class="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-md transform group-hover:scale-110 transition-transform">
+                        <svg class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                       </div>
                     </div>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1 font-semibold">
-                      <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
-                        {{ item.kategori }}
-                      </span>
-                      <span v-if="item.tipe === 'video'" class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                    <div class="flex items-center gap-1.5 text-[10px] text-slate-400 mb-1 font-semibold flex-wrap">
+                      <span class="text-rose-700 bg-rose-50 border border-rose-200/80 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider flex items-center gap-1">
+                        <svg class="w-2.5 h-2.5 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                         Video
                       </span>
-                      <span>&bull;</span>
-                      <span>{{ item.tanggal }}</span>
+                      <span class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                        {{ item.kategori }}
+                      </span>
                     </div>
-                    <h4 class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
+                    <h4 class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-rose-600 transition-colors">
                       {{ item.judul }}
                     </h4>
+                    <span class="text-[10px] text-slate-400 mt-1 block">{{ item.tanggal }}</span>
                   </div>
                 </router-link>
               </article>
 
-              <div v-if="!galeriLainnya.length" class="text-xs text-slate-400 italic py-2">
-                Belum ada dokumentasi lainnya.
+              <div v-if="!videoLainnya.length" class="text-center py-6 px-3 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                <svg class="w-8 h-8 mx-auto text-slate-300 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <p class="text-xs text-slate-500 font-medium">Belum ada video dokumentasi lainnya saat ini.</p>
               </div>
             </div>
 
             <div class="pt-3 border-t border-slate-100">
               <router-link 
-                to="/galeri"
-                class="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-200"
+                to="/galeri" 
+                class="w-full py-2.5 px-4 rounded-xl bg-slate-50 hover:bg-rose-50 text-slate-700 hover:text-rose-800 font-bold text-xs transition flex items-center justify-center gap-2 border border-slate-200 hover:border-rose-200"
               >
-                <span>Lihat Semua Galeri</span>
+                <span>Lihat Semua Video Dokumentasi</span>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
               </router-link>
             </div>
@@ -244,51 +246,42 @@
             </div>
           </div>
 
-          <!-- Bagian "Setelah Dilihat Ada Beberapa Foto Untuk Dilihat Selengkapnya" -->
+          <!-- Bagian "Setelah Dilihat Ada Beberapa Foto Untuk Dilihat Selengkapnya" (Khusus Foto Dokumentasi) -->
           <div class="bg-slate-50 p-6 sm:p-10 border-t border-slate-200">
             <div class="flex items-center justify-between mb-6">
               <div>
-                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">DOKUMENTASI LAINNYA</span>
-                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">Lihat Dokumentasi Selengkapnya</h3>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700">DOKUMENTASI FOTO</span>
+                <h3 class="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">Lihat Foto Kegiatan Lainnya</h3>
               </div>
               <router-link 
                 to="/galeri" 
                 class="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition"
               >
-                <span>Lihat Semua</span>
+                <span>Lihat Semua Foto</span>
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </router-link>
             </div>
 
-            <!-- Grid Foto & Video Terkait Selengkapnya -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <!-- Grid Khusus Foto Kegiatan Selengkapnya -->
+            <div v-if="fotoLainnya.length" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
               <div 
-                v-for="item in galeriLainnya.slice(0, 3)" 
+                v-for="item in fotoLainnya.slice(0, 3)" 
                 :key="item.id"
                 class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-emerald-400/50 transition-all duration-300 transform hover:-translate-y-1.5 group flex flex-col justify-between"
               >
                 <div class="relative h-44 overflow-hidden bg-slate-100">
                   <img 
                     :src="item.gambar" 
-                    :alt="item.judul"
+                    :alt="item.judul" 
                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     loading="lazy"
                   />
-                  <!-- Center play overlay if video -->
-                  <div v-if="item.tipe === 'video'" class="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none z-10">
-                    <div class="w-10 h-10 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                  </div>
                   <!-- Light Sweep Reflection Effect on Hover -->
                   <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10"></div>
 
                   <div class="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5">
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-800/90 text-white backdrop-blur-xs">
                       {{ item.kategori }}
-                    </span>
-                    <span v-if="item.tipe === 'video'" class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-rose-600 text-white backdrop-blur-xs">
-                      Video
                     </span>
                   </div>
                 </div>
@@ -315,6 +308,12 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Empty State jika tidak ada foto lainnya -->
+            <div v-else class="text-center py-8 px-4 bg-white rounded-2xl border border-dashed border-slate-200">
+              <svg class="w-8 h-8 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <p class="text-xs text-slate-500 font-medium">Belum ada dokumentasi foto lainnya saat ini.</p>
             </div>
           </div>
         </main>
@@ -362,8 +361,25 @@ import { KelurahanService } from '../services/api';
 const route = useRoute();
 const loading = ref(true);
 const galeri = ref({});
-const galeriLainnya = ref([]);
+const allGaleriList = ref([]);
 const showToast = ref(false);
+
+// Video Dokumentasi Khusus (untuk bagian samping / sidebar)
+const videoLainnya = computed(() => {
+  return allGaleriList.value.filter(item => 
+    (item.tipe === 'video' || !!item.video_url) && 
+    String(item.id) !== String(galeri.value?.id)
+  );
+});
+
+// Foto Dokumentasi Khusus (untuk bagian bawah)
+const fotoLainnya = computed(() => {
+  return allGaleriList.value.filter(item => 
+    item.tipe !== 'video' && 
+    !item.video_url && 
+    String(item.id) !== String(galeri.value?.id)
+  );
+});
 
 const getYouTubeId = (url) => {
   if (!url) return null;
@@ -392,9 +408,7 @@ const loadData = async (id) => {
       document.title = `${galeri.value.judul} - Galeri Kelurahan Kraksaan Wetan`;
     }
 
-    // Filter dokumentasi lainnya (kecualikan yang sedang dilihat)
-    galeriLainnya.value = (allPhotos || [])
-      .filter(item => String(item.id) !== String(id));
+    allGaleriList.value = allPhotos || [];
   } catch (err) {
     console.error('Gagal memuat galeri:', err);
   } finally {
