@@ -9,105 +9,203 @@ export const isSoundEnabled = ref(
 
 let audioCtx = null;
 let cachedVoice = null;
+// CRITICAL: Chromium V8 Garbage Collection bug workaround
+// Keeps a global reference so Chrome doesn't garbage collect the utterance before it speaks
+let activeUtterance = null;
 
-// Initialize Web Audio Context on user gesture
-const getAudioContext = () => {
+/**
+ * Initialize or resume Web Audio Context on valid user gesture
+ */
+export const getAudioContext = () => {
   if (typeof window === 'undefined') return null;
-  if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
+  try {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
     }
-  }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
-  }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+  } catch (e) {}
   return audioCtx;
 };
 
-// Find Indonesian voice in browser
-const getIndonesianVoice = () => {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-  if (cachedVoice) return cachedVoice;
-
-  try {
-    const voices = window.speechSynthesis.getVoices() || [];
-    // Prioritize ID locale voice (e.g., id-ID, id_ID, or containing Indonesian)
-    cachedVoice = voices.find(v => 
-      v.lang === 'id-ID' || 
-      v.lang.startsWith('id') || 
-      /indonesia/i.test(v.name)
-    ) || null;
-  } catch (e) {}
-
-  return cachedVoice;
-};
-
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    cachedVoice = null;
-    getIndonesianVoice();
-  };
-}
-
 /**
- * Play tactile subtle click feedback
+ * Play a clear, crisp, modern UI chime tone
+ * Guarantees immediate audible feedback on all devices & browsers
  */
-export const playClick = () => {
+export const playChime = () => {
   if (!isSoundEnabled.value) return;
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
 
     const now = ctx.currentTime;
+    // Pleasant 2-tone melodic soft chime (E5 -> A5)
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(650, now);
-    osc.frequency.exponentialRampToValueAtTime(180, now + 0.035);
+    osc.frequency.setValueAtTime(659.25, now); // E5
+    osc.frequency.exponentialRampToValueAtTime(880.0, now + 0.08); // A5
 
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.003);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
     osc.start(now);
-    osc.stop(now + 0.04);
+    osc.stop(now + 0.17);
   } catch (e) {}
 };
 
+// Aliases for compatibility
+export const playClick = playChime;
+
 /**
- * Text-to-Speech: Voice narration that reads the clicked menu text in Indonesian
+ * Load available voices reliably from browser
+ */
+const getIndonesianVoice = () => {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
+  if (cachedVoice) return cachedVoice;
+
+  try {
+    const voices = window.speechSynthesis.getVoices() || [];
+    if (!voices.length) return null;
+
+    // 1. Search for Indonesian voice (id-ID, id_ID, or containing "indonesia")
+    cachedVoice = voices.find(v => 
+      v.lang === 'id-ID' || 
+      v.lang === 'id_ID' || 
+      (typeof v.lang === 'string' && v.lang.toLowerCase().startsWith('id')) || 
+      /indonesia/i.test(v.name)
+    ) || null;
+
+    // 2. If no Indonesian voice installed on OS, fallback to default or first voice
+    if (!cachedVoice) {
+      cachedVoice = voices.find(v => v.default) || voices[0] || null;
+    }
+  } catch (e) {}
+
+  return cachedVoice;
+};
+
+// Listen for browser voice population
+if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    cachedVoice = null;
+    getIndonesianVoice();
+  };
+  getIndonesianVoice();
+}
+
+/**
+ * Clean text for natural Indonesian speech pronunciation
+ */
+export const cleanSpeechText = (rawText) => {
+  if (!rawText) return '';
+  let text = String(rawText).trim();
+
+  // Remove count badges like (3), numbers at end
+  text = text.replace(/\(\d+\)/g, '').trim();
+
+  // Replace common symbols with Indonesian words
+  text = text.replace(/&/g, ' dan ')
+             .replace(/\+/g, ' dan ')
+             .replace(/\//g, ' atau ')
+             .replace(/[•→✓›»]/g, ' ')
+             .replace(/\s+/g, ' ')
+             .trim();
+
+  // Common Kelurahan acronyms expanded for natural reading
+  text = text.replace(/\bRT\b/gi, 'R T')
+             .replace(/\bRW\b/gi, 'R W')
+             .replace(/\bLKK\b/gi, 'Lembaga Kemasyarakatan')
+             .replace(/\bHUT\b/gi, 'Hari Ulang Tahun')
+             .replace(/\bUMKM\b/gi, 'U M K M')
+             .replace(/\bYT\b/gi, 'Video')
+             .replace(/\bKTP\b/gi, 'K T P')
+             .replace(/\bKK\b/gi, 'K K')
+             .replace(/\bNIK\b/gi, 'N I K')
+             .replace(/\bSPPT\b/gi, 'S P P T')
+             .replace(/\bPBB\b/gi, 'P B B');
+
+  // If text is ALL CAPS, convert to Title Case for natural pronunciation
+  if (text.length > 2 && text === text.toUpperCase() && /[A-Z]/.test(text)) {
+    text = text.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+  }
+
+  return text;
+};
+
+/**
+ * Text-to-Speech: Voice narration that reads the clicked menu text
  */
 export const speakText = (text) => {
   if (!isSoundEnabled.value) return;
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   if (!text || typeof text !== 'string') return;
 
-  const clean = text.trim();
+  const clean = cleanSpeechText(text);
   if (!clean) return;
 
   try {
-    // Cancel previous speech so the new menu text is spoken immediately
-    window.speechSynthesis.cancel();
+    const synth = window.speechSynthesis;
 
-    const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.lang = 'id-ID';
-    utterance.rate = 1.05; // natural speaking rate
-    utterance.pitch = 1.0;
-
-    const voice = getIndonesianVoice();
-    if (voice) {
-      utterance.voice = voice;
+    // Wake up synth if paused (common Chrome bug)
+    if (synth.paused) {
+      synth.resume();
     }
 
-    window.speechSynthesis.speak(utterance);
-  } catch (e) {
-    // Speech synthesis error fallback
-  }
+    // Cancel ongoing speech so new click speaks immediately
+    if (synth.speaking || synth.pending) {
+      synth.cancel();
+    }
+
+    // Chrome bug fix: cancel() is async. Calling speak() in the exact same event loop frame
+    // causes the new utterance to be cancelled by the pending cancel command!
+    // A 35ms setTimeout prevents this race condition completely.
+    setTimeout(() => {
+      try {
+        if (synth.paused) {
+          synth.resume();
+        }
+
+        const utterance = new SpeechSynthesisUtterance(clean);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        const voice = getIndonesianVoice();
+        if (voice) {
+          utterance.voice = voice;
+          utterance.lang = voice.lang || 'id-ID';
+        } else {
+          utterance.lang = 'id-ID';
+        }
+
+        // Keep persistent reference to avoid Chromium V8 GC bug
+        activeUtterance = utterance;
+        window._currentSpeechUtterance = utterance;
+
+        utterance.onend = () => {
+          activeUtterance = null;
+          window._currentSpeechUtterance = null;
+        };
+
+        utterance.onerror = () => {
+          activeUtterance = null;
+          window._currentSpeechUtterance = null;
+        };
+
+        synth.speak(utterance);
+      } catch (err) {}
+    }, 35);
+  } catch (e) {}
 };
 
 /**
@@ -120,7 +218,8 @@ export const toggleSound = () => {
   }
 
   if (isSoundEnabled.value) {
-    speakText('Suara menu aktif');
+    playChime();
+    speakText('Suara navigasi aktif');
   } else {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -129,49 +228,17 @@ export const toggleSound = () => {
 };
 
 /**
- * Clean and format text extracted from clicked elements
- */
-const cleanSpeechText = (rawText) => {
-  if (!rawText) return '';
-  let text = String(rawText).trim();
-
-  // Remove count badges like (3), numbers at end
-  text = text.replace(/\(\d+\)/g, '').trim();
-
-  // Replace common symbols with words
-  text = text.replace(/&/g, ' dan ')
-             .replace(/\//g, ' atau ')
-             .replace(/•/g, '')
-             .replace(/→/g, '')
-             .replace(/✓/g, '')
-             .replace(/\s+/g, ' ')
-             .trim();
-
-  // Common Kelurahan acronyms
-  text = text.replace(/\bRT\b/gi, 'R T')
-             .replace(/\bRW\b/gi, 'R W')
-             .replace(/\bLKK\b/gi, 'Lembaga Kemasyarakatan')
-             .replace(/\bHUT\b/gi, 'Hari Ulang Tahun')
-             .replace(/\bUMKM\b/gi, 'U M K M')
-             .replace(/\bYT\b/gi, 'Video');
-
-  // If text is ALL CAPS, convert to Title Case for natural pronunciation
-  if (text.length > 2 && text === text.toUpperCase() && /[A-Z]/.test(text)) {
-    text = text.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
-  }
-
-  return text;
-};
-
-/**
  * Get readable speech text from element or its ancestors
  */
-const getSpeechText = (el) => {
+export const getSpeechText = (el) => {
   if (!el) return null;
 
-  // 1. Check explicit data-speech attribute
-  const explicit = el.getAttribute('data-speech') || el.closest('[data-speech]')?.getAttribute('data-speech');
-  if (explicit) return explicit;
+  // 1. Check explicit data-speech attribute on element or ancestors
+  const speechEl = el.hasAttribute('data-speech') ? el : el.closest('[data-speech]');
+  if (speechEl) {
+    const val = speechEl.getAttribute('data-speech');
+    if (val) return cleanSpeechText(val);
+  }
 
   // 2. Check title or aria-label
   const aria = el.getAttribute('aria-label') || el.getAttribute('title');
@@ -180,12 +247,12 @@ const getSpeechText = (el) => {
   }
 
   // 3. Check text content for navigation links/buttons
-  const isNav = el.closest('header, nav, [role="navigation"], aside, .menu');
+  const isNav = el.closest('header, nav, [role="navigation"], aside, .menu, ul, ol');
   if (isNav) {
     const text = el.innerText || el.textContent;
     if (text) {
       const cleaned = cleanSpeechText(text);
-      if (cleaned.length >= 2 && cleaned.length <= 50) {
+      if (cleaned.length >= 2 && cleaned.length <= 60) {
         return cleaned;
       }
     }
@@ -195,31 +262,52 @@ const getSpeechText = (el) => {
 };
 
 /**
- * Setup global listeners to play click audio and speak menu name
+ * Setup global listeners to play audio on user click
  */
 export const setupSoundInteractions = () => {
   if (typeof window === 'undefined') return;
 
-  document.addEventListener('pointerdown', (event) => {
+  // Handle user clicks with capture phase to guarantee interception before stopPropagation
+  const handleInteraction = (event) => {
     const target = event.target;
     if (!target || typeof target.closest !== 'function') return;
 
-    // Ignore clicks on video players or inside iframes
-    if (target.closest('iframe, video, audio')) return;
+    // Ignore clicks on video players, audio, or iframes
+    if (target.closest('iframe, video, audio, .video-player')) return;
 
+    // Ignore sound toggle button itself (toggleSound handles its own feedback)
+    if (target.closest('[data-sound-toggle]')) return;
+
+    // Find closest interactive element
     const interactiveEl = target.closest(
-      'a, button, [role="button"], router-link, input[type="button"], input[type="submit"], .cursor-pointer'
+      'a, button, [role="button"], router-link, input[type="button"], input[type="submit"], [data-speech], .cursor-pointer'
     );
 
     if (interactiveEl) {
-      // 1. Play tactile click sound
-      playClick();
+      // Resume AudioContext on valid user gesture
+      getAudioContext();
 
-      // 2. Read menu aloud if speech text is available
+      // 1. Play audible modern chime
+      playChime();
+
+      // 2. Read menu text aloud via SpeechSynthesis
       const speechText = getSpeechText(interactiveEl);
       if (speechText) {
         speakText(speechText);
       }
     }
-  }, { passive: true });
+  };
+
+  // 'click' in capture phase ensures standard user gesture activation in all modern browsers
+  document.addEventListener('click', handleInteraction, true);
+
+  // Pre-warm audio and voice engine on first pointer down / touch
+  const unlockAudio = () => {
+    getAudioContext();
+    getIndonesianVoice();
+    window.removeEventListener('pointerdown', unlockAudio);
+    window.removeEventListener('touchstart', unlockAudio);
+  };
+  window.addEventListener('pointerdown', unlockAudio, { passive: true });
+  window.addEventListener('touchstart', unlockAudio, { passive: true });
 };

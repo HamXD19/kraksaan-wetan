@@ -21,6 +21,7 @@
           <!-- Sound Feedback Toggle -->
           <button 
             type="button"
+            data-sound-toggle="true"
             @click="toggleSound"
             :title="isSoundEnabled ? 'Suara Navigasi: Aktif (Klik untuk matikan)' : 'Suara Navigasi: Nonaktif (Klik untuk bunyikan)'"
             class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer border"
@@ -236,6 +237,7 @@
           <li class="ml-auto pl-2 py-1.5 flex items-center gap-2">
             <button
               type="button"
+              data-sound-toggle="true"
               @click="toggleSound"
               :title="isSoundEnabled ? 'Suara Navigasi: Aktif (Klik untuk matikan)' : 'Suara Navigasi: Nonaktif (Klik untuk bunyikan)'"
               class="p-2 rounded-lg text-emerald-200 hover:text-white hover:bg-emerald-700/60 transition-all cursor-pointer flex items-center justify-center"
@@ -284,6 +286,7 @@
           <div class="flex items-center gap-2">
             <button 
               type="button"
+              data-sound-toggle="true"
               @click="toggleSound" 
               :title="isSoundEnabled ? 'Suara Navigasi: Aktif' : 'Suara Navigasi: Nonaktif'"
               class="p-1.5 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 cursor-pointer"
