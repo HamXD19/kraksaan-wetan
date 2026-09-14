@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import MainLayout from '../layouts/MainLayout.vue';
 import { AdminService } from '../services/api';
+import { stopAllSound } from '../utils/sound';
 
 const routes = [
   // Portal Publik Warga
@@ -218,6 +219,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  if (to.path.startsWith('/admin')) {
+    stopAllSound();
+  }
+
   const isAuth = AdminService.isAuthenticated();
 
   if (to.meta.requiresAuth && !isAuth) {

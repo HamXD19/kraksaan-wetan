@@ -31,10 +31,40 @@ export const getAudioContext = () => {
 };
 
 /**
+ * Detect whether current view is in the Admin section
+ */
+export const isAdminArea = () => {
+  if (typeof window === 'undefined') return false;
+  const path = window.location.pathname || '';
+  const hash = window.location.hash || '';
+  return path.startsWith('/admin') || hash.startsWith('#/admin') || path.includes('/admin');
+};
+
+/**
+ * Instantly stop all playing audio and speech synthesis
+ */
+export const stopAllSound = () => {
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (e) {}
+    currentAudio = null;
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+  }
+};
+
+/**
  * Subtle tactile soft-click feedback (subtle and non-intrusive)
  */
 export const playChime = () => {
   if (!isSoundEnabled.value) return;
+  if (isAdminArea()) return;
+
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -144,6 +174,7 @@ const fallbackSpeechSynthesis = (cleanText) => {
  */
 export const speakText = (text) => {
   if (!isSoundEnabled.value) return;
+  if (isAdminArea()) return;
   if (!text || typeof text !== 'string') return;
 
   const clean = cleanSpeechText(text);
@@ -262,6 +293,12 @@ export const setupSoundInteractions = () => {
     const target = event.target;
     if (!target || typeof target.closest !== 'function') return;
 
+    // 1. Completely ignore all clicks and stop sound in the admin area
+    if (isAdminArea() || target.closest('[data-no-sound], .admin-layout, .admin-panel, aside')) {
+      stopAllSound();
+      return;
+    }
+
     // Ignore clicks on video players, audio, or iframes
     if (target.closest('iframe, video, audio, .video-player')) return;
 
@@ -274,6 +311,17 @@ export const setupSoundInteractions = () => {
     );
 
     if (interactiveEl) {
+      // Ignore if element is marked data-no-sound or navigates to admin
+      if (interactiveEl.closest('[data-no-sound]')) {
+        stopAllSound();
+        return;
+      }
+      const targetHref = interactiveEl.getAttribute('href') || interactiveEl.getAttribute('to') || '';
+      if (targetHref.startsWith('/admin') || targetHref.includes('/admin')) {
+        stopAllSound();
+        return;
+      }
+
       // Resume AudioContext on valid user gesture
       getAudioContext();
 

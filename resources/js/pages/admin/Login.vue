@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#132b23] flex items-center justify-center p-3 sm:p-6 lg:p-10 relative overflow-hidden font-sans">
+  <div class="min-h-screen bg-[#132b23] flex items-center justify-center p-3 sm:p-6 lg:p-10 relative overflow-hidden font-sans" data-no-sound="true">
     <!-- Atmospheric Gunung Bromo Page Backdrop -->
     <div 
       class="absolute inset-0 bg-cover bg-center filter blur-xl brightness-[0.20] scale-110 pointer-events-none"

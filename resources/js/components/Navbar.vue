@@ -250,7 +250,7 @@
             <!-- LOGIN / ADMIN MENU -->
             <router-link 
               :to="isLoggedIn ? '/admin' : '/admin/login'" 
-              data-speech="Login Admin"
+              data-no-sound="true"
               class="px-3.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm hover:shadow"
               :class="isLoggedIn ? 'bg-emerald-700 hover:bg-emerald-600 text-amber-300 border border-emerald-600' : 'bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold'"
             >
@@ -405,7 +405,7 @@
           <div class="pt-2 border-t border-slate-100 mt-2">
             <router-link 
               :to="isLoggedIn ? '/admin' : '/admin/login'" 
-              data-speech="Login Administrator"
+              data-no-sound="true"
               @click="isMobileMenuOpen = false"
               class="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold transition"
               :class="isLoggedIn ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-950 border border-amber-200'"

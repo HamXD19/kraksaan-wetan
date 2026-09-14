@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-slate-100 flex flex-col md:flex-row text-slate-800 font-sans">
+  <div class="min-h-screen bg-slate-100 flex flex-col md:flex-row text-slate-800 font-sans admin-layout" data-no-sound="true">
     <!-- Mobile Sidebar Backdrop -->
     <div 
       v-if="sidebarOpen" 
