@@ -17,11 +17,11 @@
 
     <!-- Gallery Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div 
+      <router-link 
         v-for="item in filteredItems" 
         :key="item.id"
-        @click="openLightbox(item)"
-        class="group relative h-64 rounded-2xl overflow-hidden cursor-pointer shadow-xs hover:shadow-xl border border-slate-200 transition-all duration-300 transform hover:-translate-y-1"
+        :to="`/galeri/${item.id}`"
+        class="group relative h-64 rounded-2xl overflow-hidden cursor-pointer shadow-xs hover:shadow-xl border border-slate-200 transition-all duration-300 transform hover:-translate-y-1 block"
       >
         <img 
           :src="item.gambar" 
@@ -49,55 +49,16 @@
           </p>
         </div>
 
-        <!-- Zoom Icon Indicator -->
+        <!-- Detail Indicator Arrow -->
         <div class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-xs text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </div>
-      </div>
+      </router-link>
     </div>
 
     <!-- Empty State -->
     <div v-if="filteredItems.length === 0" class="text-center py-12 bg-white rounded-2xl border border-slate-200">
       <p class="text-slate-500 text-sm">Tidak ada foto kegiatan pada kategori ini.</p>
-    </div>
-
-    <!-- Lightbox Modal -->
-    <div 
-      v-if="activeLightboxItem" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm transition-all"
-      @click.self="closeLightbox"
-    >
-      <div class="relative max-w-4xl w-full bg-slate-900 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 text-white">
-        <!-- Close Button -->
-        <button 
-          @click="closeLightbox"
-          class="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/60 text-white hover:bg-black/90 transition"
-          aria-label="Tutup"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-
-        <!-- Large Image -->
-        <div class="max-h-[70vh] bg-black flex items-center justify-center overflow-hidden">
-          <img 
-            :src="activeLightboxItem.gambar" 
-            :alt="activeLightboxItem.judul"
-            class="max-h-[70vh] w-auto object-contain"
-          />
-        </div>
-
-        <!-- Lightbox Caption -->
-        <div class="p-6 bg-slate-900 border-t border-slate-800">
-          <div class="flex items-center gap-3 mb-2">
-            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-800 text-emerald-200">
-              {{ activeLightboxItem.kategori }}
-            </span>
-            <span class="text-xs text-slate-400">{{ activeLightboxItem.tanggal }}</span>
-          </div>
-          <h3 class="text-lg font-bold text-white mb-2">{{ activeLightboxItem.judul }}</h3>
-          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">{{ activeLightboxItem.deskripsi }}</p>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -117,7 +78,6 @@ const props = defineProps({
 });
 
 const selectedCategory = ref('Semua');
-const activeLightboxItem = ref(null);
 
 const categories = computed(() => {
   const cats = ['Semua'];
@@ -133,12 +93,4 @@ const filteredItems = computed(() => {
   if (selectedCategory.value === 'Semua') return props.items;
   return props.items.filter(i => i.kategori === selectedCategory.value);
 });
-
-const openLightbox = (item) => {
-  activeLightboxItem.value = item;
-};
-
-const closeLightbox = () => {
-  activeLightboxItem.value = null;
-};
 </script>

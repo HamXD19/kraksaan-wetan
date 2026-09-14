@@ -235,6 +235,23 @@ class KelurahanController extends Controller
         ]);
     }
 
+    public function getGaleriById(int $id): JsonResponse
+    {
+        $item = Galeri::find($id);
+
+        if (! $item) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Foto galeri tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $item,
+        ]);
+    }
+
     public function kirimKontak(Request $request): JsonResponse
     {
         $validated = $request->validate([
@@ -313,6 +330,7 @@ class KelurahanController extends Controller
                 $rencana = (float) $row->rencana;
                 $realisasi = (float) $row->realisasi;
                 $persen = $rencana > 0 ? round(($realisasi / $rencana) * 100, 1) : 0.0;
+
                 return [
                     'kategori' => $row->kategori,
                     'rencana' => $rencana,

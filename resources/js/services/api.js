@@ -133,6 +133,18 @@ export const KelurahanService = {
         }
     },
 
+    async getGaleriById(id) {
+        try {
+            const res = await apiClient.get(`/galeri/${id}`);
+            return res.data?.data || res.data;
+        } catch (e) {
+            console.warn(`API /galeri/${id} fallback to mock data:`, e);
+            const found = mockGaleri.find(g => String(g.id) === String(id));
+            if (found) return found;
+            throw e;
+        }
+    },
+
     async kirimKontak(data) {
         const res = await apiClient.post('/kontak', data);
         return res.data;

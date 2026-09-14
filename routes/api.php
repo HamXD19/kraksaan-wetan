@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/berita/{slug}', [KelurahanController::class, 'getBeritaBySlug']);
     Route::get('/pengumuman', [KelurahanController::class, 'getPengumuman']);
     Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
+    Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
     Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
     Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
     Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
@@ -44,6 +45,7 @@ Route::get('/berita/{slug}', [KelurahanController::class, 'getBeritaBySlug']);
 Route::get('/kategori', [KelurahanController::class, 'getKategori']);
 Route::get('/pengumuman', [KelurahanController::class, 'getPengumuman']);
 Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
+Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
 Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
 Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
 Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);

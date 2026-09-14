@@ -79,6 +79,12 @@ const routes = [
         meta: { title: 'Galeri Kegiatan - Kelurahan Kraksaan Wetan' }
       },
       {
+        path: 'galeri/:id',
+        name: 'galeri-detail',
+        component: () => import('../pages/GaleriDetail.vue'),
+        meta: { title: 'Detail Galeri - Kelurahan Kraksaan Wetan' }
+      },
+      {
         path: 'pelayanan',
         name: 'pelayanan',
         component: () => import('../pages/Pelayanan.vue'),

@@ -77,6 +77,18 @@ class KelurahanApiTest extends TestCase
         $response = $this->getJson('/api/galeri');
         $response->assertStatus(200)
             ->assertJsonPath('status', 'success');
+
+        $first = $response->json('data.0');
+        if ($first) {
+            $detail = $this->getJson("/api/galeri/{$first['id']}");
+            $detail->assertStatus(200)
+                ->assertJsonPath('status', 'success')
+                ->assertJsonPath('data.id', $first['id']);
+        }
+
+        $notFound = $this->getJson('/api/galeri/999999');
+        $notFound->assertStatus(404)
+            ->assertJsonPath('status', 'error');
     }
 
     public function test_kirim_kontak_api_with_validation(): void
