@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Layanan;
-use App\Models\ServiceDocument;
 use App\Models\ServiceRequest;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -15,7 +14,9 @@ use Tests\TestCase;
 class PelayananOnlineTest extends TestCase
 {
     protected User $admin;
+
     protected string $adminToken;
+
     protected Layanan $layanan;
 
     protected function setUp(): void
@@ -30,8 +31,8 @@ class PelayananOnlineTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $this->adminToken = base64_encode($this->admin->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $this->adminToken, $this->admin->id, now()->addDays(7));
+        $this->adminToken = base64_encode($this->admin->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$this->adminToken, $this->admin->id, now()->addDays(7));
 
         $this->layanan = Layanan::first();
         if (! $this->layanan) {
@@ -189,10 +190,9 @@ class PelayananOnlineTest extends TestCase
             ->assertJson(['status' => 'error']);
     }
 
-
     public function test_admin_can_toggle_service_active_state(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/admin/layanan/{$this->layanan->id}/toggle-aktif", [
                 'aktif' => false,
             ]);

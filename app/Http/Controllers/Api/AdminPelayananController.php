@@ -8,7 +8,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AdminPelayananController extends Controller
-{    /**
+{
+    /**
      * Mengubah status aktif / nonaktif jenis layanan.
      */
     public function toggleAktifLayanan(Request $request, int $id): JsonResponse

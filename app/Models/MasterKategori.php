@@ -31,7 +31,7 @@ class MasterKategori extends Model
         parent::boot();
 
         static::saving(function ($model) {
-            if (empty($model->slug) && !empty($model->nama)) {
+            if (empty($model->slug) && ! empty($model->nama)) {
                 $model->slug = Str::slug($model->nama);
             }
         });

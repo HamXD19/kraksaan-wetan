@@ -11,6 +11,7 @@ use Tests\TestCase;
 class TransparansiAnggaranTest extends TestCase
 {
     protected User $admin;
+
     protected string $adminToken;
 
     protected function setUp(): void
@@ -23,8 +24,8 @@ class TransparansiAnggaranTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $this->adminToken = base64_encode($this->admin->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $this->adminToken, $this->admin->id, now()->addDays(7));
+        $this->adminToken = base64_encode($this->admin->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$this->adminToken, $this->admin->id, now()->addDays(7));
     }
 
     public function test_public_can_get_transparansi_summary_and_list(): void
@@ -55,8 +56,8 @@ class TransparansiAnggaranTest extends TestCase
                                 'sisa',
                                 'persentase',
                                 'jumlah_kegiatan',
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     'kegiatan' => [
                         '*' => [
@@ -75,9 +76,9 @@ class TransparansiAnggaranTest extends TestCase
                             'progres_fisik',
                             'status',
                             'aktif',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this->assertGreaterThanOrEqual(1, count($response->json('data.kegiatan')));
@@ -123,7 +124,7 @@ class TransparansiAnggaranTest extends TestCase
 
     public function test_admin_can_get_all_transparansi(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->getJson('/api/admin/transparansi');
 
         $response->assertStatus(200)
@@ -140,9 +141,9 @@ class TransparansiAnggaranTest extends TestCase
                             'kegiatan',
                             'anggaran_rencana',
                             'anggaran_realisasi',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this->assertGreaterThanOrEqual(1, count($response->json('data.items')));
@@ -169,7 +170,7 @@ class TransparansiAnggaranTest extends TestCase
             'aktif' => true,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/admin/transparansi', $payload);
 
         $response->assertStatus(201)
@@ -193,7 +194,7 @@ class TransparansiAnggaranTest extends TestCase
 
         $this->assertNotNull($item);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/admin/transparansi/{$item->id}", [
                 'tahun' => $item->tahun,
                 'program' => $item->program,
@@ -227,7 +228,7 @@ class TransparansiAnggaranTest extends TestCase
         $item = TransparansiAnggaran::first();
         $this->assertNotNull($item);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/admin/transparansi/{$item->id}/toggle-aktif", [
                 'aktif' => false,
             ]);
@@ -258,7 +259,7 @@ class TransparansiAnggaranTest extends TestCase
             'aktif' => true,
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->deleteJson("/api/admin/transparansi/{$temp->id}");
 
         $response->assertStatus(200)
@@ -271,7 +272,7 @@ class TransparansiAnggaranTest extends TestCase
 
     public function test_transparansi_validation_rejects_negative_budget(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/admin/transparansi', [
                 'tahun' => 2026,
                 'program' => 'Test Validasi',

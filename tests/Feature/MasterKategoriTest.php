@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\MasterKategori;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -11,8 +10,11 @@ use Tests\TestCase;
 class MasterKategoriTest extends TestCase
 {
     protected User $superAdmin;
+
     protected string $superAdminToken;
+
     protected User $staffAdministrasi;
+
     protected string $staffAdministrasiToken;
 
     protected function setUp(): void
@@ -27,8 +29,8 @@ class MasterKategoriTest extends TestCase
                 'role' => User::ROLE_SUPER_ADMIN,
             ]
         );
-        $this->superAdminToken = base64_encode($this->superAdmin->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $this->superAdminToken, $this->superAdmin->id, now()->addDays(7));
+        $this->superAdminToken = base64_encode($this->superAdmin->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$this->superAdminToken, $this->superAdmin->id, now()->addDays(7));
 
         $this->staffAdministrasi = User::firstOrCreate(
             ['email' => 'staff_administrasi_test@kraksaanwetan.go.id'],
@@ -38,8 +40,8 @@ class MasterKategoriTest extends TestCase
                 'role' => User::ROLE_STAFF_ADMINISTRASI,
             ]
         );
-        $this->staffAdministrasiToken = base64_encode($this->staffAdministrasi->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $this->staffAdministrasiToken, $this->staffAdministrasi->id, now()->addDays(7));
+        $this->staffAdministrasiToken = base64_encode($this->staffAdministrasi->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$this->staffAdministrasiToken, $this->staffAdministrasi->id, now()->addDays(7));
     }
 
     public function test_public_can_get_kategori_list(): void
@@ -51,15 +53,15 @@ class MasterKategoriTest extends TestCase
             ->assertJsonStructure([
                 'status',
                 'data' => [
-                    '*' => ['id', 'modul', 'nama', 'slug', 'warna', 'urutan', 'aktif']
-                ]
+                    '*' => ['id', 'modul', 'nama', 'slug', 'warna', 'urutan', 'aktif'],
+                ],
             ]);
     }
 
     public function test_admin_can_crud_master_kategori(): void
     {
         // 1. Create category
-        $createRes = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $createRes = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->postJson('/api/admin/kategori', [
                 'modul' => 'berita',
                 'nama' => 'Teknologi & Inovasi',
@@ -74,8 +76,8 @@ class MasterKategoriTest extends TestCase
         $createdId = $createRes->json('data.id');
 
         // 2. Update category
-        $updateRes = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
-            ->putJson('/api/admin/kategori/' . $createdId, [
+        $updateRes = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
+            ->putJson('/api/admin/kategori/'.$createdId, [
                 'modul' => 'berita',
                 'nama' => 'Teknologi & Digital',
                 'warna' => 'indigo',
@@ -88,8 +90,8 @@ class MasterKategoriTest extends TestCase
             ->assertJsonPath('data.nama', 'Teknologi & Digital');
 
         // 3. Delete category
-        $deleteRes = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
-            ->deleteJson('/api/admin/kategori/' . $createdId);
+        $deleteRes = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
+            ->deleteJson('/api/admin/kategori/'.$createdId);
 
         $deleteRes->assertStatus(200)
             ->assertJsonPath('status', 'success');
@@ -99,7 +101,7 @@ class MasterKategoriTest extends TestCase
 
     public function test_staff_administrasi_can_access_transparansi_anggaran(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/transparansi');
 
         $response->assertStatus(200)
@@ -118,7 +120,7 @@ class MasterKategoriTest extends TestCase
                     'link_span_lapor',
                     'halo_sae_wa',
                     'halo_sae_link',
-                ]
+                ],
             ]);
     }
 }

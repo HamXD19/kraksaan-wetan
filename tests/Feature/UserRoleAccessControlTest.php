@@ -11,15 +11,19 @@ use Tests\TestCase;
 class UserRoleAccessControlTest extends TestCase
 {
     protected User $superAdmin;
+
     protected string $superAdminToken;
 
     protected User $staffKonten;
+
     protected string $staffKontenToken;
 
     protected User $staffPelayanan;
+
     protected string $staffPelayananToken;
 
     protected User $staffAdministrasi;
+
     protected string $staffAdministrasiToken;
 
     protected function setUp(): void
@@ -73,8 +77,9 @@ class UserRoleAccessControlTest extends TestCase
 
     private function createTokenFor(User $user): string
     {
-        $token = base64_encode($user->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $token, $user->id, now()->addDays(7));
+        $token = base64_encode($user->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$token, $user->id, now()->addDays(7));
+
         return $token;
     }
 
@@ -94,7 +99,7 @@ class UserRoleAccessControlTest extends TestCase
     public function test_super_admin_can_manage_staff_accounts(): void
     {
         // 1. Get staff list
-        $resList = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $resList = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->getJson('/api/admin/staff');
 
         $resList->assertStatus(200)
@@ -105,7 +110,7 @@ class UserRoleAccessControlTest extends TestCase
             ]);
 
         // 2. Create new staff
-        $resCreate = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $resCreate = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->postJson('/api/admin/staff', [
                 'name' => 'Staf Baru Test',
                 'email' => 'staf_baru@kraksaanwetan.go.id',
@@ -120,7 +125,7 @@ class UserRoleAccessControlTest extends TestCase
         $newStaffId = $resCreate->json('data.id');
 
         // 3. Update staff
-        $resUpdate = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $resUpdate = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->putJson("/api/admin/staff/{$newStaffId}", [
                 'name' => 'Staf Baru Diedit',
                 'email' => 'staf_baru@kraksaanwetan.go.id',
@@ -133,7 +138,7 @@ class UserRoleAccessControlTest extends TestCase
             ->assertJsonPath('data.role', User::ROLE_STAFF_ADMINISTRASI);
 
         // 4. Reset staff password
-        $resPwd = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $resPwd = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->putJson("/api/admin/staff/{$newStaffId}/reset-password", [
                 'password' => 'newpassword123',
             ]);
@@ -142,7 +147,7 @@ class UserRoleAccessControlTest extends TestCase
             ->assertJsonPath('status', 'success');
 
         // 5. Delete staff
-        $resDel = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $resDel = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->deleteJson("/api/admin/staff/{$newStaffId}");
 
         $resDel->assertStatus(200)
@@ -153,7 +158,7 @@ class UserRoleAccessControlTest extends TestCase
 
     public function test_super_admin_cannot_delete_self(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->superAdminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
             ->deleteJson("/api/admin/staff/{$this->superAdmin->id}");
 
         $response->assertStatus(422)
@@ -164,32 +169,32 @@ class UserRoleAccessControlTest extends TestCase
     public function test_staff_konten_permissions(): void
     {
         // Allowed: Berita, Pengumuman, Galeri
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/berita')
             ->assertStatus(200);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/pengumuman')
             ->assertStatus(200);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/galeri')
             ->assertStatus(200);
 
         // Forbidden: Staff, Layanan, Lembaga, Profil
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/staff')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/layanan')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->getJson('/api/admin/lembaga')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffKontenToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffKontenToken)
             ->putJson('/api/admin/profil', ['lurah_nama' => 'Test'])
             ->assertStatus(403);
     }
@@ -197,24 +202,24 @@ class UserRoleAccessControlTest extends TestCase
     public function test_staff_pelayanan_permissions(): void
     {
         // Allowed: Layanan
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffPelayananToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffPelayananToken)
             ->getJson('/api/admin/layanan')
             ->assertStatus(200);
 
         // Forbidden: Berita, Galeri, Lembaga, Staff
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffPelayananToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffPelayananToken)
             ->getJson('/api/admin/berita')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffPelayananToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffPelayananToken)
             ->getJson('/api/admin/galeri')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffPelayananToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffPelayananToken)
             ->getJson('/api/admin/lembaga')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffPelayananToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffPelayananToken)
             ->getJson('/api/admin/staff')
             ->assertStatus(403);
     }
@@ -222,24 +227,24 @@ class UserRoleAccessControlTest extends TestCase
     public function test_staff_administrasi_permissions(): void
     {
         // Allowed: Lembaga, Transparansi
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/lembaga')
             ->assertStatus(200);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/transparansi')
             ->assertStatus(200);
 
         // Forbidden: Berita, Layanan, Staff
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/berita')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/layanan')
             ->assertStatus(403);
 
-        $this->withHeader('Authorization', 'Bearer ' . $this->staffAdministrasiToken)
+        $this->withHeader('Authorization', 'Bearer '.$this->staffAdministrasiToken)
             ->getJson('/api/admin/staff')
             ->assertStatus(403);
     }
@@ -254,11 +259,11 @@ class UserRoleAccessControlTest extends TestCase
         ];
 
         foreach ($tokens as $token) {
-            $this->withHeader('Authorization', 'Bearer ' . $token)
+            $this->withHeader('Authorization', 'Bearer '.$token)
                 ->getJson('/api/admin/dashboard')
                 ->assertStatus(200);
 
-            $this->withHeader('Authorization', 'Bearer ' . $token)
+            $this->withHeader('Authorization', 'Bearer '.$token)
                 ->getJson('/api/admin/me')
                 ->assertStatus(200);
         }

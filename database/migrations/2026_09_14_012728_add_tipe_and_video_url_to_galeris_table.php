@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('profil_kelurahans', function (Blueprint $table) {
-            $table->string('hero_mode')->default('slider')->after('logo');
-            $table->string('hero_image')->nullable()->after('hero_mode');
+        Schema::table('galeris', function (Blueprint $table) {
+            $table->string('tipe', 20)->default('foto')->after('kategori');
+            $table->text('video_url')->nullable()->after('gambar');
         });
     }
 
@@ -22,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('profil_kelurahans', function (Blueprint $table) {
-            $table->dropColumn(['hero_mode', 'hero_image']);
+        Schema::table('galeris', function (Blueprint $table) {
+            $table->dropColumn(['tipe', 'video_url']);
         });
     }
 };

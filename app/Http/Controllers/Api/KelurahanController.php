@@ -217,6 +217,10 @@ class KelurahanController extends Controller
     {
         $query = Galeri::latest();
 
+        if ($request->filled('tipe') && in_array($request->tipe, ['foto', 'video'])) {
+            $query->where('tipe', $request->tipe);
+        }
+
         if ($request->filled('kategori') && $request->kategori !== 'Semua') {
             $query->where('kategori', $request->kategori);
         }
@@ -242,7 +246,7 @@ class KelurahanController extends Controller
         if (! $item) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Foto galeri tidak ditemukan',
+                'message' => 'Dokumentasi galeri tidak ditemukan',
             ], 404);
         }
 

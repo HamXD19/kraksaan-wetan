@@ -11,6 +11,7 @@ use Tests\TestCase;
 class LembagaKemasyarakatanTest extends TestCase
 {
     protected User $admin;
+
     protected string $adminToken;
 
     protected function setUp(): void
@@ -23,8 +24,8 @@ class LembagaKemasyarakatanTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $this->adminToken = base64_encode($this->admin->id . '|' . Str::random(32) . '|' . time());
-        Cache::put('admin_auth_token_' . $this->adminToken, $this->admin->id, now()->addDays(7));
+        $this->adminToken = base64_encode($this->admin->id.'|'.Str::random(32).'|'.time());
+        Cache::put('admin_auth_token_'.$this->adminToken, $this->admin->id, now()->addDays(7));
     }
 
     public function test_public_can_get_active_lembaga_list(): void
@@ -47,8 +48,8 @@ class LembagaKemasyarakatanTest extends TestCase
                         'warna_tema',
                         'urutan',
                         'aktif',
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         $this->assertGreaterThanOrEqual(5, count($response->json('data')));
@@ -81,7 +82,7 @@ class LembagaKemasyarakatanTest extends TestCase
 
     public function test_admin_can_get_all_lembaga(): void
     {
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->getJson('/api/admin/lembaga');
 
         $response->assertStatus(200)
@@ -102,7 +103,7 @@ class LembagaKemasyarakatanTest extends TestCase
             'deskripsi' => 'Wadah dialog dan penguatan toleransi serta kerukunan antarumat beragama di Kraksaan Wetan.',
             'program_kerja' => [
                 'Dialog lintas pemuda dan tokoh agama rutin tiap triwulan',
-                'Bakti sosial bersama di tempat ibadah'
+                'Bakti sosial bersama di tempat ibadah',
             ],
             'jumlah_anggota' => '15 Tokoh Masyarakat',
             'warna_tema' => 'emerald',
@@ -110,7 +111,7 @@ class LembagaKemasyarakatanTest extends TestCase
             'aktif' => true,
         ];
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->postJson('/api/admin/lembaga', $payload);
 
         $response->assertStatus(201)
@@ -128,7 +129,7 @@ class LembagaKemasyarakatanTest extends TestCase
         $lembaga = Lembaga::where('singkatan', 'LPMK')->first();
         $this->assertNotNull($lembaga);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/admin/lembaga/{$lembaga->id}", [
                 'nama' => $lembaga->nama,
                 'singkatan' => 'LPMK',
@@ -159,7 +160,7 @@ class LembagaKemasyarakatanTest extends TestCase
         $lembaga = Lembaga::where('singkatan', 'TP-PKK')->first();
         $this->assertNotNull($lembaga);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->putJson("/api/admin/lembaga/{$lembaga->id}/toggle-aktif", [
                 'aktif' => false,
             ]);
@@ -186,7 +187,7 @@ class LembagaKemasyarakatanTest extends TestCase
             'aktif' => true,
         ]);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $this->adminToken)
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
             ->deleteJson("/api/admin/lembaga/{$lembaga->id}");
 
         $response->assertStatus(200)

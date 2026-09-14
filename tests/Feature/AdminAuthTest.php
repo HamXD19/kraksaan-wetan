@@ -308,6 +308,57 @@ class AdminAuthTest extends TestCase
         $public->assertStatus(200)
             ->assertJsonPath('data.hero_image', $newHeroUrl);
     }
+
+    public function test_admin_can_create_and_manage_video_galeri_and_public_api_reflects_it(): void
+    {
+        $this->getOrCreateAdmin();
+
+        $login = $this->postJson('/api/admin/login', [
+            'email' => 'admin@kraksaanwetan.go.id',
+            'password' => 'password123',
+        ]);
+        $token = $login->json('data.token');
+
+        // 1. Create a video gallery item
+        $videoPayload = [
+            'judul' => 'Video Liputan HUT RI Kelurahan Kraksaan Wetan',
+            'kategori' => 'Pemerintahan',
+            'tanggal' => '2026-08-17',
+            'deskripsi' => 'Dokumentasi video rangkaian peringatan kemerdekaan di Kraksaan Wetan.',
+            'tipe' => 'video',
+            'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/galeri', $videoPayload);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.tipe', 'video')
+            ->assertJsonPath('data.video_url', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ')
+            ->assertJsonPath('data.gambar', 'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg');
+
+        $createdId = $response->json('data.id');
+
+        // 2. Public API by type=video
+        $publicVideos = $this->getJson('/api/galeri?tipe=video');
+        $publicVideos->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        $items = collect($publicVideos->json('data'));
+        $this->assertTrue($items->contains('id', $createdId));
+
+        // 3. Public detail endpoint
+        $detail = $this->getJson("/api/galeri/{$createdId}");
+        $detail->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.tipe', 'video')
+            ->assertJsonPath('data.video_url', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+        // 4. Clean up created item
+        $delete = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->deleteJson("/api/admin/galeri/{$createdId}");
+        $delete->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+    }
 }
-
-

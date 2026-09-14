@@ -457,18 +457,46 @@ class AdminController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:50',
+            'tipe' => 'nullable|string|in:foto,video',
             'tanggal' => 'nullable|string|max:50',
-            'gambar' => 'required|string',
+            'gambar' => 'nullable|string',
+            'video_url' => 'nullable|string',
             'deskripsi' => 'nullable|string',
         ]);
 
+        $validated['tipe'] = $validated['tipe'] ?? 'foto';
         $validated['tanggal'] = $validated['tanggal'] ?? now()->translatedFormat('d F Y');
+
+        if ($validated['tipe'] === 'video') {
+            if (empty($validated['video_url'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tautan video YouTube wajib diisi untuk galeri bertipe video.',
+                ], 422);
+            }
+
+            // Jika gambar thumbnail belum diisi, otomatis ekstrak thumbnail YouTube HQ
+            if (empty($validated['gambar'])) {
+                if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/i', $validated['video_url'], $matches)) {
+                    $validated['gambar'] = "https://img.youtube.com/vi/{$matches[1]}/hqdefault.jpg";
+                } else {
+                    $validated['gambar'] = 'https://images.unsplash.com/photo-1518173946687-a4c8a383392e?auto=format&fit=crop&w=800&q=80';
+                }
+            }
+        } else {
+            if (empty($validated['gambar'])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Foto kegiatan wajib diisi untuk galeri bertipe foto.',
+                ], 422);
+            }
+        }
 
         $galeri = Galeri::create($validated);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Foto kegiatan berhasil ditambahkan ke galeri.',
+            'message' => $galeri->tipe === 'video' ? 'Video kegiatan berhasil ditambahkan ke galeri.' : 'Foto kegiatan berhasil ditambahkan ke galeri.',
             'data' => $galeri,
         ]);
     }
@@ -480,16 +508,43 @@ class AdminController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'kategori' => 'required|string|max:50',
+            'tipe' => 'nullable|string|in:foto,video',
             'tanggal' => 'nullable|string|max:50',
-            'gambar' => 'required|string',
+            'gambar' => 'nullable|string',
+            'video_url' => 'nullable|string',
             'deskripsi' => 'nullable|string',
         ]);
+
+        $validated['tipe'] = $validated['tipe'] ?? ($galeri->tipe ?? 'foto');
+
+        if ($validated['tipe'] === 'video') {
+            if (empty($validated['video_url']) && empty($galeri->video_url)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Tautan video YouTube wajib diisi untuk galeri bertipe video.',
+                ], 422);
+            }
+
+            if (empty($validated['gambar'])) {
+                $targetUrl = $validated['video_url'] ?? $galeri->video_url;
+                if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/i', $targetUrl, $matches)) {
+                    $validated['gambar'] = "https://img.youtube.com/vi/{$matches[1]}/hqdefault.jpg";
+                }
+            }
+        } else {
+            if (empty($validated['gambar']) && empty($galeri->gambar)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Foto kegiatan wajib diisi untuk galeri bertipe foto.',
+                ], 422);
+            }
+        }
 
         $galeri->update($validated);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Foto galeri berhasil diperbarui.',
+            'message' => 'Data galeri berhasil diperbarui.',
             'data' => $galeri,
         ]);
     }
@@ -501,7 +556,7 @@ class AdminController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Foto galeri berhasil dihapus.',
+            'message' => 'Item galeri berhasil dihapus.',
         ]);
     }
 
@@ -670,7 +725,6 @@ class AdminController extends Controller
             'message' => 'Lingkungan RW berhasil dihapus.',
         ]);
     }
-
 
     /* ----------------------------------------------------
      * LEMBAGA KEMASYARAKATAN (LKK) CRUD
@@ -1099,7 +1153,7 @@ class AdminController extends Controller
             'aktif' => 'nullable|boolean',
         ]);
 
-        if ($request->has('aktif') && !$request->has('is_aktif')) {
+        if ($request->has('aktif') && ! $request->has('is_aktif')) {
             $validated['is_aktif'] = $request->boolean('aktif');
         }
         unset($validated['aktif']);
@@ -1111,7 +1165,7 @@ class AdminController extends Controller
         // Check uniqueness per modul
         $exists = MasterKategori::where('modul', $validated['modul'])->where('slug', $validated['slug'])->exists();
         if ($exists) {
-            $validated['slug'] = $validated['slug'] . '-' . (MasterKategori::where('modul', $validated['modul'])->count() + 1);
+            $validated['slug'] = $validated['slug'].'-'.(MasterKategori::where('modul', $validated['modul'])->count() + 1);
         }
 
         $kategori = MasterKategori::create($validated);
@@ -1138,7 +1192,7 @@ class AdminController extends Controller
             'aktif' => 'nullable|boolean',
         ]);
 
-        if ($request->has('aktif') && !$request->has('is_aktif')) {
+        if ($request->has('aktif') && ! $request->has('is_aktif')) {
             $validated['is_aktif'] = $request->boolean('aktif');
         }
         unset($validated['aktif']);
@@ -1152,7 +1206,7 @@ class AdminController extends Controller
             ->where('id', '!=', $id)
             ->exists();
         if ($exists) {
-            $validated['slug'] = $validated['slug'] . '-' . time();
+            $validated['slug'] = $validated['slug'].'-'.time();
         }
 
         $kategori->update($validated);

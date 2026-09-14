@@ -25,7 +25,7 @@ class LembagaSeeder extends Seeder
                     'Penyusunan usulan Musrenbang Kelurahan partisipatif tahunan',
                     'Monitoring dan evaluasi program pembangunan infrastruktur lingkungan',
                     'Fasilitasi kemitraan UMKM warga dengan dinas terkait dan sektor swasta',
-                    'Penguatan ketahanan sosial dan gotong royong antar RW/RT'
+                    'Penguatan ketahanan sosial dan gotong royong antar RW/RT',
                 ],
                 'jumlah_anggota' => '24 Pengurus & Koordinator Wilayah',
                 'warna_tema' => 'amber',
@@ -44,7 +44,7 @@ class LembagaSeeder extends Seeder
                     'Pembinaan 10 Program Pokok PKK tingkat RW dan RT se-Kraksaan Wetan',
                     'Gerakan Cegah Stunting bersama Posyandu dan Puskesmas Kraksaan',
                     'Pelatihan kewirausahaan boga, kriya, dan ekonomi digital ibu rumah tangga',
-                    'Sosialisasi pola asuh anak remaja dan penguatan ketahanan pangan pekarangan (HATINYA PKK)'
+                    'Sosialisasi pola asuh anak remaja dan penguatan ketahanan pangan pekarangan (HATINYA PKK)',
                 ],
                 'jumlah_anggota' => '42 Kader PKK & Dasa Wisma',
                 'warna_tema' => 'rose',
@@ -63,7 +63,7 @@ class LembagaSeeder extends Seeder
                     'Penyelenggaraan turnamen olahraga antar lingkungan & peringatan HUT RI',
                     'Pelatihan literasi digital, desain grafis, dan UMKM pemuda kreatif',
                     'Aksi tanggap bencana, donor darah berkala, dan kerja bakti kebersihan sungai',
-                    'Pengembangan sanggar seni budaya lokal khas Probolinggo'
+                    'Pengembangan sanggar seni budaya lokal khas Probolinggo',
                 ],
                 'jumlah_anggota' => '38 Pengurus & Relawan Pemuda',
                 'warna_tema' => 'blue',
@@ -82,7 +82,7 @@ class LembagaSeeder extends Seeder
                     'Patroli lingkungan malam terpadu bersama Babinsa dan Bhabinkamtibmas',
                     'Pengamanan kegiatan keagamaan, perayaan hari besar nasional, dan pemilu',
                     'Pikad Pos Kamling dan sosialisasi ronda malam di seluruh RT/RW',
-                    'Kesiapsiagaan penanganan pohon tumbang, genangan air, dan evakuasi bencana'
+                    'Kesiapsiagaan penanganan pohon tumbang, genangan air, dan evakuasi bencana',
                 ],
                 'jumlah_anggota' => '28 Anggota Satlinmas Terlatih',
                 'warna_tema' => 'emerald',
@@ -101,7 +101,7 @@ class LembagaSeeder extends Seeder
                     'Pelayanan rutin posyandu balita (penimbangan, ukur tinggi badan, vitamin A)',
                     'Pemberian Makanan Tambahan (PMT) bergizi berbahan pangan lokal',
                     'Posyandu Lansia untuk pemeriksaan tensi, gula darah, dan senam sehat',
-                    'Penyuluhan pola hidup bersih dan sehat (PHBS) serta sanitasi lingkungan'
+                    'Penyuluhan pola hidup bersih dan sehat (PHBS) serta sanitasi lingkungan',
                 ],
                 'jumlah_anggota' => '35 Kader Kesehatan Lingkungan',
                 'warna_tema' => 'indigo',

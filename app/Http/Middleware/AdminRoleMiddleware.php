@@ -13,7 +13,6 @@ class AdminRoleMiddleware
      * Handle an incoming request.
      *
      * @param  Closure(Request): (Response)  $next
-     * @param  string  ...$roles
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
@@ -38,7 +37,7 @@ class AdminRoleMiddleware
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Akses ditolak. Peran Anda (' . ($user->role_label ?? $user->role) . ') tidak memiliki izin untuk mengakses modul ini. Fitur ini hanya dapat diakses oleh: ' . implode(', ', $allowedLabels) . '.',
+                'message' => 'Akses ditolak. Peran Anda ('.($user->role_label ?? $user->role).') tidak memiliki izin untuk mengakses modul ini. Fitur ini hanya dapat diakses oleh: '.implode(', ', $allowedLabels).'.',
             ], 403);
         }
 

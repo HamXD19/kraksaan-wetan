@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 return new class extends Migration
@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('master_kategoris')) {
+        if (! Schema::hasTable('master_kategoris')) {
             Schema::create('master_kategoris', function (Blueprint $table) {
                 $table->id();
                 $table->string('modul'); // berita, pengumuman, layanan, galeri, lembaga, transparansi
@@ -76,7 +76,7 @@ return new class extends Migration
         foreach ($initialData as $item) {
             $modul = $item['modul'];
             $urutanPerModul[$modul] = ($urutanPerModul[$modul] ?? 0) + 1;
-            
+
             DB::table('master_kategoris')->updateOrInsert(
                 [
                     'modul' => $modul,

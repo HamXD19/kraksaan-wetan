@@ -7,7 +7,7 @@
         <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Dokumentasi Visual</span>
         <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Galeri Kegiatan Kelurahan</h1>
         <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl">
-          Dokumentasi foto dan rekam jejak program kerja pemerintah, pelayanan masyarakat, dan kegiatan sosial warga Kraksaan Wetan.
+          Dokumentasi foto dan video rekam jejak program kerja pemerintah, pelayanan masyarakat, dan kegiatan sosial warga Kraksaan Wetan.
         </p>
       </div>
     </section>
