@@ -39,7 +39,7 @@
     <!-- Main Header Brand & Identity -->
     <div class="bg-white border-b border-slate-200 py-3.5 px-4">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <router-link to="/" class="flex items-center gap-3.5 group">
+        <router-link to="/" data-speech="Kelurahan Kraksaan Wetan" class="flex items-center gap-3.5 group">
           <!-- Official Probolinggo Crest Badge / Custom Logo -->
           <div class="w-12 h-14 md:w-14 md:h-16 flex-shrink-0 flex items-center justify-center">
             <img 
@@ -63,11 +63,11 @@
         </router-link>
 
         <div class="hidden lg:flex items-center gap-3">
-          <router-link to="/pelayanan" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition shadow-xs">
+          <router-link to="/pelayanan" data-speech="Panduan Layanan" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-semibold hover:bg-emerald-100 transition shadow-xs">
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             Panduan Layanan
           </router-link>
-          <router-link to="/kontak" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition shadow-sm hover:shadow">
+          <router-link to="/kontak" data-speech="Aspirasi Warga" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition shadow-sm hover:shadow">
             <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             Aspirasi Warga
           </router-link>
@@ -76,6 +76,7 @@
         <!-- Mobile Menu Toggle Button -->
         <button 
           @click="isMobileMenuOpen = !isMobileMenuOpen"
+          data-speech="Buka Menu"
           class="lg:hidden p-2 rounded-lg text-slate-600 hover:text-emerald-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-600"
           aria-label="Buka menu navigasi"
         >
@@ -100,6 +101,7 @@
           <li>
             <router-link 
               to="/" 
+              data-speech="Beranda"
               class="px-3.5 py-3 inline-block transition-colors border-b-2 hover:bg-emerald-700/60"
               :class="$route.path === '/' ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
@@ -110,7 +112,8 @@
           <!-- PROFIL (Dropdown) -->
           <li class="relative group" @mouseenter="activeDropdown = 'profil'" @mouseleave="activeDropdown = null">
             <button 
-              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60"
+              data-speech="Profil"
+              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60 cursor-pointer"
               :class="$route.path.startsWith('/profil') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
               PROFIL
@@ -121,12 +124,12 @@
               class="absolute left-0 top-full pt-1 w-64 transition-all z-50"
             >
               <div class="bg-white text-slate-800 shadow-2xl rounded-2xl border border-slate-200/80 p-1.5 space-y-0.5">
-                <router-link to="/profil" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Tentang Kelurahan</router-link>
-                <router-link to="/profil/sejarah" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Sejarah Kelurahan</router-link>
-                <router-link to="/profil/visi-misi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Visi dan Misi</router-link>
-                <router-link to="/profil/struktur-organisasi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Struktur Organisasi</router-link>
-                <router-link to="/pemerintahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Profil Lurah & Perangkat</router-link>
-                <router-link to="/informasi-publik" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Wilayah</router-link>
+                <router-link to="/profil" data-speech="Tentang Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Tentang Kelurahan</router-link>
+                <router-link to="/profil/sejarah" data-speech="Sejarah Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Sejarah Kelurahan</router-link>
+                <router-link to="/profil/visi-misi" data-speech="Visi dan Misi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Visi dan Misi</router-link>
+                <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Struktur Organisasi</router-link>
+                <router-link to="/pemerintahan" data-speech="Profil Lurah dan Perangkat" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Profil Lurah & Perangkat</router-link>
+                <router-link to="/informasi-publik" data-speech="Data Wilayah" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Wilayah</router-link>
               </div>
             </div>
           </li>
@@ -134,7 +137,8 @@
           <!-- PEMERINTAHAN (Dropdown) -->
           <li class="relative group" @mouseenter="activeDropdown = 'pemerintahan'" @mouseleave="activeDropdown = null">
             <button 
-              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60"
+              data-speech="Pemerintahan"
+              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60 cursor-pointer"
               :class="$route.path.startsWith('/pemerintahan') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
               PEMERINTAHAN
@@ -145,11 +149,11 @@
               class="absolute left-0 top-full pt-1 w-64 transition-all z-50"
             >
               <div class="bg-white text-slate-800 shadow-2xl rounded-2xl border border-slate-200/80 p-1.5 space-y-0.5">
-                <router-link to="/pemerintahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Pemerintahan Kelurahan</router-link>
-                <router-link to="/profil/struktur-organisasi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Struktur Organisasi</router-link>
-                <router-link to="/pemerintahan#perangkat" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Perangkat Kelurahan</router-link>
-                <router-link to="/pemerintahan#rtrw" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Rukun Tetangga & RW (RT/RW)</router-link>
-                <router-link to="/lembaga" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Lembaga Kemasyarakatan (LKK)</router-link>
+                <router-link to="/pemerintahan" data-speech="Pemerintahan Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Pemerintahan Kelurahan</router-link>
+                <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Struktur Organisasi</router-link>
+                <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Perangkat Kelurahan</router-link>
+                <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Rukun Tetangga & RW (RT/RW)</router-link>
+                <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Lembaga Kemasyarakatan (LKK)</router-link>
               </div>
             </div>
           </li>
@@ -157,7 +161,8 @@
           <!-- INFORMASI PUBLIK (Dropdown) -->
           <li class="relative group" @mouseenter="activeDropdown = 'informasi'" @mouseleave="activeDropdown = null">
             <button 
-              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60"
+              data-speech="Informasi Publik"
+              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60 cursor-pointer"
               :class="$route.path.startsWith('/informasi-publik') || $route.path.startsWith('/transparansi') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
               INFORMASI PUBLIK
@@ -168,11 +173,11 @@
               class="absolute left-0 top-full pt-1 w-64 transition-all z-50"
             >
               <div class="bg-white text-slate-800 shadow-2xl rounded-2xl border border-slate-200/80 p-1.5 space-y-0.5">
-                <router-link to="/informasi-publik" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Kependudukan</router-link>
-                <router-link to="/informasi-publik#wilayah" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Wilayah & Lingkungan</router-link>
-                <router-link to="/informasi-publik#statistik" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Statistik Kelurahan</router-link>
-                <router-link to="/pelayanan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Informasi Pelayanan</router-link>
-                <router-link to="/transparansi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Transparansi & Akuntabilitas</router-link>
+                <router-link to="/informasi-publik" data-speech="Data Kependudukan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Kependudukan</router-link>
+                <router-link to="/informasi-publik#wilayah" data-speech="Data Wilayah dan Lingkungan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Wilayah & Lingkungan</router-link>
+                <router-link to="/informasi-publik#statistik" data-speech="Data Statistik Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Statistik Kelurahan</router-link>
+                <router-link to="/pelayanan" data-speech="Informasi Pelayanan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Informasi Pelayanan</router-link>
+                <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Transparansi & Akuntabilitas</router-link>
               </div>
             </div>
           </li>
@@ -181,6 +186,7 @@
           <li>
             <router-link 
               to="/berita" 
+              data-speech="Berita dan Pengumuman"
               class="px-3.5 py-3 inline-block transition-colors border-b-2 hover:bg-emerald-700/60"
               :class="$route.path.startsWith('/berita') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
@@ -188,23 +194,25 @@
             </router-link>
           </li>
 
-         <!-- GALERI -->
-<li>
-  <router-link 
-    to="/galeri"
-    class="px-3.5 py-3 inline-flex items-center transition-colors border-b-2"
-    :class="$route.path.startsWith('/galeri') 
-      ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' 
-      : 'border-transparent text-white/95 hover:text-white hover:bg-emerald-700/60'"
-  >
-    GALERI
-  </router-link>
-</li>
+          <!-- GALERI -->
+          <li>
+            <router-link 
+              to="/galeri"
+              data-speech="Galeri Dokumentasi"
+              class="px-3.5 py-3 inline-flex items-center transition-colors border-b-2"
+              :class="$route.path.startsWith('/galeri') 
+                ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' 
+                : 'border-transparent text-white/95 hover:text-white hover:bg-emerald-700/60'"
+            >
+              GALERI
+            </router-link>
+          </li>
 
           <!-- PELAYANAN -->
           <li>
             <router-link 
               to="/pelayanan" 
+              data-speech="Pelayanan Warga"
               class="px-3.5 py-3 inline-block transition-colors border-b-2 hover:bg-emerald-700/60"
               :class="$route.path === '/pelayanan' ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
@@ -216,6 +224,7 @@
           <li>
             <router-link 
               to="/kontak" 
+              data-speech="Kontak dan Pengaduan"
               class="px-3.5 py-3 inline-block transition-colors border-b-2 hover:bg-emerald-700/60"
               :class="$route.path === '/kontak' ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
@@ -239,6 +248,7 @@
             <!-- LOGIN / ADMIN MENU -->
             <router-link 
               :to="isLoggedIn ? '/admin' : '/admin/login'" 
+              data-speech="Login Admin"
               class="px-3.5 py-1.5 rounded-lg font-bold text-xs inline-flex items-center gap-1.5 transition shadow-sm hover:shadow"
               :class="isLoggedIn ? 'bg-emerald-700 hover:bg-emerald-600 text-amber-300 border border-emerald-600' : 'bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold'"
             >
@@ -291,6 +301,7 @@
         <div class="p-4 space-y-1 text-sm font-medium text-slate-700">
           <router-link 
             to="/" 
+            data-speech="Beranda"
             @click="isMobileMenuOpen = false"
             class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 font-semibold"
           >
@@ -301,16 +312,17 @@
           <div>
             <button 
               @click="toggleMobileSubmenu('profil')" 
-              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              data-speech="Menu Profil"
+              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
             >
               <span>Profil</span>
               <svg :class="{ 'rotate-180': mobileSubmenus.profil }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div v-show="mobileSubmenus.profil" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-              <router-link to="/profil" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Tentang Kelurahan</router-link>
-              <router-link to="/profil/sejarah" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Sejarah Kelurahan</router-link>
-              <router-link to="/profil/visi-misi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Visi dan Misi</router-link>
-              <router-link to="/profil/struktur-organisasi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Struktur Organisasi</router-link>
+              <router-link to="/profil" data-speech="Tentang Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Tentang Kelurahan</router-link>
+              <router-link to="/profil/sejarah" data-speech="Sejarah Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Sejarah Kelurahan</router-link>
+              <router-link to="/profil/visi-misi" data-speech="Visi dan Misi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Visi dan Misi</router-link>
+              <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Struktur Organisasi</router-link>
             </div>
           </div>
 
@@ -318,16 +330,17 @@
           <div>
             <button 
               @click="toggleMobileSubmenu('pemerintahan')" 
-              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              data-speech="Menu Pemerintahan"
+              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
             >
               <span>Pemerintahan</span>
               <svg :class="{ 'rotate-180': mobileSubmenus.pemerintahan }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div v-show="mobileSubmenus.pemerintahan" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-              <router-link to="/pemerintahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Pemerintahan Kelurahan</router-link>
-              <router-link to="/pemerintahan#perangkat" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Perangkat Kelurahan</router-link>
-              <router-link to="/pemerintahan#rtrw" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">RT / RW</router-link>
-              <router-link to="/lembaga" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Lembaga Kemasyarakatan</router-link>
+              <router-link to="/pemerintahan" data-speech="Pemerintahan Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Pemerintahan Kelurahan</router-link>
+              <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Perangkat Kelurahan</router-link>
+              <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">RT / RW</router-link>
+              <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Lembaga Kemasyarakatan</router-link>
             </div>
           </div>
 
@@ -335,21 +348,23 @@
           <div>
             <button 
               @click="toggleMobileSubmenu('informasi')" 
-              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              data-speech="Menu Informasi Publik"
+              class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
             >
               <span>Informasi Publik</span>
               <svg :class="{ 'rotate-180': mobileSubmenus.informasi }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
             <div v-show="mobileSubmenus.informasi" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-              <router-link to="/informasi-publik" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Kependudukan</router-link>
-              <router-link to="/informasi-publik#wilayah" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Wilayah</router-link>
-              <router-link to="/informasi-publik#statistik" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Statistik</router-link>
-              <router-link to="/transparansi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Transparansi & Akuntabilitas</router-link>
+              <router-link to="/informasi-publik" data-speech="Data Kependudukan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Kependudukan</router-link>
+              <router-link to="/informasi-publik#wilayah" data-speech="Data Wilayah dan Lingkungan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Wilayah</router-link>
+              <router-link to="/informasi-publik#statistik" data-speech="Data Statistik Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data Statistik</router-link>
+              <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Transparansi & Akuntabilitas</router-link>
             </div>
           </div>
 
           <router-link 
             to="/berita" 
+            data-speech="Berita dan Pengumuman"
             @click="isMobileMenuOpen = false"
             class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
           >
@@ -358,6 +373,7 @@
 
           <router-link 
             to="/galeri" 
+            data-speech="Galeri Dokumentasi"
             @click="isMobileMenuOpen = false"
             class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
           >
@@ -366,6 +382,7 @@
 
           <router-link 
             to="/pelayanan" 
+            data-speech="Pelayanan Masyarakat"
             @click="isMobileMenuOpen = false"
             class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
           >
@@ -374,6 +391,7 @@
 
           <router-link 
             to="/kontak" 
+            data-speech="Kontak dan Pengaduan"
             @click="isMobileMenuOpen = false"
             class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
           >
@@ -384,6 +402,7 @@
           <div class="pt-2 border-t border-slate-100 mt-2">
             <router-link 
               :to="isLoggedIn ? '/admin' : '/admin/login'" 
+              data-speech="Login Administrator"
               @click="isMobileMenuOpen = false"
               class="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold transition"
               :class="isLoggedIn ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-950 border border-amber-200'"
