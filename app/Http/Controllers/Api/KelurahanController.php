@@ -17,6 +17,7 @@ use App\Models\Statistik;
 use App\Models\TransparansiAnggaran;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class KelurahanController extends Controller
 {
@@ -394,5 +395,51 @@ class KelurahanController extends Controller
                 'kegiatan' => $items,
             ],
         ]);
+    }
+
+    /**
+     * Endpoint Audio Text-to-Speech (TTS) Bahasa Indonesia
+     * Menghasilkan audio ucapan alami dengan disk caching server-side
+     */
+    public function getTtsAudio(Request $request)
+    {
+        $text = trim((string) $request->query('text', ''));
+        if (empty($text) || mb_strlen($text) > 120) {
+            return response()->noContent();
+        }
+
+        $hash = md5(mb_strtolower($text));
+        $cacheDir = storage_path('app/tts');
+        if (! is_dir($cacheDir)) {
+            @mkdir($cacheDir, 0755, true);
+        }
+        $cacheFile = $cacheDir.'/'.$hash.'.mp3';
+
+        if (file_exists($cacheFile) && filesize($cacheFile) > 300) {
+            return response()->file($cacheFile, [
+                'Content-Type' => 'audio/mpeg',
+                'Cache-Control' => 'public, max-age=31536000',
+            ]);
+        }
+
+        try {
+            $url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=id&q='.urlencode($text);
+            $response = Http::withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            ])->timeout(5)->get($url);
+
+            if ($response->successful() && strlen($response->body()) > 300) {
+                file_put_contents($cacheFile, $response->body());
+
+                return response()->file($cacheFile, [
+                    'Content-Type' => 'audio/mpeg',
+                    'Cache-Control' => 'public, max-age=31536000',
+                ]);
+            }
+        } catch (\Throwable $e) {
+            // fallback gracefully
+        }
+
+        return response()->noContent();
     }
 }

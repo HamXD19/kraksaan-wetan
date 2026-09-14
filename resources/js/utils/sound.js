@@ -8,9 +8,7 @@ export const isSoundEnabled = ref(
 );
 
 let audioCtx = null;
-let cachedVoice = null;
-// CRITICAL: Chromium V8 Garbage Collection bug workaround
-// Keeps a global reference so Chrome doesn't garbage collect the utterance before it speaks
+let currentAudio = null;
 let activeUtterance = null;
 
 /**
@@ -33,8 +31,7 @@ export const getAudioContext = () => {
 };
 
 /**
- * Play a clear, crisp, modern UI chime tone
- * Guarantees immediate audible feedback on all devices & browsers
+ * Subtle tactile soft-click feedback (subtle and non-intrusive)
  */
 export const playChime = () => {
   if (!isSoundEnabled.value) return;
@@ -43,65 +40,26 @@ export const playChime = () => {
     if (!ctx) return;
 
     const now = ctx.currentTime;
-    // Pleasant 2-tone melodic soft chime (E5 -> A5)
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(659.25, now); // E5
-    osc.frequency.exponentialRampToValueAtTime(880.0, now + 0.08); // A5
+    osc.frequency.setValueAtTime(650, now);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.04);
 
-    gain.gain.setValueAtTime(0.001, now);
-    gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(0.08, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
     osc.start(now);
-    osc.stop(now + 0.17);
+    osc.stop(now + 0.045);
   } catch (e) {}
 };
 
-// Aliases for compatibility
 export const playClick = playChime;
-
-/**
- * Load available voices reliably from browser
- */
-const getIndonesianVoice = () => {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-  if (cachedVoice) return cachedVoice;
-
-  try {
-    const voices = window.speechSynthesis.getVoices() || [];
-    if (!voices.length) return null;
-
-    // 1. Search for Indonesian voice (id-ID, id_ID, or containing "indonesia")
-    cachedVoice = voices.find(v => 
-      v.lang === 'id-ID' || 
-      v.lang === 'id_ID' || 
-      (typeof v.lang === 'string' && v.lang.toLowerCase().startsWith('id')) || 
-      /indonesia/i.test(v.name)
-    ) || null;
-
-    // 2. If no Indonesian voice installed on OS, fallback to default or first voice
-    if (!cachedVoice) {
-      cachedVoice = voices.find(v => v.default) || voices[0] || null;
-    }
-  } catch (e) {}
-
-  return cachedVoice;
-};
-
-// Listen for browser voice population
-if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = () => {
-    cachedVoice = null;
-    getIndonesianVoice();
-  };
-  getIndonesianVoice();
-}
 
 /**
  * Clean text for natural Indonesian speech pronunciation
@@ -110,10 +68,8 @@ export const cleanSpeechText = (rawText) => {
   if (!rawText) return '';
   let text = String(rawText).trim();
 
-  // Remove count badges like (3), numbers at end
   text = text.replace(/\(\d+\)/g, '').trim();
 
-  // Replace common symbols with Indonesian words
   text = text.replace(/&/g, ' dan ')
              .replace(/\+/g, ' dan ')
              .replace(/\//g, ' atau ')
@@ -121,7 +77,6 @@ export const cleanSpeechText = (rawText) => {
              .replace(/\s+/g, ' ')
              .trim();
 
-  // Common Kelurahan acronyms expanded for natural reading
   text = text.replace(/\bRT\b/gi, 'R T')
              .replace(/\bRW\b/gi, 'R W')
              .replace(/\bLKK\b/gi, 'Lembaga Kemasyarakatan')
@@ -134,7 +89,6 @@ export const cleanSpeechText = (rawText) => {
              .replace(/\bSPPT\b/gi, 'S P P T')
              .replace(/\bPBB\b/gi, 'P B B');
 
-  // If text is ALL CAPS, convert to Title Case for natural pronunciation
   if (text.length > 2 && text === text.toUpperCase() && /[A-Z]/.test(text)) {
     text = text.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
   }
@@ -143,69 +97,98 @@ export const cleanSpeechText = (rawText) => {
 };
 
 /**
- * Text-to-Speech: Voice narration that reads the clicked menu text
+ * Fallback Web Speech API when network audio is unavailable
+ */
+const fallbackSpeechSynthesis = (cleanText) => {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+  try {
+    const synth = window.speechSynthesis;
+    if (synth.paused) synth.resume();
+    if (synth.speaking || synth.pending) synth.cancel();
+
+    setTimeout(() => {
+      try {
+        if (synth.paused) synth.resume();
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.rate = 1.0;
+        utterance.volume = 1.0;
+        utterance.lang = 'id-ID';
+
+        const voices = synth.getVoices() || [];
+        const voice = voices.find(v => 
+          v.lang === 'id-ID' || 
+          v.lang === 'id_ID' || 
+          (typeof v.lang === 'string' && v.lang.toLowerCase().startsWith('id')) || 
+          /indonesia/i.test(v.name)
+        ) || voices.find(v => v.default) || voices[0];
+
+        if (voice) {
+          utterance.voice = voice;
+        }
+
+        activeUtterance = utterance;
+        window._currentSpeechUtterance = utterance;
+
+        utterance.onend = () => { activeUtterance = null; };
+        utterance.onerror = () => { activeUtterance = null; };
+
+        synth.speak(utterance);
+      } catch (err) {}
+    }, 25);
+  } catch (e) {}
+};
+
+/**
+ * Text-to-Speech: Voice narration that reads the clicked menu text in Indonesian
+ * Uses server-cached natural human Indonesian audio MP3 with zero latency
  */
 export const speakText = (text) => {
   if (!isSoundEnabled.value) return;
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
   if (!text || typeof text !== 'string') return;
 
   const clean = cleanSpeechText(text);
   if (!clean) return;
 
+  // 1. Immediately cancel previous audio and speech synthesis
+  if (currentAudio) {
+    try {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    } catch (e) {}
+    currentAudio = null;
+  }
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+  }
+
+  // 2. Play natural Indonesian voice from server-cached MP3 endpoint
   try {
-    const synth = window.speechSynthesis;
+    const audioUrl = `/api/tts?text=${encodeURIComponent(clean)}`;
+    const audio = new Audio(audioUrl);
+    audio.volume = 1.0;
+    currentAudio = audio;
 
-    // Wake up synth if paused (common Chrome bug)
-    if (synth.paused) {
-      synth.resume();
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        fallbackSpeechSynthesis(clean);
+      });
     }
 
-    // Cancel ongoing speech so new click speaks immediately
-    if (synth.speaking || synth.pending) {
-      synth.cancel();
-    }
+    audio.onended = () => {
+      if (currentAudio === audio) {
+        currentAudio = null;
+      }
+    };
 
-    // Chrome bug fix: cancel() is async. Calling speak() in the exact same event loop frame
-    // causes the new utterance to be cancelled by the pending cancel command!
-    // A 35ms setTimeout prevents this race condition completely.
-    setTimeout(() => {
-      try {
-        if (synth.paused) {
-          synth.resume();
-        }
-
-        const utterance = new SpeechSynthesisUtterance(clean);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-
-        const voice = getIndonesianVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = voice.lang || 'id-ID';
-        } else {
-          utterance.lang = 'id-ID';
-        }
-
-        // Keep persistent reference to avoid Chromium V8 GC bug
-        activeUtterance = utterance;
-        window._currentSpeechUtterance = utterance;
-
-        utterance.onend = () => {
-          activeUtterance = null;
-          window._currentSpeechUtterance = null;
-        };
-
-        utterance.onerror = () => {
-          activeUtterance = null;
-          window._currentSpeechUtterance = null;
-        };
-
-        synth.speak(utterance);
-      } catch (err) {}
-    }, 35);
-  } catch (e) {}
+    audio.onerror = () => {
+      fallbackSpeechSynthesis(clean);
+    };
+  } catch (e) {
+    fallbackSpeechSynthesis(clean);
+  }
 };
 
 /**
@@ -221,6 +204,13 @@ export const toggleSound = () => {
     playChime();
     speakText('Suara navigasi aktif');
   } else {
+    if (currentAudio) {
+      try {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      } catch (e) {}
+      currentAudio = null;
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
@@ -287,10 +277,10 @@ export const setupSoundInteractions = () => {
       // Resume AudioContext on valid user gesture
       getAudioContext();
 
-      // 1. Play audible modern chime
+      // 1. Play subtle click pop
       playChime();
 
-      // 2. Read menu text aloud via SpeechSynthesis
+      // 2. Read menu text aloud with natural Indonesian voice
       const speechText = getSpeechText(interactiveEl);
       if (speechText) {
         speakText(speechText);
@@ -301,10 +291,9 @@ export const setupSoundInteractions = () => {
   // 'click' in capture phase ensures standard user gesture activation in all modern browsers
   document.addEventListener('click', handleInteraction, true);
 
-  // Pre-warm audio and voice engine on first pointer down / touch
+  // Pre-warm audio engine on first touch or pointer down
   const unlockAudio = () => {
     getAudioContext();
-    getIndonesianVoice();
     window.removeEventListener('pointerdown', unlockAudio);
     window.removeEventListener('touchstart', unlockAudio);
   };

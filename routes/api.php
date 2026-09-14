@@ -30,6 +30,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
     Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
     Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
+    Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 });
 
 Route::get('/profil', [KelurahanController::class, 'getProfil']);
@@ -49,6 +50,7 @@ Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
 Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
 Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
 Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
+Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 
 // Admin CMS Endpoints
 Route::prefix('admin')->group(function () {
