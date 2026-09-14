@@ -3,8 +3,8 @@
     <!-- Header Section -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
       <div>
-        <h2 class="text-xl font-bold text-slate-900">Kelola Galeri Foto & Video</h2>
-        <p class="text-xs text-slate-500">Unggah dokumentasi foto dan sematkan video YouTube kegiatan pemerintahan serta masyarakat Kraksaan Wetan.</p>
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">Kelola Galeri & Dokumentasi</h1>
+        <p class="text-xs text-slate-500">Unggah dokumentasi foto dan sematkan video dokumentasi kegiatan pemerintahan serta masyarakat Kraksaan Wetan.</p>
       </div>
 
       <button 
@@ -51,7 +51,7 @@
           : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'"
       >
         <svg class="w-3.5 h-3.5" :class="adminFilter === 'video' ? 'text-white' : 'text-rose-500'" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        <span>Video YouTube ({{ galeriList.filter(g => g.tipe === 'video').length }})</span>
+        <span>Video Dokumentasi ({{ galeriList.filter(g => g.tipe === 'video').length }})</span>
       </button>
     </div>
 
@@ -70,13 +70,13 @@
               {{ g.kategori }}
             </span>
 
-            <!-- YouTube Video Badge -->
+            <!-- Video Dokumentasi Badge -->
             <span 
               v-if="g.tipe === 'video'" 
               class="absolute top-2 right-2 px-2 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold uppercase flex items-center gap-1 shadow-xs"
             >
               <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-              <span>YouTube</span>
+              <span>Video</span>
             </span>
 
             <!-- Center Play Icon Overlay -->
@@ -94,7 +94,7 @@
               <span>{{ g.tanggal }}</span>
               <span>&bull;</span>
               <span class="font-semibold" :class="g.tipe === 'video' ? 'text-rose-600' : 'text-emerald-700'">
-                {{ g.tipe === 'video' ? 'Video YouTube' : 'Foto Kegiatan' }}
+                {{ g.tipe === 'video' ? 'Video Dokumentasi' : 'Foto Kegiatan' }}
               </span>
             </div>
             <h4 class="font-bold text-slate-900 text-sm mb-1 group-hover:text-emerald-700 transition-colors">{{ g.judul }}</h4>
@@ -151,7 +151,7 @@
         </div>
 
         <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
-          <!-- Type Selector: Foto vs Video YouTube -->
+          <!-- Type Selector: Foto vs Video Dokumentasi -->
           <div>
             <label class="block font-bold text-slate-700 mb-1.5">Tipe Dokumentasi *</label>
             <div class="grid grid-cols-2 gap-3">
@@ -176,7 +176,7 @@
                   : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
               >
                 <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                <span>Video YouTube</span>
+                <span>Video Dokumentasi</span>
               </button>
             </div>
           </div>
@@ -184,7 +184,7 @@
           <!-- Judul Input -->
           <div>
             <label class="block font-bold text-slate-700 mb-1">
-              {{ form.tipe === 'video' ? 'Judul Video Kegiatan *' : 'Judul Foto Kegiatan *' }}
+              {{ form.tipe === 'video' ? 'Judul Video Dokumentasi *' : 'Judul Foto Kegiatan *' }}
             </label>
             <input 
               type="text" 
@@ -223,12 +223,12 @@
             </div>
           </div>
 
-          <!-- Section Khusus Video YouTube -->
+          <!-- Section Khusus Video Dokumentasi -->
           <div v-if="form.tipe === 'video'" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-3">
             <div>
               <label class="block font-bold text-rose-950 mb-1 flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                <span>Tautan / URL Video YouTube *</span>
+                <span>Tautan / URL Video Dokumentasi *</span>
               </label>
               <input 
                 type="url" 
@@ -238,15 +238,15 @@
                 class="w-full px-3.5 py-2 rounded-xl border border-rose-200 bg-white focus:ring-2 focus:ring-rose-500 outline-none text-xs"
               />
               <p class="text-[11px] text-rose-700/90 mt-1">
-                Salin tautan langsung video dari browser atau tombol Bagikan di YouTube.
+                Salin tautan video dari YouTube untuk ditampilkan sebagai video dokumentasi.
               </p>
             </div>
 
-            <!-- Live YouTube Preview -->
+            <!-- Live Video Preview -->
             <div v-if="youtubeId" class="space-y-2 pt-1">
               <div class="flex items-center justify-between text-[11px]">
                 <span class="font-bold text-emerald-700 flex items-center gap-1">
-                  ✓ ID YouTube: <code class="bg-white px-1.5 py-0.5 rounded border border-emerald-300 font-mono">{{ youtubeId }}</code>
+                  ✓ Video Terdeteksi: <code class="bg-white px-1.5 py-0.5 rounded border border-emerald-300 font-mono">{{ youtubeId }}</code>
                 </span>
                 <span class="text-slate-500">Pratinjau Video:</span>
               </div>
@@ -270,7 +270,7 @@
                 <input 
                   type="text" 
                   v-model="form.gambar" 
-                  placeholder="Kosongkan untuk memakai thumbnail resmi YouTube" 
+                  placeholder="Kosongkan untuk memakai thumbnail otomatis" 
                   class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-600"
                 />
                 <label class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl cursor-pointer text-xs flex items-center gap-1 border border-slate-200">
@@ -279,7 +279,7 @@
                 </label>
               </div>
               <p class="text-[10px] text-slate-500 mt-1">
-                * Jika dikosongkan, sistem secara otomatis memasang thumbnail resmi dari YouTube.
+                * Jika dikosongkan, sistem secara otomatis memasang thumbnail resmi dari video.
               </p>
             </div>
           </div>
@@ -474,7 +474,7 @@ const openModal = (item = null) => {
 
 const saveItem = async () => {
   if (form.tipe === 'video' && !form.video_url) {
-    alert('Harap masukkan tautan video YouTube!');
+    alert('Harap masukkan tautan video dokumentasi!');
     return;
   }
   if (form.tipe === 'foto' && !form.gambar) {

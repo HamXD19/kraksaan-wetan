@@ -40,7 +40,7 @@
               : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
           >
             <svg class="w-3.5 h-3.5 text-rose-500" :class="selectedType === 'video' ? 'text-white' : ''" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-            <span>Video YouTube</span>
+            <span>Video Dokumentasi</span>
             <span class="text-[10px] px-1.5 py-0.5 rounded-full" :class="selectedType === 'video' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'">{{ videoCount }}</span>
           </button>
         </div>
@@ -109,7 +109,7 @@
           <p class="text-[11px] text-emerald-300 font-medium mb-1 flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full" :class="item.tipe === 'video' ? 'bg-rose-400' : 'bg-emerald-400'"></span>
             <span>{{ item.tanggal }}</span>
-            <span v-if="item.tipe === 'video'" class="text-[10px] text-rose-300 font-bold ml-1">• Video YT</span>
+            <span v-if="item.tipe === 'video'" class="text-[10px] text-rose-300 font-bold ml-1">• Video Dokumentasi</span>
           </p>
           <h4 class="text-sm sm:text-base font-bold leading-snug group-hover:text-amber-300 transition-colors duration-200">
             {{ item.judul }}

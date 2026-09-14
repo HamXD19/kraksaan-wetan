@@ -471,7 +471,7 @@ class AdminController extends Controller
             if (empty($validated['video_url'])) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Tautan video YouTube wajib diisi untuk galeri bertipe video.',
+                    'message' => 'Tautan video dokumentasi wajib diisi untuk galeri bertipe video.',
                 ], 422);
             }
 
@@ -496,7 +496,7 @@ class AdminController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => $galeri->tipe === 'video' ? 'Video kegiatan berhasil ditambahkan ke galeri.' : 'Foto kegiatan berhasil ditambahkan ke galeri.',
+            'message' => $galeri->tipe === 'video' ? 'Video dokumentasi berhasil ditambahkan ke galeri.' : 'Foto kegiatan berhasil ditambahkan ke galeri.',
             'data' => $galeri,
         ]);
     }
@@ -521,7 +521,7 @@ class AdminController extends Controller
             if (empty($validated['video_url']) && empty($galeri->video_url)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Tautan video YouTube wajib diisi untuk galeri bertipe video.',
+                    'message' => 'Tautan video dokumentasi wajib diisi untuk galeri bertipe video.',
                 ], 422);
             }
 

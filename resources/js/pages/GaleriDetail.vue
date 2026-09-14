@@ -141,7 +141,7 @@
             </h1>
           </div>
 
-          <!-- Tampilan Video YouTube Player (Jika Tipe Video) -->
+          <!-- Tampilan Video Dokumentasi Player (Jika Tipe Video) -->
           <div v-if="galeri.tipe === 'video' && youtubeEmbedUrl" class="w-full bg-slate-950 relative">
             <div class="relative w-full aspect-video bg-black overflow-hidden shadow-2xl">
               <iframe
@@ -156,7 +156,7 @@
             <div class="bg-slate-900/95 text-slate-300 text-xs px-6 py-3 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800">
               <span class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                <span class="font-medium text-slate-200">Video Dokumentasi Resmi YouTube Kelurahan Kraksaan Wetan</span>
+                <span class="font-medium text-slate-200">Video Dokumentasi Resmi Kelurahan Kraksaan Wetan</span>
               </span>
               <a 
                 v-if="galeri.video_url"
@@ -166,7 +166,7 @@
                 class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition shadow-sm"
               >
                 <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                <span>Tonton di YouTube</span>
+                <span>Tonton Video Dokumentasi</span>
                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
               </a>
             </div>
