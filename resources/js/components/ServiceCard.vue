@@ -1,8 +1,11 @@
 <template>
-  <div class="group relative bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between transform hover:-translate-y-1">
+  <div class="group relative bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs hover:shadow-2xl hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between transform hover:-translate-y-1.5 overflow-hidden">
+    <!-- Top Accent Line on Hover -->
+    <div class="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-emerald-500 to-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
     <div>
       <!-- Icon Container with Subtle Glow -->
-      <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-5 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-300 shadow-inner">
+      <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-5 group-hover:bg-emerald-600 group-hover:text-white group-hover:scale-110 group-hover:shadow-md group-hover:shadow-emerald-600/30 transition-all duration-300 shadow-inner">
         <!-- Dynamic SVG Icons based on type -->
         <svg v-if="layanan.icon === 'Users'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         <svg v-else-if="layanan.icon === 'Home'" class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -32,10 +35,10 @@
       </span>
       <router-link 
         :to="{ path: '/pelayanan', query: { item: layanan.slug } }"
-        class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 group-hover:text-emerald-900 group-hover:translate-x-1 transition-all"
+        class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 group-hover:translate-x-1 active:scale-95 transition-all duration-200"
       >
         Lihat Detail
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </router-link>
     </div>
   </div>

@@ -1,10 +1,10 @@
 <template>
   <div 
     ref="cardRef"
-    class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:shadow-md transition-shadow relative overflow-hidden"
+    class="group bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-emerald-400/50 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
   >
-    <!-- Background Decor Element -->
-    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-50 rounded-full opacity-60 pointer-events-none"></div>
+    <!-- Background Decor Element with smooth scale on hover -->
+    <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-50 rounded-full opacity-60 group-hover:opacity-80 group-hover:scale-150 group-hover:bg-emerald-100 transition-all duration-500 pointer-events-none"></div>
 
     <div class="relative z-10 flex items-start justify-between">
       <div>
@@ -24,7 +24,7 @@
         </p>
       </div>
 
-      <div class="w-12 h-12 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center flex-shrink-0">
+      <div class="w-12 h-12 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center shrink-0 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-inner">
         <slot name="icon">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </slot>

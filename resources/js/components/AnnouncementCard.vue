@@ -1,14 +1,17 @@
 <template>
-  <div class="bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-md transition-all">
+  <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-amber-400/50 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between">
     <!-- Optional Wide Banner -->
     <div v-if="pengumuman.banner" class="w-full h-44 sm:h-52 bg-slate-100 overflow-hidden relative">
       <img 
         :src="pengumuman.banner" 
         :alt="pengumuman.judul" 
-        class="w-full h-full object-cover object-center" 
+        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" 
         loading="lazy"
       />
-      <div class="absolute top-3 right-3 flex items-center gap-1.5">
+      <!-- Light Sweep Reflection Effect on Hover -->
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10"></div>
+
+      <div class="absolute top-3 right-3 flex items-center gap-1.5 z-20">
         <span 
           class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-xs"
           :class="pengumuman.prioritas === 'Penting' ? 'bg-rose-600 text-white' : 'bg-amber-500 text-slate-950'"
@@ -70,7 +73,7 @@
         </div>
         <button 
           @click="unduhPengumuman(pengumuman.file)"
-          class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 transition shrink-0"
+          class="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 hover:bg-emerald-100 active:scale-95 transition-all duration-200 shrink-0 cursor-pointer"
         >
           Unduh PDF
         </button>

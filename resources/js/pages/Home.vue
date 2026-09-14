@@ -30,10 +30,10 @@
       <div class="text-center mt-8">
         <router-link 
           to="/pelayanan" 
-          class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 transition"
+          class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200"
         >
           <span>Lihat Seluruh 6+ Panduan Layanan & Persyaratan</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </router-link>
       </div>
     </section>
@@ -43,12 +43,12 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <!-- Gambar & Sambutan Lurah -->
-          <div class="lg:col-span-5 relative">
+          <div class="lg:col-span-5 relative group">
             <div class="relative mx-auto max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-200">
               <img 
                 :src="profil.lurah?.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'" 
                 :alt="profil.lurah?.nama"
-                class="w-full h-96 object-cover object-top"
+                class="w-full h-96 object-cover object-top group-hover:scale-105 transition-transform duration-700 ease-out"
               />
               <div class="absolute bottom-0 inset-x-0 p-5 bg-gradient-to-t from-emerald-950 via-emerald-900/90 to-transparent text-white">
                 <p class="text-xs font-semibold text-amber-400 uppercase tracking-wider">{{ profil.lurah?.jabatan || 'Lurah Kraksaan Wetan' }}</p>
@@ -58,47 +58,48 @@
             </div>
           </div>
 
-          <!-- Teks Deskripsi, Visi, Misi Ringkas -->
+          <!-- Teks Sambutan -->
           <div class="lg:col-span-7 space-y-6">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-              Profil Kelurahan
+              Pemerintahan Kelurahan
             </div>
-
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-snug">
-              Mengenal Lebih Dekat <br class="hidden sm:inline">
-              <span class="text-emerald-700">Kelurahan Kraksaan Wetan</span>
-            </h2>
-
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-              {{ profil.deskripsi }}
-            </p>
-
-            <!-- Visi Highlight -->
-            <div class="p-5 rounded-2xl bg-white border-l-4 border-amber-500 shadow-xs">
-              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Visi Kelurahan:</h4>
-              <p class="text-xs sm:text-sm font-semibold text-slate-800 italic">
-                "{{ profil.visi }}"
+            
+            <div class="space-y-2">
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Membangun Bersama Warga, Melayani dengan Sepenuh Hati
+              </h2>
+              <p class="text-sm font-semibold text-emerald-700">
+                Sambutan Lurah Kraksaan Wetan
               </p>
             </div>
 
-            <!-- Misi 2 Poin Awal -->
-            <div class="space-y-2 text-xs sm:text-sm text-slate-700">
-              <p class="font-bold text-slate-800">Fokus Program Utama:</p>
-              <ul class="space-y-1.5 pl-4 list-disc marker:text-emerald-600">
-                <li v-for="(m, idx) in (profil.misi || []).slice(0, 3)" :key="idx">
-                  {{ m }}
-                </li>
-              </ul>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic border-l-4 border-emerald-600 pl-4 py-1">
+              "{{ profil.sambutan_lurah || 'Selamat datang di website resmi Kelurahan Kraksaan Wetan. Media ini kami dedikasikan sebagai wujud transparansi, keterbukaan informasi publik, dan percepatan pelayanan administrasi bagi seluruh warga masyarakat tercinta.' }}"
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5">
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Status</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">Kelurahan Mandiri</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5">
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Tipologi</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">Perkotaan / Jasa</p>
+              </div>
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 col-span-2 sm:col-span-1">
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Kecamatan</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">Kraksaan</p>
+              </div>
             </div>
 
             <div class="pt-2">
               <router-link 
                 to="/profil" 
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold shadow-md transition transform hover:-translate-y-0.5"
+                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer group"
               >
                 <span>Selengkapnya Tentang Kami</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
               </router-link>
             </div>
           </div>
@@ -174,10 +175,10 @@
 
         <router-link 
           to="/berita" 
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 transition self-start sm:self-auto"
+          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200 self-start sm:self-auto"
         >
           <span>Lihat Semua Berita</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </router-link>
       </div>
 
@@ -243,10 +244,10 @@
 
         <router-link 
           to="/galeri" 
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 transition self-start sm:self-auto"
+          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200 self-start sm:self-auto"
         >
           <span>Buka Galeri Lengkap</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </router-link>
       </div>
 

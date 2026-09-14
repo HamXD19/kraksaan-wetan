@@ -1,11 +1,11 @@
 <template>
   <section class="relative bg-emerald-950 text-white overflow-hidden py-10 sm:py-12 lg:py-16 min-h-[380px] lg:min-h-[440px] flex items-center">
     <!-- Background: Pemandangan Gunung Bromo Vektor Pilihan User -->
-    <div class="absolute inset-0 z-0">
+    <div class="absolute inset-0 z-0 overflow-hidden">
       <img 
         :src="heroImage" 
         alt="Gunung Bromo - Kabupaten Probolinggo" 
-        class="w-full h-full object-cover object-[center_35%]"
+        class="w-full h-full object-cover object-[center_35%] animate-ken-burns pointer-events-none"
         fetchpriority="high"
         loading="eager"
       />
@@ -26,8 +26,8 @@
     <!-- Main Content Container: Clean, Grand, Proportional & Unobstructed -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
       <div class="max-w-3xl space-y-5">
-        <!-- Official Government Badge -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/90 border border-emerald-500/40 text-emerald-200 text-xs font-semibold shadow-inner backdrop-blur-md">
+        <!-- Official Government Badge with Gentle Float Animation -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/90 border border-emerald-500/40 text-emerald-200 text-xs font-semibold shadow-inner backdrop-blur-md animate-float">
           <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
           <span>WEBSITE RESMI PEMERINTAH KELURAHAN</span>
         </div>
@@ -47,11 +47,11 @@
           </p>
         </div>
 
-        <!-- Action Buttons (CTA) -->
+        <!-- Action Buttons (CTA) with Micro-Interactions -->
         <div class="flex flex-wrap items-center gap-3 pt-1">
           <a 
             href="#layanan-masyarakat" 
-            class="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            class="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm shadow-lg hover:shadow-amber-500/30 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
           >
             <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
             <span>Layanan Masyarakat</span>
@@ -59,7 +59,7 @@
 
           <a 
             href="#profil-kelurahan" 
-            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-900/80 hover:bg-emerald-800/90 text-white font-bold text-xs sm:text-sm border border-emerald-500/40 backdrop-blur-md transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-900/80 hover:bg-emerald-800/90 active:scale-95 text-white font-bold text-xs sm:text-sm border border-emerald-500/40 backdrop-blur-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer shadow-sm hover:shadow-emerald-900/40"
           >
             <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>Jelajahi Informasi</span>
@@ -72,7 +72,7 @@
             <span class="p-1 rounded-md bg-emerald-800/80 text-amber-400 shrink-0">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </span>
-            <span>Webiste Resmi</span>
+            <span>Website Resmi</span>
           </div>
           <div class="flex items-center gap-2">
             <span class="p-1 rounded-md bg-emerald-800/80 text-amber-400 shrink-0">

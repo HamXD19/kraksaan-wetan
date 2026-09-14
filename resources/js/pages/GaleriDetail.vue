@@ -52,12 +52,12 @@
                 :key="item.id"
                 class="pt-3 first:pt-0 group"
               >
-                <router-link :to="`/galeri/${item.id}`" class="flex items-start gap-3">
+                <router-link :to="`/galeri/${item.id}`" class="flex items-start gap-3 transition-transform duration-200 group-hover:translate-x-1">
                   <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200/70 relative">
                     <img 
                       :src="item.gambar" 
                       :alt="item.judul"
-                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                       loading="lazy"
                     />
                   </div>
@@ -69,7 +69,7 @@
                       <span>&bull;</span>
                       <span>{{ item.tanggal }}</span>
                     </div>
-                    <h4 class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition">
+                    <h4 class="text-xs font-bold text-slate-900 line-clamp-2 leading-snug group-hover:text-emerald-700 transition-colors">
                       {{ item.judul }}
                     </h4>
                   </div>
@@ -195,7 +195,7 @@
                 <span class="text-slate-500 font-medium">Bagikan:</span>
                 <button 
                   @click="sharePhoto" 
-                  class="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold transition flex items-center gap-1.5"
+                  class="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:scale-95 text-emerald-800 font-bold transition-all duration-200 flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                   Salin Tautan
@@ -225,16 +225,19 @@
               <div 
                 v-for="item in galeriLainnya.slice(0, 3)" 
                 :key="item.id"
-                class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-md transition-all duration-300 group flex flex-col justify-between"
+                class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-emerald-400/50 transition-all duration-300 transform hover:-translate-y-1.5 group flex flex-col justify-between"
               >
                 <div class="relative h-44 overflow-hidden bg-slate-100">
                   <img 
                     :src="item.gambar" 
                     :alt="item.judul"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     loading="lazy"
                   />
-                  <div class="absolute top-2.5 left-2.5">
+                  <!-- Light Sweep Reflection Effect on Hover -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10"></div>
+
+                  <div class="absolute top-2.5 left-2.5 z-20">
                     <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-800/90 text-white backdrop-blur-xs">
                       {{ item.kategori }}
                     </span>
@@ -244,7 +247,7 @@
                 <div class="p-4 flex flex-col flex-1 justify-between">
                   <div>
                     <span class="text-[10px] text-slate-400 font-medium">{{ item.tanggal }}</span>
-                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2 mt-1 leading-snug group-hover:text-emerald-700 transition">
+                    <h4 class="text-xs sm:text-sm font-bold text-slate-900 line-clamp-2 mt-1 leading-snug group-hover:text-emerald-700 transition-colors">
                       {{ item.judul }}
                     </h4>
                     <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">
@@ -255,10 +258,10 @@
                   <div class="pt-3 mt-3 border-t border-slate-100">
                     <router-link 
                       :to="`/galeri/${item.id}`"
-                      class="text-xs font-bold text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 transition"
+                      class="text-xs font-bold text-emerald-700 hover:text-emerald-900 active:scale-95 inline-flex items-center gap-1 transition-all duration-200"
                     >
                       <span>Lihat Selengkapnya</span>
-                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                      <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </router-link>
                   </div>
                 </div>
@@ -277,6 +280,26 @@
         </router-link>
       </div>
     </div>
+
+    <!-- Toast Notification with Slide-Up Transition -->
+    <transition
+      enter-active-class="transition duration-300 ease-out"
+      enter-from-class="transform translate-y-6 opacity-0 scale-95"
+      enter-to-class="transform translate-y-0 opacity-100 scale-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="transform translate-y-0 opacity-100 scale-100"
+      leave-to-class="transform translate-y-6 opacity-0 scale-95"
+    >
+      <div 
+        v-if="showToast" 
+        class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-5 py-3.5 rounded-2xl bg-slate-900 text-white shadow-2xl border border-emerald-500/60 backdrop-blur-md"
+      >
+        <span class="w-7 h-7 rounded-full bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+        </span>
+        <span class="text-xs sm:text-sm font-semibold tracking-wide">Tautan foto berhasil disalin ke clipboard!</span>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -291,6 +314,7 @@ const route = useRoute();
 const loading = ref(true);
 const galeri = ref({});
 const galeriLainnya = ref([]);
+const showToast = ref(false);
 
 const loadData = async (id) => {
   loading.value = true;
@@ -329,10 +353,17 @@ onMounted(() => {
   }
 });
 
-const sharePhoto = () => {
+const sharePhoto = async () => {
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(window.location.href);
-    alert('Tautan foto berhasil disalin ke clipboard!');
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showToast.value = true;
+      setTimeout(() => {
+        showToast.value = false;
+      }, 3000);
+    } catch {
+      // Fallback
+    }
   }
 };
 </script>

@@ -1,15 +1,18 @@
 <template>
-  <article class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-xs hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col group">
+  <article class="bg-white rounded-2xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-emerald-400/50 transition-all duration-300 flex flex-col group transform hover:-translate-y-1.5">
     <!-- Thumbnail Image -->
     <div class="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-100">
       <img 
         :src="berita.gambar || 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80'" 
         :alt="berita.judul"
-        class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+        class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
         loading="lazy"
       />
-      <div class="absolute top-3 left-3">
-        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide bg-emerald-700/90 text-white shadow-xs backdrop-blur-xs">
+      <!-- Light Sweep Reflection Effect on Hover -->
+      <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out pointer-events-none z-10"></div>
+
+      <div class="absolute top-3 left-3 z-20">
+        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold uppercase tracking-wide bg-emerald-700/90 text-white shadow-xs backdrop-blur-xs group-hover:bg-emerald-600 transition-colors">
           {{ berita.kategori }}
         </span>
       </div>
@@ -49,10 +52,10 @@
         </span>
         <router-link 
           :to="`/berita/${berita.slug}`"
-          class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-colors group-hover:translate-x-1 duration-200"
+          class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-900 transition-all group-hover:translate-x-1 duration-200 active:scale-95"
         >
           Baca Selengkapnya
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </router-link>
       </div>
     </div>
