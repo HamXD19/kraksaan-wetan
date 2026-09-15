@@ -55,7 +55,7 @@
         <!-- 4 KPI Cards: Real-Time Budget Tracking -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <!-- 1. Total Pagu Rencana -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden reveal delay-75">
             <div class="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-bold text-xs mb-3">
               <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
             </div>
@@ -67,7 +67,7 @@
           </div>
 
           <!-- 2. Realisasi Terserap -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden reveal delay-150">
             <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-xs mb-3">
               <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
@@ -79,7 +79,7 @@
           </div>
 
           <!-- 3. Sisa Anggaran -->
-          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden">
+          <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs relative overflow-hidden reveal delay-200">
             <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs mb-3">
               <svg class="w-5 h-5 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
             </div>
@@ -91,7 +91,7 @@
           </div>
 
           <!-- 4. Persentase Realisasi Serapan -->
-          <div class="bg-emerald-950 text-white p-6 rounded-3xl shadow-sm relative overflow-hidden flex flex-col justify-between">
+          <div class="bg-emerald-950 text-white p-6 rounded-3xl shadow-sm relative overflow-hidden flex flex-col justify-between reveal delay-250">
             <div>
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Serapan Anggaran</span>
@@ -116,7 +116,7 @@
         </div>
 
         <!-- Breakdown Realisasi per Kategori Program -->
-        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-6 reveal">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
             <div>
               <h2 class="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -132,9 +132,10 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div 
-              v-for="b in (summary.breakdown_kategori || [])" 
+              v-for="(b, bIdx) in (summary.breakdown_kategori || [])" 
               :key="b.kategori"
-              class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3"
+              class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 reveal"
+              :class="`delay-${((bIdx % 4) + 1) * 100}`"
             >
               <div class="flex items-center justify-between">
                 <h3 class="font-bold text-slate-900 text-xs sm:text-sm">{{ b.kategori }}</h3>
@@ -167,7 +168,7 @@
 
         <!-- Daftar Kegiatan, Filter, & Penerima Manfaat -->
         <div class="space-y-6">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 reveal">
             <div>
               <h2 class="text-xl font-bold text-slate-900">Rincian Program & Penerima Manfaat</h2>
               <p class="text-xs text-slate-500 mt-0.5">Pantau pelaksanaan teknis setiap kegiatan, progres fisik, dan dampak bagi masyarakat.</p>
@@ -192,9 +193,10 @@
           <!-- Cards Grid Kegiatan -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div 
-              v-for="item in filteredKegiatan" 
+              v-for="(item, kIdx) in filteredKegiatan" 
               :key="item.id"
-              class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-5"
+              class="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between space-y-5 reveal"
+              :class="`delay-${((kIdx % 4) + 1) * 75}`"
             >
               <div class="space-y-4">
                 <!-- Header Card: Tahun, Kategori, Status -->

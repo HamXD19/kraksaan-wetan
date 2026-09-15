@@ -1,11 +1,11 @@
 <template>
   <div class="space-y-16 sm:space-y-24 pb-16">
     <!-- 1. Hero Section -->
-    <HeroSection :profil="profil" />
+    <HeroSection :profil="profil" class="reveal-fade" />
 
     <!-- 2. Quick Service Section -->
     <section id="layanan-masyarakat" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
-      <div class="text-center max-w-2xl mx-auto mb-12">
+      <div class="text-center max-w-2xl mx-auto mb-12 reveal">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
           Layanan Cepat Warga
@@ -21,13 +21,15 @@
       <LoadingSpinner v-if="loading.layanan" text="Memuat daftar layanan..." />
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <ServiceCard 
-          v-for="item in quickServices" 
+          v-for="(item, idx) in quickServices" 
           :key="item.id" 
           :layanan="item" 
+          class="reveal"
+          :class="`delay-${(idx + 1) * 100}`"
         />
       </div>
 
-      <div class="text-center mt-8">
+      <div class="text-center mt-8 reveal delay-300">
         <router-link 
           to="/pelayanan" 
           class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200"
@@ -43,7 +45,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           <!-- Gambar & Sambutan Lurah -->
-          <div class="lg:col-span-5 relative group">
+          <div class="lg:col-span-5 relative group reveal-left">
             <div class="relative mx-auto max-w-sm rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-slate-200">
               <img 
                 :src="profil.lurah?.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'" 
@@ -59,7 +61,7 @@
           </div>
 
           <!-- Teks Sambutan -->
-          <div class="lg:col-span-7 space-y-6">
+          <div class="lg:col-span-7 space-y-6 reveal-right">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
               Pemerintahan Kelurahan
@@ -79,15 +81,15 @@
             </p>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
-              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5">
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 reveal delay-100">
                 <p class="text-[11px] text-slate-400 font-semibold uppercase">Status</p>
                 <p class="text-sm font-bold text-slate-800 mt-0.5">Kelurahan Mandiri</p>
               </div>
-              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5">
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 reveal delay-200">
                 <p class="text-[11px] text-slate-400 font-semibold uppercase">Tipologi</p>
                 <p class="text-sm font-bold text-slate-800 mt-0.5">Perkotaan / Jasa</p>
               </div>
-              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 col-span-2 sm:col-span-1">
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 col-span-2 sm:col-span-1 reveal delay-300">
                 <p class="text-[11px] text-slate-400 font-semibold uppercase">Kecamatan</p>
                 <p class="text-sm font-bold text-slate-800 mt-0.5">Kraksaan</p>
               </div>
@@ -109,7 +111,7 @@
 
     <!-- 4. Statistik Kelurahan (Animated Counter) -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="text-center max-w-2xl mx-auto mb-10 reveal">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
           Data Statistik
@@ -128,38 +130,42 @@
           :value="statistik.penduduk || 6842" 
           unit="Jiwa" 
           subtext="L: 3.390 | P: 3.452"
+          class="reveal delay-75"
         />
         <StatisticCard 
           label="Kepala Keluarga" 
           :value="statistik.kk || 2185" 
           unit="KK" 
           subtext="Tersebar di 7 RW"
+          class="reveal delay-150"
         />
         <StatisticCard 
           label="Rukun Warga (RW)" 
           :value="statistik.rw || 7" 
           unit="RW" 
           subtext="Lingkungan Wilayah"
+          class="reveal delay-200"
         />
         <StatisticCard 
           label="Rukun Tetangga (RT)" 
           :value="statistik.rt || 28" 
           unit="RT" 
           subtext="Pelayanan Lingkungan"
+          class="reveal delay-250"
         />
         <StatisticCard 
           label="Luas Wilayah" 
           :value="statistik.luas_wilayah || '1.84'" 
           unit="km²" 
           subtext="Kepadatan 3.718/km²"
-          class="col-span-2 sm:col-span-1"
+          class="col-span-2 sm:col-span-1 reveal delay-300"
         />
       </div>
     </section>
 
     <!-- 5. Berita Terbaru -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 reveal">
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
             <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -185,9 +191,11 @@
       <LoadingSpinner v-if="loading.berita" text="Memuat berita terbaru..." />
       <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <NewsCard 
-          v-for="b in beritaList.slice(0, 3)" 
+          v-for="(b, idx) in beritaList.slice(0, 3)" 
           :key="b.id" 
           :berita="b" 
+          class="reveal"
+          :class="`delay-${(idx + 1) * 100}`"
         />
       </div>
     </section>
@@ -195,7 +203,7 @@
     <!-- 6. Pengumuman Resmi Kelurahan -->
     <section class="bg-amber-50/60 py-16 border-y border-amber-200/70">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 reveal">
           <div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/80 text-amber-900 text-xs font-bold uppercase tracking-wider mb-2">
               <span class="w-2 h-2 rounded-full bg-amber-600"></span>
@@ -218,9 +226,11 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <AnnouncementCard 
-            v-for="item in pengumumanList.slice(0, 3)" 
+            v-for="(item, idx) in pengumumanList.slice(0, 3)" 
             :key="item.id" 
             :pengumuman="item" 
+            class="reveal"
+            :class="`delay-${(idx + 1) * 100}`"
           />
         </div>
       </div>
@@ -228,7 +238,7 @@
 
     <!-- 7. Galeri Dokumentasi Kegiatan -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+      <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10 reveal">
         <div>
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
             <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -252,12 +262,12 @@
       </div>
 
       <LoadingSpinner v-if="loading.galeri" text="Memuat foto kegiatan..." />
-      <GalleryGrid v-else :items="galeriList.slice(0, 6)" :show-filter="false" />
+      <GalleryGrid v-else :items="galeriList.slice(0, 6)" :show-filter="false" class="reveal delay-100" />
     </section>
 
     <!-- 8. Lokasi Kelurahan Kraksaan Wetan -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="text-center max-w-2xl mx-auto mb-10 reveal">
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
           Peta & Navigasi
@@ -270,7 +280,7 @@
         </p>
       </div>
 
-      <LocationMap />
+      <LocationMap class="reveal-scale delay-100" />
     </section>
   </div>
 </template>

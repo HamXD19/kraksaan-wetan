@@ -17,7 +17,7 @@
       <template v-else>
         <!-- Data Kependudukan & Statistik Ringkasan -->
         <section id="statistik" class="scroll-mt-24 space-y-8">
-          <div class="text-center max-w-2xl mx-auto">
+          <div class="text-center max-w-2xl mx-auto reveal">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
               Statistik Kependudukan
@@ -32,22 +32,22 @@
 
           <!-- Cards Statistik -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center reveal delay-75">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Total Penduduk</p>
               <p class="text-3xl font-black text-emerald-950">{{ (statistik.penduduk || 6842).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">Jiwa Terdaftar</p>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center reveal delay-150">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Laki-Laki</p>
               <p class="text-3xl font-black text-emerald-700">{{ (statistik.laki_laki || 3390).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">49.5% dari Total</p>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center reveal delay-200">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Perempuan</p>
               <p class="text-3xl font-black text-emerald-700">{{ (statistik.perempuan || 3452).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">50.5% dari Total</p>
             </div>
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs text-center reveal delay-250">
               <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kepala Keluarga</p>
               <p class="text-3xl font-black text-amber-600">{{ (statistik.kk || 2185).toLocaleString('id-ID') }}</p>
               <p class="text-[11px] text-slate-500 mt-1">Kartu Keluarga (KK)</p>
@@ -56,7 +56,7 @@
         </section>
 
         <!-- Data Sebaran RW & Wilayah (#wilayah) -->
-        <section id="wilayah" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm">
+        <section id="wilayah" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm reveal delay-100">
           <h3 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
             Tabel Sebaran Penduduk per-Rukun Warga (RW)
@@ -84,7 +84,7 @@
         </section>
 
         <!-- Transparansi & Akuntabilitas (#transparansi) -->
-        <section id="transparansi" class="scroll-mt-24 space-y-6">
+        <section id="transparansi" class="scroll-mt-24 space-y-6 reveal">
           <div class="text-center max-w-2xl mx-auto">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>

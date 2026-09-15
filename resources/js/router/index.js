@@ -137,6 +137,12 @@ const routes = [
         meta: { title: 'Kelola Akun Staf - Super Admin', requiresAuth: true, roles: ['super_admin'] }
       },
       {
+        path: 'activity-logs',
+        name: 'admin-activity-logs',
+        component: () => import('../pages/admin/ManageActivityLogs.vue'),
+        meta: { title: 'Log Aktifitas Akun - Super Admin', requiresAuth: true, roles: ['super_admin'] }
+      },
+      {
         path: 'berita',
         name: 'admin-berita',
         component: () => import('../pages/admin/ManageBerita.vue'),

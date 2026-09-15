@@ -82,6 +82,79 @@ body {
     animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ==========================================================================
+   Modern GPU-Accelerated Scroll Reveal System
+   Specifically active on public portal pages (excluded on admin dashboard).
+   ========================================================================== */
+
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal-fade {
+    opacity: 0;
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity;
+}
+
+.reveal-fade.is-revealed {
+    opacity: 1;
+}
+
+.reveal-scale {
+    opacity: 0;
+    transform: scale(0.94);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-scale.is-revealed {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.reveal-left {
+    opacity: 0;
+    transform: translateX(-36px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-left.is-revealed {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.reveal-right {
+    opacity: 0;
+    transform: translateX(36px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.reveal-right.is-revealed {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Stagger Delay Helper Classes */
+.delay-75  { transition-delay: 75ms !important; }
+.delay-100 { transition-delay: 100ms !important; }
+.delay-150 { transition-delay: 150ms !important; }
+.delay-200 { transition-delay: 200ms !important; }
+.delay-250 { transition-delay: 250ms !important; }
+.delay-300 { transition-delay: 300ms !important; }
+.delay-400 { transition-delay: 400ms !important; }
+.delay-500 { transition-delay: 500ms !important; }
+
 /* Respect user preference for reduced motion */
 @media (prefers-reduced-motion: reduce) {
     *,
@@ -91,5 +164,15 @@ body {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+
+    .reveal,
+    .reveal-fade,
+    .reveal-scale,
+    .reveal-left,
+    .reveal-right {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
     }
 }

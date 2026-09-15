@@ -17,7 +17,7 @@
       <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <div class="lg:col-span-8 space-y-8">
           <!-- Card Visi -->
-          <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+          <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden reveal">
             <div class="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full opacity-50"></div>
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase tracking-wider mb-4">
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -29,7 +29,7 @@
           </div>
 
           <!-- Card Misi -->
-          <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm reveal delay-100">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-6">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
               Misi Pembangunan
@@ -38,7 +38,8 @@
               <div 
                 v-for="(m, idx) in profil.misi" 
                 :key="idx"
-                class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-emerald-200 transition"
+                class="flex items-start gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-emerald-200 transition reveal"
+                :class="`delay-${(idx + 1) * 75}`"
               >
                 <span class="w-8 h-8 rounded-lg bg-emerald-700 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm">
                   0{{ idx + 1 }}
@@ -51,7 +52,7 @@
           </div>
 
           <!-- Nilai-Nilai Budaya Kerja -->
-          <div class="bg-gradient-to-r from-emerald-950 to-emerald-900 text-white p-8 rounded-3xl shadow-sm">
+          <div class="bg-gradient-to-r from-emerald-950 to-emerald-900 text-white p-8 rounded-3xl shadow-sm reveal delay-150">
             <h3 class="text-lg font-bold text-amber-400 mb-4">Tata Nilai Pelayanan "BERAKHLAK & GUYUB"</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60">
@@ -75,7 +76,7 @@
         </div>
 
         <!-- Sidebar -->
-        <div class="lg:col-span-4 space-y-6">
+        <div class="lg:col-span-4 space-y-6 reveal delay-100">
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
             <h3 class="font-bold text-slate-900 text-sm mb-4 pb-2 border-b border-slate-100">Menu Profil</h3>
             <ul class="space-y-2 text-xs">

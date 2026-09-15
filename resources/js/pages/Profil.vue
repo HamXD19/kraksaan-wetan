@@ -18,7 +18,7 @@
       <LoadingSpinner v-if="loading" />
       <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-10">
         <!-- Main Article -->
-        <div class="lg:col-span-8 space-y-8 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="lg:col-span-8 space-y-8 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs reveal">
           <div>
             <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
@@ -33,7 +33,7 @@
           </div>
 
           <!-- Batas Wilayah -->
-          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 reveal delay-100">
             <h3 class="font-bold text-slate-800 text-sm mb-3 uppercase tracking-wider">Batas-Batas Wilayah Administratif</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
               <div class="p-3 bg-white rounded-lg border border-slate-200/80">
@@ -56,7 +56,7 @@
           </div>
 
           <!-- Potensi Unggulan -->
-          <div>
+          <div class="reveal delay-150">
             <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
               Potensi Kelurahan
@@ -79,7 +79,7 @@
         </div>
 
         <!-- Sidebar Info -->
-        <div class="lg:col-span-4 space-y-6">
+        <div class="lg:col-span-4 space-y-6 reveal delay-100">
           <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
             <h3 class="font-bold text-slate-900 text-sm mb-4 pb-2 border-b border-slate-100">Navigasi Profil</h3>
             <ul class="space-y-2 text-xs">

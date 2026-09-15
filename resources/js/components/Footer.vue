@@ -8,7 +8,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
         
         <!-- Kolom 1: Identitas Resmi Kelurahan (lg:col-span-4) -->
-        <div class="lg:col-span-4 space-y-4">
+        <div class="lg:col-span-4 space-y-4 reveal">
           <div class="flex items-center gap-3.5">
             <!-- Emblem / Logo Kelurahan / Pemkab -->
             <div class="w-12 h-14 shrink-0 flex items-center justify-center">
@@ -36,14 +36,14 @@
               Kode Pos: 67282
             </span>
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-900/90 border border-emerald-700/60 text-emerald-200 text-xs font-semibold">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
               Kode Wilayah: 35.13.14.1001
             </span>
           </div>
         </div>
 
         <!-- Kolom 2: Layanan & Informasi Publik (lg:col-span-3) -->
-        <div class="lg:col-span-3 space-y-3">
+        <div class="lg:col-span-3 space-y-3 reveal delay-100">
           <h4 class="text-white font-bold text-sm tracking-wide flex items-center gap-2 border-b border-emerald-800 pb-2">
             <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             Layanan & Transparansi
@@ -83,7 +83,7 @@
         </div>
 
         <!-- Kolom 3: Jam Pelayanan & Integritas (lg:col-span-2) -->
-        <div class="lg:col-span-2 space-y-3">
+        <div class="lg:col-span-2 space-y-3 reveal delay-150">
           <h4 class="text-white font-bold text-sm tracking-wide flex items-center gap-2 border-b border-emerald-800 pb-2">
             <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             Jam Pelayanan Kantor
@@ -109,7 +109,7 @@
         </div>
 
         <!-- Kolom 4: Kontak & Pengaduan Resmi (lg:col-span-3) -->
-        <div class="lg:col-span-3 space-y-3">
+        <div class="lg:col-span-3 space-y-3 reveal delay-200">
           <h4 class="text-white font-bold text-sm tracking-wide flex items-center gap-2 border-b border-emerald-800 pb-2">
             <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             Kontak & Pengaduan

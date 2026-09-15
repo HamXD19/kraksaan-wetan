@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\ActivityLog;
 use App\Models\Berita;
 use App\Models\Galeri;
 use App\Models\Layanan;
@@ -20,6 +21,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -132,6 +134,14 @@ class AdminController extends Controller
         $token = base64_encode($user->id.'|'.Str::random(40).'|'.time());
         Cache::put('admin_auth_token_'.$token, $user->id, now()->addDays(7));
 
+        ActivityLog::record(
+            action: 'login',
+            module: 'auth',
+            description: "Login berhasil ke panel admin sebagai {$user->role_label}",
+            properties: ['role' => $user->role],
+            user: $user
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Login berhasil. Selamat datang di Panel Admin Kelurahan Kraksaan Wetan.',
@@ -156,6 +166,15 @@ class AdminController extends Controller
         $token = $request->bearerToken();
         if ($token) {
             Cache::forget('admin_auth_token_'.$token);
+        }
+
+        if ($user = $request->user()) {
+            ActivityLog::record(
+                action: 'logout',
+                module: 'auth',
+                description: 'Keluar (logout) dari sesi panel admin',
+                user: $user
+            );
         }
 
         return response()->json([
@@ -206,6 +225,13 @@ class AdminController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'auth',
+            description: 'Memperbarui kata sandi akun sendiri',
+            user: $user
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Kata sandi administrator berhasil diperbarui.',
@@ -252,6 +278,14 @@ class AdminController extends Controller
         $file = $request->file('file');
         $filename = Str::random(20).'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('uploads', $filename, 'public');
+
+        ActivityLog::record(
+            action: 'upload',
+            module: 'media',
+            description: "Mengunggah file {$file->getClientOriginalName()}",
+            properties: ['filename' => $file->getClientOriginalName(), 'path' => $path, 'type' => $type],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -337,6 +371,14 @@ class AdminController extends Controller
             'dilihat' => 0,
         ]);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'berita',
+            description: "Menerbitkan berita baru: \"{$berita->judul}\"",
+            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul, 'kategori' => $berita->kategori],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Berita berhasil diterbitkan.',
@@ -360,6 +402,14 @@ class AdminController extends Controller
 
         $berita->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'berita',
+            description: "Memperbarui berita: \"{$berita->judul}\"",
+            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Berita berhasil diperbarui.',
@@ -367,10 +417,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteBerita(int $id): JsonResponse
+    public function deleteBerita(Request $request, int $id): JsonResponse
     {
         $berita = Berita::findOrFail($id);
+        $judul = $berita->judul;
+        $beritaId = $berita->id;
         $berita->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'berita',
+            description: "Menghapus berita: \"{$judul}\"",
+            properties: ['berita_id' => $beritaId, 'judul' => $judul],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -407,6 +467,14 @@ class AdminController extends Controller
 
         $pengumuman = Pengumuman::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'pengumuman',
+            description: "Menerbitkan pengumuman baru: \"{$pengumuman->judul}\"",
+            properties: ['pengumuman_id' => $pengumuman->id, 'judul' => $pengumuman->judul],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Pengumuman berhasil dibuat.',
@@ -432,6 +500,14 @@ class AdminController extends Controller
 
         $pengumuman->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'pengumuman',
+            description: "Memperbarui pengumuman: \"{$pengumuman->judul}\"",
+            properties: ['pengumuman_id' => $pengumuman->id, 'judul' => $pengumuman->judul],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Pengumuman berhasil diperbarui.',
@@ -439,10 +515,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deletePengumuman(int $id): JsonResponse
+    public function deletePengumuman(Request $request, int $id): JsonResponse
     {
         $pengumuman = Pengumuman::findOrFail($id);
+        $judul = $pengumuman->judul;
+        $pengumumanId = $pengumuman->id;
         $pengumuman->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'pengumuman',
+            description: "Menghapus pengumuman: \"{$judul}\"",
+            properties: ['pengumuman_id' => $pengumumanId, 'judul' => $judul],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -482,6 +568,14 @@ class AdminController extends Controller
 
         $layanan = Layanan::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'layanan',
+            description: "Menambahkan layanan baru: \"{$layanan->judul}\"",
+            properties: ['layanan_id' => $layanan->id, 'judul' => $layanan->judul, 'kategori' => $layanan->kategori],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Layanan baru berhasil ditambahkan.',
@@ -507,6 +601,14 @@ class AdminController extends Controller
 
         $layanan->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'layanan',
+            description: "Memperbarui layanan: \"{$layanan->judul}\"",
+            properties: ['layanan_id' => $layanan->id, 'judul' => $layanan->judul],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Layanan berhasil diperbarui.',
@@ -514,10 +616,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteLayanan(int $id): JsonResponse
+    public function deleteLayanan(Request $request, int $id): JsonResponse
     {
         $layanan = Layanan::findOrFail($id);
+        $judul = $layanan->judul;
+        $layananId = $layanan->id;
         $layanan->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'layanan',
+            description: "Menghapus layanan: \"{$judul}\"",
+            properties: ['layanan_id' => $layananId, 'judul' => $judul],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -578,6 +690,14 @@ class AdminController extends Controller
 
         $galeri = Galeri::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'galeri',
+            description: "Menambahkan galeri baru: \"{$galeri->judul}\"",
+            properties: ['galeri_id' => $galeri->id, 'judul' => $galeri->judul, 'tipe' => $galeri->tipe],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => $galeri->tipe === 'video' ? 'Video dokumentasi berhasil ditambahkan ke galeri.' : 'Foto kegiatan berhasil ditambahkan ke galeri.',
@@ -626,6 +746,14 @@ class AdminController extends Controller
 
         $galeri->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'galeri',
+            description: "Memperbarui galeri: \"{$galeri->judul}\"",
+            properties: ['galeri_id' => $galeri->id, 'judul' => $galeri->judul],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data galeri berhasil diperbarui.',
@@ -633,10 +761,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteGaleri(int $id): JsonResponse
+    public function deleteGaleri(Request $request, int $id): JsonResponse
     {
         $galeri = Galeri::findOrFail($id);
+        $judul = $galeri->judul;
+        $galeriId = $galeri->id;
         $galeri->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'galeri',
+            description: "Menghapus galeri: \"{$judul}\"",
+            properties: ['galeri_id' => $galeriId, 'judul' => $judul],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -676,6 +814,13 @@ class AdminController extends Controller
 
         $profil->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'profil',
+            description: 'Memperbarui profil kelurahan dan informasi aparatur pimpinan',
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Profil kelurahan berhasil diperbarui.',
@@ -694,6 +839,14 @@ class AdminController extends Controller
         ]);
 
         $p = PerangkatKelurahan::create($validated);
+
+        ActivityLog::record(
+            action: 'create',
+            module: 'profil',
+            description: "Menambahkan data aparatur: \"{$p->nama}\" ({$p->jabatan})",
+            properties: ['perangkat_id' => $p->id, 'nama' => $p->nama, 'jabatan' => $p->jabatan],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -716,6 +869,14 @@ class AdminController extends Controller
 
         $p->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'profil',
+            description: "Memperbarui data aparatur: \"{$p->nama}\" ({$p->jabatan})",
+            properties: ['perangkat_id' => $p->id, 'nama' => $p->nama, 'jabatan' => $p->jabatan],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data aparatur berhasil diperbarui.',
@@ -723,10 +884,21 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deletePerangkat(int $id): JsonResponse
+    public function deletePerangkat(Request $request, int $id): JsonResponse
     {
         $p = PerangkatKelurahan::findOrFail($id);
+        $nama = $p->nama;
+        $jabatan = $p->jabatan;
+        $perangkatId = $p->id;
         $p->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'profil',
+            description: "Menghapus data aparatur: \"{$nama}\" ({$jabatan})",
+            properties: ['perangkat_id' => $perangkatId, 'nama' => $nama, 'jabatan' => $jabatan],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -754,6 +926,14 @@ class AdminController extends Controller
 
         $stat->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'statistik',
+            description: 'Memperbarui data statistik kependudukan wilayah',
+            properties: ['penduduk' => $validated['penduduk'], 'kk' => $validated['kk']],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data statistik berhasil diperbarui.',
@@ -771,6 +951,14 @@ class AdminController extends Controller
         ]);
 
         $l = Lingkungan::create($validated);
+
+        ActivityLog::record(
+            action: 'create',
+            module: 'statistik',
+            description: "Menambahkan data lingkungan RW: \"{$l->nama}\"",
+            properties: ['lingkungan_id' => $l->id, 'nama' => $l->nama, 'rt' => $l->rt, 'penduduk' => $l->penduduk],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -792,6 +980,14 @@ class AdminController extends Controller
 
         $l->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'statistik',
+            description: "Memperbarui data lingkungan RW: \"{$l->nama}\"",
+            properties: ['lingkungan_id' => $l->id, 'nama' => $l->nama],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data lingkungan RW berhasil diperbarui.',
@@ -799,10 +995,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteLingkungan(int $id): JsonResponse
+    public function deleteLingkungan(Request $request, int $id): JsonResponse
     {
         $l = Lingkungan::findOrFail($id);
+        $nama = $l->nama;
+        $lingkunganId = $l->id;
         $l->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'statistik',
+            description: "Menghapus data lingkungan RW: \"{$nama}\"",
+            properties: ['lingkungan_id' => $lingkunganId, 'nama' => $nama],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -846,6 +1052,14 @@ class AdminController extends Controller
 
         $lembaga = Lembaga::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'lembaga',
+            description: "Menambahkan lembaga kemasyarakatan: \"{$lembaga->nama}\"",
+            properties: ['lembaga_id' => $lembaga->id, 'nama' => $lembaga->nama],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Lembaga Kemasyarakatan berhasil ditambahkan.',
@@ -876,6 +1090,14 @@ class AdminController extends Controller
 
         $lembaga->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'lembaga',
+            description: "Memperbarui lembaga kemasyarakatan: \"{$lembaga->nama}\"",
+            properties: ['lembaga_id' => $lembaga->id, 'nama' => $lembaga->nama],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Lembaga Kemasyarakatan berhasil diperbarui.',
@@ -893,6 +1115,15 @@ class AdminController extends Controller
 
         $lembaga->update(['aktif' => $validated['aktif']]);
 
+        $statusText = $validated['aktif'] ? 'mengaktifkan' : 'menonaktifkan';
+        ActivityLog::record(
+            action: 'update',
+            module: 'lembaga',
+            description: "Telah {$statusText} status lembaga: \"{$lembaga->nama}\"",
+            properties: ['lembaga_id' => $lembaga->id, 'aktif' => $validated['aktif']],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Status aktif lembaga berhasil diubah.',
@@ -900,10 +1131,20 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteLembaga(int $id): JsonResponse
+    public function deleteLembaga(Request $request, int $id): JsonResponse
     {
         $lembaga = Lembaga::findOrFail($id);
+        $nama = $lembaga->nama;
+        $lembagaId = $lembaga->id;
         $lembaga->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'lembaga',
+            description: "Menghapus lembaga kemasyarakatan: \"{$nama}\"",
+            properties: ['lembaga_id' => $lembagaId, 'nama' => $nama],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -989,6 +1230,14 @@ class AdminController extends Controller
 
         $item = TransparansiAnggaran::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'transparansi',
+            description: "Menambahkan program transparansi anggaran: \"{$item->kegiatan}\" (Tahun {$item->tahun})",
+            properties: ['transparansi_id' => $item->id, 'tahun' => $item->tahun, 'kegiatan' => $item->kegiatan, 'anggaran' => $item->anggaran_rencana],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Program kegiatan anggaran berhasil ditambahkan.',
@@ -1021,6 +1270,14 @@ class AdminController extends Controller
 
         $item->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'transparansi',
+            description: "Memperbarui program transparansi anggaran: \"{$item->kegiatan}\" (Tahun {$item->tahun})",
+            properties: ['transparansi_id' => $item->id, 'tahun' => $item->tahun, 'kegiatan' => $item->kegiatan],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Program kegiatan anggaran berhasil diperbarui.',
@@ -1038,6 +1295,15 @@ class AdminController extends Controller
 
         $item->update(['aktif' => $validated['aktif']]);
 
+        $statusText = $validated['aktif'] ? 'mengaktifkan' : 'menonaktifkan';
+        ActivityLog::record(
+            action: 'update',
+            module: 'transparansi',
+            description: "Telah {$statusText} program transparansi anggaran: \"{$item->kegiatan}\"",
+            properties: ['transparansi_id' => $item->id, 'aktif' => $validated['aktif']],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Status aktif kegiatan berhasil diubah.',
@@ -1045,10 +1311,21 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteTransparansi(int $id): JsonResponse
+    public function deleteTransparansi(Request $request, int $id): JsonResponse
     {
         $item = TransparansiAnggaran::findOrFail($id);
+        $kegiatan = $item->kegiatan;
+        $tahun = $item->tahun;
+        $transparansiId = $item->id;
         $item->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'transparansi',
+            description: "Menghapus program transparansi anggaran: \"{$kegiatan}\" (Tahun {$tahun})",
+            properties: ['transparansi_id' => $transparansiId, 'kegiatan' => $kegiatan, 'tahun' => $tahun],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -1112,6 +1389,14 @@ class AdminController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'staff',
+            description: "Menambahkan akun staf baru: {$user->name} ({$user->role_label})",
+            properties: ['staff_id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => "Akun staf untuk {$user->name} berhasil dibuat.",
@@ -1151,6 +1436,14 @@ class AdminController extends Controller
 
         $user->save();
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'staff',
+            description: "Memperbarui data akun staf: {$user->name} ({$user->role_label})",
+            properties: ['staff_id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data akun staf berhasil diperbarui.',
@@ -1168,6 +1461,14 @@ class AdminController extends Controller
 
         $user->password = Hash::make($validated['password']);
         $user->save();
+
+        ActivityLog::record(
+            action: 'reset_password',
+            module: 'staff',
+            description: "Mereset kata sandi akun staf: {$user->name} ({$user->role_label})",
+            properties: ['staff_id' => $user->id, 'name' => $user->name, 'email' => $user->email],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
@@ -1199,7 +1500,22 @@ class AdminController extends Controller
             }
         }
 
+        $userData = [
+            'staff_id' => $targetUser->id,
+            'name' => $targetUser->name,
+            'email' => $targetUser->email,
+            'role' => $targetUser->role,
+        ];
+
         $targetUser->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'staff',
+            description: "Menghapus akun staf: {$userData['name']} ({$userData['email']})",
+            properties: $userData,
+            user: $currentUser
+        );
 
         return response()->json([
             'status' => 'success',
@@ -1254,6 +1570,14 @@ class AdminController extends Controller
 
         $kategori = MasterKategori::create($validated);
 
+        ActivityLog::record(
+            action: 'create',
+            module: 'kategori',
+            description: "Menambahkan master kategori: \"{$kategori->nama}\" (Modul {$kategori->modul})",
+            properties: ['kategori_id' => $kategori->id, 'modul' => $kategori->modul, 'nama' => $kategori->nama],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Master kategori berhasil ditambahkan.',
@@ -1295,6 +1619,14 @@ class AdminController extends Controller
 
         $kategori->update($validated);
 
+        ActivityLog::record(
+            action: 'update',
+            module: 'kategori',
+            description: "Memperbarui master kategori: \"{$kategori->nama}\" (Modul {$kategori->modul})",
+            properties: ['kategori_id' => $kategori->id, 'modul' => $kategori->modul, 'nama' => $kategori->nama],
+            user: $request->user()
+        );
+
         return response()->json([
             'status' => 'success',
             'message' => 'Master kategori berhasil diperbarui.',
@@ -1302,14 +1634,103 @@ class AdminController extends Controller
         ]);
     }
 
-    public function deleteMasterKategori(int $id): JsonResponse
+    public function deleteMasterKategori(Request $request, int $id): JsonResponse
     {
         $kategori = MasterKategori::findOrFail($id);
+        $nama = $kategori->nama;
+        $modul = $kategori->modul;
+        $kategoriId = $kategori->id;
         $kategori->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'kategori',
+            description: "Menghapus master kategori: \"{$nama}\" (Modul {$modul})",
+            properties: ['kategori_id' => $kategoriId, 'nama' => $nama, 'modul' => $modul],
+            user: $request->user()
+        );
 
         return response()->json([
             'status' => 'success',
             'message' => 'Master kategori berhasil dihapus.',
+        ]);
+    }
+
+    /* ----------------------------------------------------
+     * ACTIVITY LOGS (SUPER ADMIN ONLY)
+     * ---------------------------------------------------- */
+    public function getActivityLogs(Request $request): JsonResponse
+    {
+        $query = ActivityLog::with('user:id,name,email,role')->latest();
+
+        if ($request->filled('user_id') && $request->user_id !== 'semua' && $request->user_id !== '') {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->filled('module') && $request->module !== 'semua' && $request->module !== '') {
+            $query->where('module', $request->module);
+        }
+
+        if ($request->filled('action') && $request->action !== 'semua' && $request->action !== '') {
+            $query->where('action', $request->action);
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('description', 'like', "%{$s}%")
+                    ->orWhere('user_name', 'like', "%{$s}%")
+                    ->orWhere('user_email', 'like', "%{$s}%")
+                    ->orWhere('ip_address', 'like', "%{$s}%");
+            });
+        }
+
+        $perPage = min(max((int) $request->input('per_page', 20), 5), 100);
+        $logs = $query->paginate($perPage);
+
+        // Summary metrics for Super Admin
+        $today = now()->toDateString();
+        $totalLogs = ActivityLog::count();
+        $todayLogs = ActivityLog::whereDate('created_at', $today)->count();
+        $activeUsersToday = ActivityLog::whereDate('created_at', $today)
+            ->whereNotNull('user_id')
+            ->distinct('user_id')
+            ->count('user_id');
+
+        $mostActiveModule = ActivityLog::select('module', DB::raw('count(*) as total'))
+            ->groupBy('module')
+            ->orderByDesc('total')
+            ->first();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $logs,
+            'summary' => [
+                'total_logs' => $totalLogs,
+                'today_logs' => $todayLogs,
+                'active_users_today' => $activeUsersToday,
+                'most_active_module' => $mostActiveModule ? $mostActiveModule->module : '-',
+            ],
+        ]);
+    }
+
+    public function getActivityLogUsers(): JsonResponse
+    {
+        $users = User::select('id', 'name', 'email', 'role')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $users,
         ]);
     }
 }

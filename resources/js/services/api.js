@@ -466,6 +466,16 @@ export const AdminService = {
     },
     async deleteMasterKategori(id) {
         return (await apiClient.delete(`/admin/kategori/${id}`)).data;
+    },
+
+    // Pemantauan Log Aktifitas (Super Admin Only)
+    async getActivityLogs(params = {}) {
+        const res = await apiClient.get('/admin/activity-logs', { params });
+        return res.data;
+    },
+    async getActivityLogUsers() {
+        const res = await apiClient.get('/admin/activity-logs/users');
+        return res.data?.data || [];
     }
 };
 

@@ -79,6 +79,10 @@ Route::prefix('admin')->group(function () {
             Route::post('/perangkat', [AdminController::class, 'storePerangkat']);
             Route::put('/perangkat/{id}', [AdminController::class, 'updatePerangkat']);
             Route::delete('/perangkat/{id}', [AdminController::class, 'deletePerangkat']);
+
+            // Pemantauan Log Aktifitas Setiap Akun (Super Admin Only)
+            Route::get('/activity-logs', [AdminController::class, 'getActivityLogs']);
+            Route::get('/activity-logs/users', [AdminController::class, 'getActivityLogUsers']);
         });
 
         // Master Kategori CRUD (Semua Staf Pengelola Konten & Administrasi)

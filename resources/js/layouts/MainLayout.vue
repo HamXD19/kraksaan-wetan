@@ -30,10 +30,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
+import { scanAndObserveElements } from '../directives/vReveal';
 
+const route = useRoute();
 const showScrollTop = ref(false);
 
 const handleScroll = () => {
@@ -44,8 +47,23 @@ const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
+const triggerRevealScan = () => {
+  nextTick(() => {
+    // Run scan multiple times to catch delayed API data fetches
+    scanAndObserveElements();
+    setTimeout(scanAndObserveElements, 100);
+    setTimeout(scanAndObserveElements, 350);
+    setTimeout(scanAndObserveElements, 700);
+  });
+};
+
+watch(() => route.fullPath, () => {
+  triggerRevealScan();
+});
+
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  triggerRevealScan();
 });
 
 onUnmounted(() => {
