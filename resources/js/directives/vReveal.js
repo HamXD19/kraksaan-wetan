@@ -5,11 +5,12 @@
 
 const observerOptions = {
   root: null,
-  rootMargin: '0px 0px -50px 0px', // Triggers slightly before reaching bottom of viewport
-  threshold: 0.08
+  rootMargin: '0px 0px -40px 0px', // Triggers slightly before reaching bottom of viewport
+  threshold: 0.05
 };
 
 let sharedObserver = null;
+let mutationObserver = null;
 
 function getSharedObserver() {
   if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
@@ -22,7 +23,7 @@ function getSharedObserver() {
         if (entry.isIntersecting) {
           const el = entry.target;
           el.classList.add('is-revealed');
-          // Once revealed, unobserve to free resources and keep state stable
+          // Once revealed, unobserve to save CPU/memory and maintain stable layout
           sharedObserver.unobserve(el);
         }
       });
@@ -44,8 +45,7 @@ function getSharedObserver() {
  */
 export const vReveal = {
   mounted(el, binding) {
-    // Check if current route is admin
-    if (window.location.pathname.startsWith('/admin')) {
+    if (typeof window === 'undefined' || window.location.pathname.startsWith('/admin')) {
       el.classList.add('is-revealed');
       return;
     }
@@ -65,7 +65,7 @@ export const vReveal = {
       el.classList.add('reveal-left');
     } else if (binding.modifiers.right) {
       el.classList.add('reveal-right');
-    } else {
+    } else if (!el.classList.contains('reveal') && !el.classList.contains('reveal-fade') && !el.classList.contains('reveal-scale') && !el.classList.contains('reveal-left') && !el.classList.contains('reveal-right')) {
       el.classList.add('reveal');
     }
 
@@ -87,7 +87,7 @@ export const vReveal = {
 };
 
 /**
- * Helper to scan and observe all `.reveal*` elements in DOM on page navigation
+ * Helper to scan and observe all `.reveal*` elements in DOM
  */
 export function scanAndObserveElements(rootEl = document) {
   if (typeof window === 'undefined' || window.location.pathname.startsWith('/admin')) {
@@ -97,10 +97,42 @@ export function scanAndObserveElements(rootEl = document) {
   const observer = getSharedObserver();
   if (!observer) return;
 
-  const elements = rootEl.querySelectorAll('.reveal, .reveal-fade, .reveal-scale, .reveal-left, .reveal-right');
+  const elements = rootEl.querySelectorAll('.reveal, .reveal-fade, .reveal-scale, .reveal-left, .reveal-right, [data-reveal]');
   elements.forEach((el) => {
     if (!el.classList.contains('is-revealed')) {
       observer.observe(el);
     }
   });
+}
+
+/**
+ * Setup continuous observer using MutationObserver to catch dynamic/async loaded content
+ */
+export function initAutoScrollReveal() {
+  if (typeof window === 'undefined' || window.location.pathname.startsWith('/admin')) {
+    return;
+  }
+
+  // Initial scan
+  scanAndObserveElements();
+
+  if (window.MutationObserver && !mutationObserver) {
+    mutationObserver = new MutationObserver((mutations) => {
+      let shouldScan = false;
+      for (const mutation of mutations) {
+        if (mutation.addedNodes.length > 0) {
+          shouldScan = true;
+          break;
+        }
+      }
+      if (shouldScan) {
+        scanAndObserveElements();
+      }
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  }
 }

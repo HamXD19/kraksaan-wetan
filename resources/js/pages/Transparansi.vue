@@ -4,18 +4,11 @@
     <Breadcrumb :items="[{ label: 'Informasi Publik', to: '/informasi-publik' }, { label: 'Transparansi & Akuntabilitas' }]" />
 
     <!-- Hero Header -->
-    <section class="bg-emerald-900 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/80 border border-emerald-700 text-amber-300 text-xs font-bold uppercase tracking-wider mb-2">
-          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-          Keterbukaan Anggaran & Tata Kelola
-        </div>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Transparansi & Akuntabilitas Anggaran</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-3xl leading-relaxed">
-          Portal pelaporan real-time penyerapan anggaran, program pembangunan sarana prasarana, pemberdayaan ekonomi, serta penyaluran bantuan sosial bagi segenap warga Kelurahan Kraksaan Wetan.
-        </p>
-      </div>
-    </section>
+    <HeroPageHeader 
+      badge-text="Keterbukaan Anggaran & Tata Kelola"
+      title="Transparansi & Akuntabilitas Anggaran"
+      description="Portal pelaporan real-time penyerapan anggaran, program pembangunan sarana prasarana, pemberdayaan ekonomi, serta penyaluran bantuan sosial bagi segenap warga Kelurahan Kraksaan Wetan."
+    />
 
     <!-- Main Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-12">
@@ -328,6 +321,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 

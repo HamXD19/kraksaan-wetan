@@ -20,16 +20,18 @@ Route::prefix('v1')->group(function () {
     Route::get('/layanan/{slug}', [PelayananController::class, 'getLayananBySlug']);
     Route::get('/pelayanan', [PelayananController::class, 'getLayanan']);
     Route::get('/pelayanan/{slug}', [PelayananController::class, 'getLayananBySlug']);
-    Route::post('/pelayanan/pengajuan', [PelayananController::class, 'submitPengajuan']);
-    Route::post('/pelayanan/tracking', [PelayananController::class, 'trackPengajuan']);
     Route::get('/berita', [KelurahanController::class, 'getBerita']);
     Route::get('/berita/{slug}', [KelurahanController::class, 'getBeritaBySlug']);
     Route::get('/pengumuman', [KelurahanController::class, 'getPengumuman']);
+    Route::get('/pengumuman/{id}/unduh', [KelurahanController::class, 'unduhPengumuman']);
+    Route::get('/dokumen', [KelurahanController::class, 'getDokumen']);
+    Route::get('/dokumen/{id}/unduh', [KelurahanController::class, 'unduhDokumen']);
     Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
     Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
     Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
     Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
-    Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
+    Route::get('/agenda', [KelurahanController::class, 'getAgenda']);
+    Route::get('/agenda/{slug}', [KelurahanController::class, 'getAgendaBySlug']);
     Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 });
 
@@ -39,18 +41,21 @@ Route::get('/layanan', [PelayananController::class, 'getLayanan']);
 Route::get('/layanan/{slug}', [PelayananController::class, 'getLayananBySlug']);
 Route::get('/pelayanan', [PelayananController::class, 'getLayanan']);
 Route::get('/pelayanan/{slug}', [PelayananController::class, 'getLayananBySlug']);
-Route::post('/pelayanan/pengajuan', [PelayananController::class, 'submitPengajuan']);
-Route::post('/pelayanan/tracking', [PelayananController::class, 'trackPengajuan']);
 Route::get('/berita', [KelurahanController::class, 'getBerita']);
 Route::get('/berita/{slug}', [KelurahanController::class, 'getBeritaBySlug']);
 Route::get('/kategori', [KelurahanController::class, 'getKategori']);
 Route::get('/pengumuman', [KelurahanController::class, 'getPengumuman']);
+Route::get('/pengumuman/{id}/unduh', [KelurahanController::class, 'unduhPengumuman']);
+Route::get('/dokumen', [KelurahanController::class, 'getDokumen']);
+Route::get('/dokumen/{id}/unduh', [KelurahanController::class, 'unduhDokumen']);
 Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
 Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
 Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
 Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
-Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
+Route::get('/agenda', [KelurahanController::class, 'getAgenda']);
+Route::get('/agenda/{slug}', [KelurahanController::class, 'getAgendaBySlug']);
 Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
+Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
 
 // Admin CMS Endpoints
 Route::prefix('admin')->group(function () {
@@ -110,6 +115,22 @@ Route::prefix('admin')->group(function () {
             Route::post('/galeri', [AdminController::class, 'storeGaleri']);
             Route::put('/galeri/{id}', [AdminController::class, 'updateGaleri']);
             Route::delete('/galeri/{id}', [AdminController::class, 'deleteGaleri']);
+
+            // Agenda Kegiatan CRUD
+            Route::get('/agenda', [AdminController::class, 'getAgenda']);
+            Route::post('/agenda', [AdminController::class, 'storeAgenda']);
+            Route::put('/agenda/{id}', [AdminController::class, 'updateAgenda']);
+            Route::put('/agenda/{id}/toggle-aktif', [AdminController::class, 'toggleAktifAgenda']);
+            Route::delete('/agenda/{id}', [AdminController::class, 'deleteAgenda']);
+        });
+
+        // Dokumen Publik (PDF) CRUD (Super Admin, Staff Konten, Staff Administrasi)
+        Route::middleware('admin.role:super_admin,staff_konten,staff_administrasi')->group(function () {
+            Route::get('/dokumen', [AdminController::class, 'getDokumen']);
+            Route::post('/dokumen', [AdminController::class, 'storeDokumen']);
+            Route::put('/dokumen/{id}', [AdminController::class, 'updateDokumen']);
+            Route::put('/dokumen/{id}/toggle-status', [AdminController::class, 'toggleDokumenStatus']);
+            Route::delete('/dokumen/{id}', [AdminController::class, 'deleteDokumen']);
         });
 
         // 3. STAFF PELAYANAN (Kelola Layanan SOP & Informasi)

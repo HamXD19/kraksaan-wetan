@@ -3,28 +3,12 @@
     <Breadcrumb :items="[{ label: 'Galeri Kegiatan', to: '/galeri' }, { label: galeri.judul || 'Detail Dokumentasi' }]" />
 
     <!-- Hero Header Portal Dokumentasi -->
-    <section class="relative bg-emerald-950 text-white overflow-hidden py-8 sm:py-10 border-b border-emerald-800">
-      <!-- Background subtle overlay -->
-      <div class="absolute inset-0 z-0 opacity-20">
-        <img 
-          src="/images/hero-bromo-vector.jpg" 
-          alt="Gunung Bromo - Kelurahan Kraksaan Wetan" 
-          class="w-full h-full object-cover object-[center_35%]"
-        />
-      </div>
-      <div class="absolute inset-0 z-1 bg-gradient-to-r from-emerald-950 via-emerald-950/90 to-transparent"></div>
-
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/90 border border-emerald-500/40 text-emerald-200 text-xs font-semibold mb-2 backdrop-blur-xs">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-          <span>DOKUMENTASI VISUAL RESMI</span>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Portal Galeri & Publikasi Visual</h2>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-1 max-w-2xl leading-relaxed">
-          Rekam jejak visual program kerja pemerintah, pelayanan masyarakat, dan kegiatan sosial warga Kelurahan Kraksaan Wetan.
-        </p>
-      </div>
-    </section>
+    <HeroPageHeader 
+      badge-text="DOKUMENTASI VISUAL RESMI"
+      title="Portal Galeri & Publikasi Visual"
+      description="Rekam jejak visual program kerja pemerintah, pelayanan masyarakat, dan kegiatan sosial warga Kelurahan Kraksaan Wetan."
+      padding-class="py-8 sm:py-10"
+    />
 
     <!-- Main Content Layout (Mirip Halaman Berita) -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
@@ -33,7 +17,7 @@
       <div v-else-if="galeri.id" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Kolom Kiri (Sidebar): Foto Terkini Lainnya (lg:col-span-4) -->
         <!-- Kolom Kiri (Sidebar): Khusus Video Dokumentasi (lg:col-span-4) -->
-        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 order-2 lg:order-1">
+        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 order-2 lg:order-1 reveal-left delay-75">
           <!-- Widget Khusus Video Dokumentasi -->
           <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -120,7 +104,7 @@
         </aside>
 
         <!-- Kolom Kanan: Konten Foto Utama (lg:col-span-8) -->
-        <main class="lg:col-span-8 bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm order-1 lg:order-2">
+        <main class="lg:col-span-8 bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm order-1 lg:order-2 reveal">
           <!-- Header Informasi Foto -->
           <div class="p-6 sm:p-10 space-y-4">
             <div class="flex flex-wrap items-center gap-2.5">
@@ -215,9 +199,11 @@
 
             <!-- Paragraf Keterangan Lengkap -->
             <div class="space-y-4 text-slate-700 leading-relaxed text-sm sm:text-base">
-              <p v-if="galeri.deskripsi" class="whitespace-pre-line">
-                {{ galeri.deskripsi }}
-              </p>
+              <div 
+                v-if="galeri.deskripsi" 
+                class="rich-content"
+                v-html="galeri.deskripsi"
+              ></div>
               <p v-else class="text-slate-400 italic text-sm">
                 Dokumentasi visual arsip resmi kegiatan dan pelayanan Pemerintah Kelurahan Kraksaan Wetan.
               </p>
@@ -293,7 +279,7 @@
                       {{ item.judul }}
                     </h4>
                     <p class="text-[11px] text-slate-500 line-clamp-2 mt-1">
-                      {{ item.deskripsi }}
+                      {{ (item.deskripsi || '').replace(/<[^>]*>?/gm, '') }}
                     </p>
                   </div>
 
@@ -355,6 +341,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 
@@ -444,3 +431,37 @@ const sharePhoto = async () => {
   }
 };
 </script>
+
+<style scoped>
+.rich-content :deep(p) {
+  margin-bottom: 0.75rem;
+  line-height: 1.7;
+}
+.rich-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+.rich-content :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.rich-content :deep(ol) {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+.rich-content :deep(li) {
+  margin-bottom: 0.25rem;
+}
+.rich-content :deep(blockquote) {
+  border-left: 4px solid #10b981;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #475569;
+  margin: 0.75rem 0;
+}
+.rich-content :deep(a) {
+  color: #047857;
+  text-decoration: underline;
+}
+</style>

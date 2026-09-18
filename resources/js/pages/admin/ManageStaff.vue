@@ -234,110 +234,130 @@
     </div>
 
     <!-- MODAL 1: Tambah / Edit Staf -->
-    <div v-if="showModalForm" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-5 animate-in fade-in zoom-in duration-200">
-        <!-- Modal Header -->
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+    <div v-if="showModalForm" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[90vh] overflow-hidden">
+        <!-- Modal Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
           <div>
-            <h3 class="font-bold text-slate-900 text-base">
+            <h3 class="font-bold text-slate-900 text-base sm:text-lg">
               {{ isEditing ? 'Edit Akun Staf' : 'Tambah Akun Staf Baru' }}
             </h3>
             <p class="text-xs text-slate-500">Tentukan nama, alamat email resmi, serta peran dan hak akses staf.</p>
           </div>
-          <button @click="showModalForm = false" class="text-slate-400 hover:text-slate-700 font-bold text-lg">&times;</button>
+          <button @click="showModalForm = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-700 font-bold cursor-pointer" title="Tutup">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
 
-        <!-- Form Fields -->
-        <form @submit.prevent="submitForm" class="space-y-4">
-          <!-- Nama Lengkap -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Staf *</label>
-            <input 
-              v-model="form.name" 
-              type="text" 
-              required
-              placeholder="Contoh: Rahmat Hidayat, S.Kom." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
-            />
-          </div>
-
-          <!-- Email Resmi -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email Resmi *</label>
-            <input 
-              v-model="form.email" 
-              type="email" 
-              required
-              placeholder="nama@kraksaanwetan.go.id" 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
-            />
-          </div>
-
-          <!-- Pilihan Peran (Role) -->
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1.5">Peran & Hak Akses (Role) *</label>
-            <div class="space-y-2">
-              <label 
-                v-for="opt in roleOptions" 
-                :key="opt.value"
-                class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition text-xs"
-                :class="form.role === opt.value ? opt.activeBorderClass : 'border-slate-200 hover:bg-slate-50'"
-              >
-                <input 
-                  type="radio" 
-                  name="role" 
-                  :value="opt.value" 
-                  v-model="form.role"
-                  class="mt-0.5 text-purple-600 focus:ring-purple-500" 
-                />
-                <div class="space-y-0.5">
-                  <p class="font-bold" :class="opt.titleClass">{{ opt.label }}</p>
-                  <p class="text-[11px] text-slate-500">{{ opt.desc }}</p>
+        <!-- Form Fields with Sticky Footer -->
+        <form @submit.prevent="submitForm" class="flex flex-col flex-1 overflow-hidden">
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-5">
+              <!-- Left Column: Identitas & Keamanan (cols-6) -->
+              <div class="md:col-span-6 space-y-4">
+                <!-- Nama Lengkap -->
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Staf *</label>
+                  <input 
+                    v-model="form.name" 
+                    type="text" 
+                    required
+                    placeholder="Contoh: Rahmat Hidayat, S.Kom." 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
+                  />
                 </div>
-              </label>
+
+                <!-- Email Resmi -->
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Alamat Email Resmi *</label>
+                  <input 
+                    v-model="form.email" 
+                    type="email" 
+                    required
+                    placeholder="nama@kraksaanwetan.go.id" 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <!-- Kata Sandi -->
+                <div v-if="!isEditing" class="p-3.5 rounded-2xl bg-purple-50/50 border border-purple-100 space-y-1">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi Awal * (Min. 6 karakter)</label>
+                  <input 
+                    v-model="form.password" 
+                    type="password" 
+                    required
+                    minlength="6"
+                    placeholder="Masukkan kata sandi awal staf" 
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
+                  />
+                </div>
+
+                <div v-else class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
+                  <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi Baru (Opsional)</label>
+                  <input 
+                    v-model="form.password" 
+                    type="password" 
+                    minlength="6"
+                    placeholder="Kosongkan jika tidak diubah" 
+                    class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
+                  />
+                </div>
+              </div>
+
+              <!-- Right Column: Pilihan Peran (Role) (cols-6) -->
+              <div class="md:col-span-6 space-y-2">
+                <label class="block text-xs font-bold text-slate-700 mb-1">Peran & Hak Akses (Role) *</label>
+                <div class="space-y-2.5">
+                  <label 
+                    v-for="opt in roleOptions" 
+                    :key="opt.value"
+                    class="flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition text-xs"
+                    :class="form.role === opt.value ? opt.activeBorderClass : 'border-slate-200 hover:bg-slate-50'"
+                  >
+                    <input 
+                      type="radio" 
+                      name="role" 
+                      :value="opt.value" 
+                      v-model="form.role"
+                      class="mt-0.5 text-purple-600 focus:ring-purple-500" 
+                    />
+                    <div class="space-y-0.5">
+                      <p class="font-bold" :class="opt.titleClass">{{ opt.label }}</p>
+                      <p class="text-[11px] text-slate-500 leading-snug">{{ opt.desc }}</p>
+                    </div>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Kata Sandi (Hanya jika Tambah Baru atau Opsional saat Edit) -->
-          <div v-if="!isEditing">
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi Awal * (Minimal 6 karakter)</label>
-            <input 
-              v-model="form.password" 
-              type="password" 
-              required
-              minlength="6"
-              placeholder="Masukkan kata sandi awal staf" 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
-            />
-          </div>
-
-          <div v-else>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kata Sandi Baru (Opsional)</label>
-            <input 
-              v-model="form.password" 
-              type="password" 
-              minlength="6"
-              placeholder="Kosongkan jika tidak ingin mengubah kata sandi" 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-purple-600 focus:outline-hidden"
-            />
-          </div>
-
-          <!-- Actions -->
-          <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModalForm = false"
-              class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving"
-              class="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-xs font-bold transition shadow-xs"
-            >
-              {{ saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Buat Akun Staf') }}
-            </button>
+          <!-- Modal Sticky Footer -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <div class="text-xs text-slate-400">
+              <span v-if="isEditing" class="text-purple-700 font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+                Mode Edit Akun Staf
+              </span>
+              <span v-else class="text-slate-500">
+                Menambahkan akun staf baru
+              </span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <button 
+                type="button" 
+                @click="showModalForm = false"
+                class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 text-xs sm:text-sm font-bold transition cursor-pointer"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="saving"
+                class="px-5 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 disabled:opacity-50 text-white text-xs sm:text-sm font-bold transition shadow-xs cursor-pointer flex items-center gap-1.5"
+              >
+                {{ saving ? 'Menyimpan...' : (isEditing ? 'Simpan Perubahan' : 'Buat Akun Staf') }}
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -389,7 +409,16 @@
 
     <!-- MODAL 3: Konfirmasi Hapus Staf -->
     <div v-if="showModalDelete" class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200 relative">
+        <button 
+          type="button" 
+          @click="showModalDelete = false" 
+          class="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          title="Tutup"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
         <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
@@ -426,7 +455,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const staffList = ref([]);
@@ -631,7 +662,9 @@ const submitForm = async () => {
       };
       if (form.password) payload.password = form.password;
       const res = await AdminService.updateStaff(editId.value, payload);
-      successMsg.value = res.message || 'Data staf berhasil diperbarui.';
+      const msg = res.message || 'Data staf berhasil diperbarui.';
+      successMsg.value = msg;
+      toast.success(msg, 'Akun Staf');
     } else {
       const res = await AdminService.storeStaff({
         name: form.name,
@@ -639,12 +672,16 @@ const submitForm = async () => {
         role: form.role,
         password: form.password,
       });
-      successMsg.value = res.message || 'Akun staf berhasil dibuat.';
+      const msg = res.message || 'Akun staf berhasil dibuat.';
+      successMsg.value = msg;
+      toast.success(msg, 'Akun Staf');
     }
     showModalForm.value = false;
     await loadStaff();
   } catch (e) {
-    errorMsg.value = e.response?.data?.message || 'Gagal menyimpan data staf.';
+    const err = e.response?.data?.message || 'Gagal menyimpan data staf.';
+    errorMsg.value = err;
+    toast.error(err, 'Gagal Menyimpan');
   } finally {
     saving.value = false;
   }
@@ -665,10 +702,14 @@ const submitResetPassword = async () => {
     const res = await AdminService.resetStaffPassword(targetStaff.value.id, {
       password: pwdForm.password,
     });
-    successMsg.value = res.message || 'Kata sandi berhasil direset.';
+    const msg = res.message || 'Kata sandi berhasil direset.';
+    successMsg.value = msg;
+    toast.success(msg, 'Reset Kata Sandi');
     showModalPwd.value = false;
   } catch (e) {
-    errorMsg.value = e.response?.data?.message || 'Gagal mereset kata sandi staf.';
+    const err = e.response?.data?.message || 'Gagal mereset kata sandi staf.';
+    errorMsg.value = err;
+    toast.error(err, 'Gagal Reset Sandi');
   } finally {
     saving.value = false;
   }
@@ -686,11 +727,15 @@ const executeDelete = async () => {
   errorMsg.value = '';
   try {
     const res = await AdminService.deleteStaff(targetStaff.value.id);
-    successMsg.value = res.message || 'Akun staf berhasil dihapus.';
+    const msg = res.message || 'Akun staf berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Akun Dihapus');
     showModalDelete.value = false;
     await loadStaff();
   } catch (e) {
-    errorMsg.value = e.response?.data?.message || 'Gagal menghapus akun staf.';
+    const err = e.response?.data?.message || 'Gagal menghapus akun staf.';
+    errorMsg.value = err;
+    toast.error(err, 'Gagal Menghapus');
   } finally {
     saving.value = false;
   }

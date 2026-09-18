@@ -3,31 +3,12 @@
     <Breadcrumb :items="[{ label: 'Berita', to: '/berita' }, { label: berita.judul || 'Detail Berita' }]" />
 
     <!-- Hero Header Portal Berita Tetap Muncul -->
-    <section class="relative bg-emerald-950 text-white overflow-hidden py-8 sm:py-10 border-b border-emerald-800">
-      <!-- Subtle Scenic Background Vector -->
-      <div class="absolute inset-0 z-0 opacity-20">
-        <img 
-          src="/images/hero-bromo-vector.jpg" 
-          alt="Gunung Bromo - Kelurahan Kraksaan Wetan" 
-          class="w-full h-full object-cover object-[center_35%]"
-        />
-      </div>
-
-      <!-- Gradient Overlay -->
-      <div class="absolute inset-0 z-1 bg-gradient-to-r from-emerald-950 via-emerald-950/90 to-transparent"></div>
-
-      <!-- Hero Header Content -->
-      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/90 border border-emerald-500/40 text-emerald-200 text-xs font-semibold mb-2 backdrop-blur-xs">
-          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-          <span>KABAR & INFORMASI RESMI</span>
-        </div>
-        <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">Portal Berita & Publikasi Kelurahan</h2>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-1 max-w-2xl leading-relaxed">
-          Liputan resmi kegiatan kemasyarakatan, program pembangunan wilayah, dan transparansi pelayanan publik Kelurahan Kraksaan Wetan.
-        </p>
-      </div>
-    </section>
+    <HeroPageHeader 
+      badge-text="KABAR & INFORMASI RESMI"
+      title="Portal Berita & Publikasi Kelurahan"
+      description="Liputan resmi kegiatan kemasyarakatan, program pembangunan wilayah, dan transparansi pelayanan publik Kelurahan Kraksaan Wetan."
+      padding-class="py-8 sm:py-10"
+    />
 
     <!-- Main Container Layout 2 Kolom Profesional -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
@@ -35,7 +16,7 @@
 
       <div v-else-if="berita.id" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <!-- Kolom Kiri (Sidebar): Berita Terkini (lg:col-span-4) -->
-        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 order-2 lg:order-1">
+        <aside class="lg:col-span-4 space-y-6 lg:sticky lg:top-24 order-2 lg:order-1 reveal-left delay-75">
           <!-- Widget Berita Terkini -->
           <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs space-y-4">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -112,7 +93,7 @@
         </aside>
 
         <!-- Kolom Kanan: Konten Artikel Utama (lg:col-span-8) -->
-        <main class="lg:col-span-8 bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm order-1 lg:order-2">
+        <main class="lg:col-span-8 bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm order-1 lg:order-2 reveal">
           <!-- Header Informasi Artikel -->
           <div class="p-6 sm:p-10 space-y-4">
             <div class="flex flex-wrap items-center gap-2.5">
@@ -156,9 +137,10 @@
             </p>
 
             <!-- Teks Berita Lengkap -->
-            <div class="space-y-4 whitespace-pre-line text-slate-700 leading-relaxed">
-              {{ berita.konten }}
-            </div>
+            <div 
+              class="rich-content text-slate-700 text-sm sm:text-base leading-relaxed"
+              v-html="formattedKonten"
+            ></div>
 
             <!-- Share & Navigasi Bawah -->
             <div class="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -198,12 +180,15 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
+import { useToast } from '../composables/useToast';
 
+const toast = useToast();
 const route = useRoute();
 const loading = ref(true);
 const berita = ref({});
@@ -250,7 +235,74 @@ onMounted(() => {
 const shareArticle = () => {
   if (navigator.clipboard) {
     navigator.clipboard.writeText(window.location.href);
-    alert('Tautan berita berhasil disalin ke clipboard!');
+    toast.success('Tautan berita berhasil disalin ke clipboard!', 'Tautan Disalin');
   }
 };
+
+const formattedKonten = computed(() => {
+  if (!berita.value?.konten) return '';
+  const text = berita.value.konten;
+  if (/<(p|h[1-6]|ul|ol|li|div|blockquote|span|b|i|u|strong|em)[^>]*>/i.test(text)) {
+    return text;
+  }
+  return text.split(/\n\n+/).map(p => `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`).join('');
+});
 </script>
+
+<style scoped>
+.rich-content :deep(h2) {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #0f172a;
+}
+.rich-content :deep(h3) {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+.rich-content :deep(h4) {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #334155;
+}
+.rich-content :deep(p) {
+  margin-bottom: 1rem;
+  line-height: 1.75;
+}
+.rich-content :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.75rem;
+  margin-bottom: 1rem;
+}
+.rich-content :deep(ol) {
+  list-style-type: decimal;
+  padding-left: 1.75rem;
+  margin-bottom: 1rem;
+}
+.rich-content :deep(li) {
+  margin-bottom: 0.35rem;
+}
+.rich-content :deep(blockquote) {
+  border-left: 4px solid #10b981;
+  padding-left: 1.25rem;
+  font-style: italic;
+  color: #475569;
+  margin: 1.25rem 0;
+}
+.rich-content :deep(a) {
+  color: #047857;
+  text-decoration: underline;
+  font-weight: 600;
+}
+.rich-content :deep(hr) {
+  border: 0;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+</style>

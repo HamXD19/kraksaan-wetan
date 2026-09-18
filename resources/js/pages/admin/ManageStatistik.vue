@@ -113,9 +113,19 @@
     </template>
 
     <!-- Modal Lingkungan -->
-    <div v-if="showLingkunganModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs" @click.self="showLingkunganModal = false">
+    <div v-if="showLingkunganModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
       <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-        <h4 class="text-base font-bold text-slate-900 mb-4">{{ lingkunganEditId ? 'Edit RW' : 'Tambah RW' }}</h4>
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+          <h4 class="text-base font-bold text-slate-900">{{ lingkunganEditId ? 'Edit RW' : 'Tambah RW' }}</h4>
+          <button 
+            type="button" 
+            @click="showLingkunganModal = false" 
+            class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
         <form @submit.prevent="saveLingkungan" class="space-y-3 text-xs sm:text-sm">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Nama Lingkungan / RW *</label>
@@ -145,7 +155,9 @@
 import { ref, reactive, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import { AdminService, KelurahanService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const successMsg = ref('');
@@ -194,9 +206,12 @@ const saveStatistik = async () => {
   saving.value = true;
   try {
     const res = await AdminService.updateStatistik(statForm);
-    successMsg.value = res.message || 'Statistik berhasil diperbarui!';
+    const msg = res.message || 'Statistik berhasil diperbarui!';
+    successMsg.value = msg;
+    toast.success(msg, 'Statistik Kependudukan');
   } catch (err) {
-    alert('Gagal menyimpan statistik: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';
+    toast.error('Gagal menyimpan statistik: ' + errText, 'Gagal Menyimpan');
   } finally {
     saving.value = false;
   }
@@ -221,10 +236,13 @@ const saveLingkungan = async () => {
   try {
     await AdminService.saveLingkungan(lingkunganForm, lingkunganEditId.value);
     showLingkunganModal.value = false;
-    successMsg.value = 'Data lingkungan RW berhasil disimpan!';
+    const msg = lingkunganEditId.value ? 'Data lingkungan RW berhasil diperbarui!' : 'Data lingkungan RW baru berhasil ditambahkan!';
+    successMsg.value = msg;
+    toast.success(msg, 'Wilayah RW');
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan RW.');
+    const errText = err.response?.data?.message || err.message || 'Gagal menyimpan data RW';
+    toast.error('Gagal menyimpan RW: ' + errText, 'Gagal Menyimpan');
   }
 };
 
@@ -232,12 +250,17 @@ const deleteLingkungan = async (id) => {
   if (!confirm('Hapus lingkungan RW ini?')) return;
   try {
     await AdminService.deleteLingkungan(id);
-    successMsg.value = 'Lingkungan RW berhasil dihapus.';
+    const msg = 'Lingkungan RW berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'RW Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus RW.');
+    const errText = err.response?.data?.message || err.message || 'Gagal menghapus data RW';
+    toast.error('Gagal menghapus RW: ' + errText, 'Gagal Menghapus');
   }
 };
 
-onMounted(loadData);
+onMounted(() => {
+  loadData();
+});
 </script>

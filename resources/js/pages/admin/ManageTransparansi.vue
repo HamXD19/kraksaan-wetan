@@ -280,243 +280,267 @@
       </div>
     </div>
 
-    <!-- Modal Form Tambah / Edit Kegiatan Anggaran -->
+    <!-- Modal Form Tambah / Edit -->
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
-      @click.self="showModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
-        <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+        <!-- Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
           <div>
-            <h3 class="text-lg font-bold text-slate-900">
-              {{ editId ? 'Sunting Program & Kegiatan Anggaran' : 'Tambah Program & Kegiatan Baru' }}
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              {{ editId ? 'Sunting Kegiatan Anggaran' : 'Tambah Kegiatan Anggaran Baru' }}
             </h3>
             <p class="text-xs text-slate-500">Isi data pagu rencana, realisasi anggaran, target penerima manfaat, dan capaian fisik.</p>
           </div>
-          <button @click="showModal = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+          <button @click="showModal = false" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer transition" title="Tutup">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           </button>
         </div>
 
-        <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
-          <!-- Baris 1: Tahun Anggaran & Kategori -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Tahun Anggaran *</label>
-              <input 
-                type="number" 
-                v-model.number="form.tahun" 
-                required 
-                min="2020" 
-                max="2035"
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
+        <!-- Form with Scrollable Interior & Sticky Footer -->
+        <form @submit.prevent="saveItem" class="flex flex-col flex-1 overflow-hidden">
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left Column: Program, Kegiatan & Deskripsi -->
+              <div class="lg:col-span-6 space-y-3.5">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nama Program Induk *</label>
+                  <input 
+                    type="text" 
+                    v-model="form.program" 
+                    required 
+                    placeholder="Contoh: Program Sarana Prasarana Perkotaan" 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-medium text-xs sm:text-sm"
+                  />
+                </div>
 
-            <div class="sm:col-span-2">
-              <label class="block font-bold text-slate-700 mb-1">Kategori Program *</label>
-              <select 
-                v-model="form.kategori" 
-                required 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
-              >
-                <option v-for="k in kategoriOptions" :key="k.id" :value="k.nama">
-                  {{ k.nama }}
-                </option>
-                <option v-if="form.kategori && !kategoriOptions.some(k => k.nama === form.kategori)" :value="form.kategori">
-                  {{ form.kategori }}
-                </option>
-              </select>
-            </div>
-          </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nama Kegiatan Spesifik *</label>
+                  <input 
+                    type="text" 
+                    v-model="form.kegiatan" 
+                    required 
+                    placeholder="Contoh: Pembangunan Saluran Drainase RW 02" 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-medium text-xs sm:text-sm"
+                  />
+                </div>
 
-          <!-- Baris 2: Program Induk -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Program Induk *</label>
-            <input 
-              type="text" 
-              v-model="form.program" 
-              required 
-              placeholder="Contoh: Program Peningkatan Sarana dan Prasarana Lingkungan Perkotaan" 
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            />
-          </div>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Deskripsi / Rincian Kegiatan</label>
+                  <RichTextEditor 
+                    v-model="form.deskripsi" 
+                    placeholder="Catatan teknis, spesifikasi pekerjaan, atau dampak kegiatan..." 
+                    height="160px"
+                    maxHeight="240px"
+                  />
+                </div>
 
-          <!-- Baris 3: Nama Kegiatan -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Kegiatan Spesifik *</label>
-            <input 
-              type="text" 
-              v-model="form.kegiatan" 
-              required 
-              placeholder="Contoh: Pembangunan & Normalisasi Saluran Drainase U-Ditch RW 02" 
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            />
-          </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Sumber Dana *</label>
+                    <input 
+                      type="text" 
+                      v-model="form.sumber_dana" 
+                      required 
+                      placeholder="ADK / APBD / BKK" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Lokasi Kegiatan</label>
+                    <input 
+                      type="text" 
+                      v-model="form.lokasi" 
+                      placeholder="Jl. Pattimura RW 02" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                    />
+                  </div>
+                </div>
 
-          <!-- Baris 4: Sumber Dana & Lokasi -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Sumber Dana *</label>
-              <input 
-                type="text" 
-                v-model="form.sumber_dana" 
-                required 
-                placeholder="Alokasi Dana Kelurahan (ADK) / APBD / BKK" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Lokasi Pelaksanaan</label>
-              <input 
-                type="text" 
-                v-model="form.lokasi" 
-                placeholder="Contoh: Jl. Pattimura s.d. Gang Patemon RW 02" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <!-- Baris 5: Rencana vs Realisasi Anggaran (Budget Tracking) -->
-          <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100 space-y-3">
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-emerald-950 text-xs uppercase tracking-wider">Tracking Anggaran (Rupiah)</span>
-              <span class="text-[11px] font-bold text-emerald-800">
-                Serapan: {{ modalSerapanPercent }}% | Sisa: {{ formatRupiah(modalSisaAnggaran) }}
-              </span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label class="block font-bold text-slate-700 mb-1">Pagu Anggaran Rencana (Rp) *</label>
-                <input 
-                  type="number" 
-                  v-model.number="form.anggaran_rencana" 
-                  required 
-                  min="0"
-                  placeholder="0"
-                  class="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-mono font-bold text-slate-900 bg-white focus:ring-2 focus:ring-emerald-600 outline-none"
-                />
-                <span class="text-[10px] text-slate-500 mt-0.5 block font-mono">{{ formatRupiah(form.anggaran_rencana) }}</span>
+                <div class="flex items-center gap-2 pt-1">
+                  <input 
+                    type="checkbox" 
+                    id="check_transparansi_aktif" 
+                    v-model="form.aktif" 
+                    class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+                  />
+                  <label for="check_transparansi_aktif" class="font-bold text-slate-700 cursor-pointer select-none text-xs">
+                    Publikasikan ke Portal Warga (Status Aktif)
+                  </label>
+                </div>
               </div>
 
-              <div>
-                <label class="block font-bold text-slate-700 mb-1">Realisasi Anggaran Terserap (Rp)</label>
-                <input 
-                  type="number" 
-                  v-model.number="form.anggaran_realisasi" 
-                  min="0"
-                  placeholder="0"
-                  class="w-full px-3.5 py-2 rounded-xl border border-slate-200 font-mono font-bold text-emerald-700 bg-white focus:ring-2 focus:ring-emerald-600 outline-none"
-                />
-                <span class="text-[10px] text-emerald-600 mt-0.5 block font-mono">{{ formatRupiah(form.anggaran_realisasi) }}</span>
+              <!-- Right Column: Meta, Budget & Progres -->
+              <div class="lg:col-span-6 space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Tahun Anggaran *</label>
+                    <input 
+                      type="number" 
+                      v-model.number="form.tahun" 
+                      required 
+                      min="2020" 
+                      max="2035"
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+
+                  <div class="sm:col-span-2">
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block font-bold text-slate-700 text-xs">Kategori *</label>
+                      <button 
+                        type="button" 
+                        @click="isCustomKategori = !isCustomKategori"
+                        class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        {{ isCustomKategori ? '← Master' : '+ Baru' }}
+                      </button>
+                    </div>
+                    <div v-if="!isCustomKategori">
+                      <select 
+                        v-model="form.kategori" 
+                        required 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      >
+                        <option v-for="k in kategoriOptions" :key="k.id || k" :value="k.nama || k">
+                          {{ k.nama || k }}
+                        </option>
+                        <option v-if="form.kategori && !kategoriOptions.some(k => (k.nama || k) === form.kategori)" :value="form.kategori">
+                          {{ form.kategori }}
+                        </option>
+                      </select>
+                    </div>
+                    <div v-else>
+                      <input 
+                        type="text" 
+                        v-model="form.customKategori" 
+                        required 
+                        placeholder="Kategori baru..." 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Budget Tracking -->
+                <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100 space-y-2.5">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-emerald-950 text-xs uppercase tracking-wider">Tracking Anggaran</span>
+                    <span class="text-[10px] font-bold text-emerald-800">
+                      Serapan: {{ modalSerapanPercent }}% | Sisa: {{ formatRupiah(modalSisaAnggaran) }}
+                    </span>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1 text-[11px]">Pagu Rencana (Rp) *</label>
+                      <input 
+                        type="number" 
+                        v-model.number="form.anggaran_rencana" 
+                        required 
+                        min="0" 
+                        placeholder="0"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-mono font-bold text-slate-900 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-600"
+                      />
+                      <span class="text-[9px] text-slate-500 mt-0.5 block font-mono truncate">{{ formatRupiah(form.anggaran_rencana) }}</span>
+                    </div>
+
+                    <div>
+                      <label class="block font-bold text-slate-700 mb-1 text-[11px]">Realisasi Terserap (Rp)</label>
+                      <input 
+                        type="number" 
+                        v-model.number="form.anggaran_realisasi" 
+                        min="0" 
+                        placeholder="0"
+                        class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-mono font-bold text-emerald-700 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-600"
+                      />
+                      <span class="text-[9px] text-emerald-600 mt-0.5 block font-mono truncate">{{ formatRupiah(form.anggaran_realisasi) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Penerima Manfaat -->
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Target Penerima</label>
+                    <input 
+                      type="text" 
+                      v-model="form.penerima_manfaat_target" 
+                      placeholder="350 KK Prasejahtera" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Realisasi Penerima</label>
+                    <input 
+                      type="text" 
+                      v-model="form.penerima_manfaat_realisasi" 
+                      placeholder="348 KK Terbantu" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                </div>
+
+                <!-- Status & PJ -->
+                <div class="grid grid-cols-3 gap-2.5">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Status</label>
+                    <select 
+                      v-model="form.status" 
+                      class="w-full px-2.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs font-medium"
+                    >
+                      <option value="Rencana">Rencana</option>
+                      <option value="Sedang Berjalan">Berjalan</option>
+                      <option value="Selesai">Selesai</option>
+                      <option value="Evaluasi">Evaluasi</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Fisik (%)</label>
+                    <input 
+                      type="number" 
+                      v-model.number="form.progres_fisik" 
+                      min="0" 
+                      max="100" 
+                      class="w-full px-2.5 py-2 rounded-xl border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">PJ Pelaksana</label>
+                    <input 
+                      type="text" 
+                      v-model="form.penanggung_jawab" 
+                      placeholder="Kasi Ekbang" 
+                      class="w-full px-2.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Baris 6: Penerima Manfaat -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Target Penerima Manfaat</label>
-              <input 
-                type="text" 
-                v-model="form.penerima_manfaat_target" 
-                placeholder="Contoh: 350 KK Prasejahtera / 950 Jiwa" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Realisasi Penerima Manfaat</label>
-              <input 
-                type="text" 
-                v-model="form.penerima_manfaat_realisasi" 
-                placeholder="Contoh: 348 KK Terbantu / Terbebas genangan" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <!-- Baris 7: Status & Progres Fisik -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Status Pelaksanaan</label>
-              <select 
-                v-model="form.status" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
+          <!-- Sticky Footer Actions -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-xs text-slate-400 italic hidden sm:inline">Kolom bertanda * wajib diisi</span>
+            <div class="flex items-center gap-2.5 ml-auto">
+              <button 
+                type="button" 
+                @click="showModal = false" 
+                class="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition cursor-pointer"
               >
-                <option value="Rencana">Rencana</option>
-                <option value="Sedang Berjalan">Sedang Berjalan</option>
-                <option value="Selesai">Selesai</option>
-                <option value="Evaluasi">Evaluasi</option>
-              </select>
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="saving" 
+                class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition shadow-xs flex items-center gap-1.5 cursor-pointer"
+              >
+                <span v-if="saving">Menyimpan...</span>
+                <span v-else>{{ editId ? 'Simpan Perubahan' : 'Tambahkan Kegiatan' }}</span>
+              </button>
             </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Progres Fisik (%)</label>
-              <input 
-                type="number" 
-                v-model.number="form.progres_fisik" 
-                min="0" 
-                max="100" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono font-bold focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Penanggung Jawab (PJ)</label>
-              <input 
-                type="text" 
-                v-model="form.penanggung_jawab" 
-                placeholder="Kasi Ekbang / Kesra" 
-                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <!-- Baris 8: Deskripsi -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Deskripsi / Rincian Kegiatan</label>
-            <textarea 
-              v-model="form.deskripsi" 
-              rows="2" 
-              placeholder="Catatan teknis, spesifikasi pekerjaan, atau dampak kegiatan..." 
-              class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none resize-none leading-relaxed"
-            ></textarea>
-          </div>
-
-          <!-- Baris 9: Status Publikasi -->
-          <div class="flex items-center gap-2 pt-1">
-            <input 
-              type="checkbox" 
-              id="check_transparansi_aktif" 
-              v-model="form.aktif" 
-              class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
-            />
-            <label for="check_transparansi_aktif" class="font-bold text-slate-700 cursor-pointer select-none">
-              Publikasikan ke Portal Warga (Status Aktif)
-            </label>
-          </div>
-
-          <!-- Actions -->
-          <div class="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModal = false" 
-              class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold transition"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving" 
-              class="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition shadow-sm flex items-center gap-1.5"
-            >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>{{ editId ? 'Simpan Perubahan' : 'Tambahkan Kegiatan' }}</span>
-            </button>
           </div>
         </form>
       </div>
@@ -527,8 +551,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const successMsg = ref('');
@@ -546,6 +573,7 @@ const filterTahun = ref(new Date().getFullYear());
 const filterKategori = ref('Semua');
 const searchQuery = ref('');
 const showModal = ref(false);
+const isCustomKategori = ref(false);
 const editId = ref(null);
 
 const form = reactive({
@@ -553,6 +581,7 @@ const form = reactive({
   program: '',
   kegiatan: '',
   kategori: 'Infrastruktur & Sarpras',
+  customKategori: '',
   sumber_dana: 'Alokasi Dana Kelurahan (ADK)',
   anggaran_rencana: 0,
   anggaran_realisasi: 0,
@@ -660,6 +689,8 @@ const loadData = async () => {
 };
 
 const openModal = (item = null) => {
+  isCustomKategori.value = false;
+  form.customKategori = '';
   if (item) {
     editId.value = item.id;
     form.tahun = item.tahun;
@@ -683,7 +714,7 @@ const openModal = (item = null) => {
     form.tahun = filterTahun.value !== 'Semua' ? Number(filterTahun.value) : new Date().getFullYear();
     form.program = '';
     form.kegiatan = '';
-    form.kategori = kategoriOptions.value.length > 0 ? kategoriOptions.value[0].nama : 'Infrastruktur & Sarpras';
+    form.kategori = kategoriOptions.value.length > 0 ? (kategoriOptions.value[0]?.nama || kategoriOptions.value[0]) : 'Infrastruktur & Sarpras';
     form.sumber_dana = 'Alokasi Dana Kelurahan (ADK)';
     form.anggaran_rencana = 0;
     form.anggaran_realisasi = 0;
@@ -704,12 +735,18 @@ const saveItem = async () => {
   saving.value = true;
   try {
     const payload = { ...form };
+    if (isCustomKategori.value && form.customKategori?.trim()) {
+      payload.kategori = form.customKategori.trim();
+    }
     const res = await AdminService.saveTransparansi(payload, editId.value);
-    successMsg.value = res?.message || 'Data kegiatan anggaran berhasil disimpan!';
+    const msg = res?.message || 'Data kegiatan anggaran berhasil disimpan!';
+    successMsg.value = msg;
+    toast.success(msg, editId.value ? 'Anggaran Diperbarui' : 'Kegiatan Anggaran Ditambahkan');
     showModal.value = false;
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan kegiatan anggaran: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan kegiatan anggaran.';
+    toast.error('Gagal menyimpan kegiatan anggaran: ' + errMsg);
   } finally {
     saving.value = false;
   }
@@ -720,9 +757,12 @@ const toggleAktif = async (item) => {
   try {
     await AdminService.toggleAktifTransparansi(item.id, newState);
     item.aktif = newState;
-    successMsg.value = `Status kegiatan "${item.kegiatan}" berhasil diubah menjadi ${newState ? 'Live (Tampil)' : 'Draft (Sembunyi)'}.`;
+    const msg = `Status kegiatan "${item.kegiatan}" berhasil diubah menjadi ${newState ? 'Live (Tampil)' : 'Draft (Sembunyi)'}.`;
+    successMsg.value = msg;
+    toast.success(msg, 'Status Transparansi Diperbarui');
   } catch (err) {
-    alert('Gagal mengubah status kegiatan: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal mengubah status kegiatan.';
+    toast.error(errMsg);
   }
 };
 
@@ -732,10 +772,13 @@ const deleteItem = async (item) => {
   }
   try {
     await AdminService.deleteTransparansi(item.id);
-    successMsg.value = `Kegiatan "${item.kegiatan}" berhasil dihapus.`;
+    const msg = `Kegiatan "${item.kegiatan}" berhasil dihapus.`;
+    successMsg.value = msg;
+    toast.success(msg, 'Kegiatan Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus kegiatan: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal menghapus kegiatan.';
+    toast.error(errMsg);
   }
 };
 

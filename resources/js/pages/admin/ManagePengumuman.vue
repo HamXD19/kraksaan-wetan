@@ -64,7 +64,16 @@
                     <div class="flex items-center gap-2 mt-1">
                       <span v-if="p.banner" class="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">Ada Banner</span>
                       <span v-if="p.thumbnail" class="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-bold">Ada Thumbnail</span>
-                      <span v-if="p.file" class="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold">Lampiran PDF</span>
+                      <a 
+                        v-if="p.file" 
+                        :href="p.file_url || ('/api/pengumuman/' + p.id + '/unduh')" 
+                        target="_blank" 
+                        class="text-[9px] bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 px-2 py-0.5 rounded-md font-bold inline-flex items-center gap-1 transition shadow-2xs" 
+                        title="Unduh Berkas PDF"
+                      >
+                        <span>Lampiran PDF</span>
+                        <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -97,164 +106,221 @@
     <!-- Modal Form Tambah / Edit -->
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
-      @click.self="showModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-          {{ editId ? 'Sunting Pengumuman' : 'Tambah Pengumuman Baru' }}
-        </h3>
-
-        <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+        <!-- Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Judul Pengumuman *</label>
-            <input 
-              type="text" 
-              v-model="form.judul" 
-              required 
-              placeholder="Contoh: Sosialisasi Penataan Lingkungan Bersih..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            />
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              {{ editId ? 'Sunting Pengumuman' : 'Tambah Pengumuman Baru' }}
+            </h3>
+            <p class="text-xs text-slate-500">Kelola judul, prioritas, uraian isi pengumuman, dan berkas lampiran resmi.</p>
           </div>
+          <button 
+            type="button" 
+            @click="showModal = false" 
+            class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Prioritas *</label>
-              <select 
-                v-model="form.prioritas" 
-                required 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
-              >
-                <option value="Penting">Penting</option>
-                <option value="Himbauan">Himbauan</option>
-                <option value="Pemberitahuan">Pemberitahuan</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Kategori Pengumuman *</label>
-              <select 
-                v-model="form.kategori" 
-                required 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
-              >
-                <option v-for="k in kategoriOptions" :key="k.id" :value="k.nama">
-                  {{ k.nama }}
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Penyelenggara / Seksi</label>
-              <input 
-                type="text" 
-                v-model="form.penyelenggara" 
-                placeholder="Kelurahan / Kasi Trantib" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <!-- Banner Pengumuman -->
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <label class="block font-bold text-slate-900 text-xs">Banner Pengumuman (Spanduk Lanskap / Rasio 16:9)</label>
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-24 h-14 rounded-xl border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center">
-                <img v-if="form.banner" :src="form.banner" alt="Banner" class="w-full h-full object-cover" />
-                <span v-else class="text-[10px] text-slate-400">Belum ada</span>
-              </div>
-              <div class="flex-1 w-full space-y-1.5">
-                <div class="flex gap-2">
+        <!-- Form with Scrollable Interior & Sticky Footer -->
+        <form @submit.prevent="saveItem" class="flex flex-col flex-1 overflow-hidden">
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left Column: Primary Content (Judul, Isi Pengumuman, & Lampiran PDF) -->
+              <div class="lg:col-span-7 space-y-4">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Judul Pengumuman *</label>
                   <input 
                     type="text" 
-                    v-model="form.banner" 
-                    placeholder="URL gambar banner atau unggah foto..." 
-                    class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs outline-none"
+                    v-model="form.judul" 
+                    required 
+                    placeholder="Contoh: Sosialisasi Penataan Lingkungan Bersih..." 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-medium text-xs sm:text-sm"
                   />
-                  <label class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl text-xs cursor-pointer whitespace-nowrap">
-                    <span>{{ uploadingBanner ? 'Mengunggah...' : 'Unggah Foto' }}</span>
-                    <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleBannerUpload" :disabled="uploadingBanner" />
-                  </label>
-                  <button v-if="form.banner" type="button" @click="form.banner = ''" class="px-2 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-semibold">Hapus</button>
                 </div>
-                <p class="text-[10px] text-slate-500">Format gambar: JPG, PNG, WebP, SVG (Maks. 10MB).</p>
-              </div>
-            </div>
-          </div>
 
-          <!-- Thumbnail Pengumuman -->
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <label class="block font-bold text-slate-900 text-xs">Thumbnail Pengumuman (Gambar Mini Kotak / 1:1)</label>
-            <div class="flex flex-col sm:flex-row items-center gap-3">
-              <div class="w-14 h-14 rounded-xl border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center">
-                <img v-if="form.thumbnail" :src="form.thumbnail" alt="Thumbnail" class="w-full h-full object-cover" />
-                <span v-else class="text-[10px] text-slate-400">Belum ada</span>
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Uraian Isi Pengumuman *</label>
+                  <RichTextEditor 
+                    v-model="form.isi"
+                    placeholder="Rincian informasi pengumuman..."
+                    height="200px"
+                    maxHeight="320px"
+                  />
+                </div>
+
+                <!-- Dokumen Lampiran PDF -->
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+                  <div class="flex items-center justify-between">
+                    <label class="block font-bold text-slate-900 text-xs">File Lampiran PDF (Opsional)</label>
+                    <span class="text-[10px] text-slate-400">PDF resmi kedinasan</span>
+                  </div>
+                  <div class="flex gap-2">
+                    <input 
+                      type="text" 
+                      v-model="form.file" 
+                      placeholder="URL atau unggah dokumen..." 
+                      class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs outline-none"
+                    />
+                    <label class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs">
+                      <span>{{ uploadingFile ? '...' : 'Unggah PDF' }}</span>
+                      <input type="file" accept="application/pdf" class="hidden" @change="handlePdfUpload" :disabled="uploadingFile" />
+                    </label>
+                    <button v-if="form.file" type="button" @click="form.file = ''" class="px-2.5 py-1.5 bg-rose-50 text-rose-700 rounded-xl text-xs font-semibold">Hapus</button>
+                  </div>
+                  <div v-if="form.file" class="flex items-center justify-between p-2 rounded-xl bg-emerald-50 border border-emerald-200/80 text-[11px] text-emerald-900">
+                    <span class="truncate font-semibold flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      <span class="truncate">{{ form.file.split('/').pop() }}</span>
+                    </span>
+                    <a 
+                      :href="form.file.startsWith('http') ? form.file : ('/storage/uploads/' + form.file)" 
+                      target="_blank" 
+                      class="font-bold underline text-emerald-700 hover:text-emerald-900 shrink-0 text-[11px]"
+                    >
+                      Lihat File &rarr;
+                    </a>
+                  </div>
+                </div>
               </div>
-              <div class="flex-1 w-full space-y-1.5">
-                <div class="flex gap-2">
+
+              <!-- Right Column: Meta & Media Pengumuman -->
+              <div class="lg:col-span-5 space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Prioritas *</label>
+                    <select 
+                      v-model="form.prioritas" 
+                      required 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs font-semibold"
+                    >
+                      <option value="Penting">Penting</option>
+                      <option value="Himbauan">Himbauan</option>
+                      <option value="Pemberitahuan">Pemberitahuan</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block font-bold text-slate-700 text-xs">Kategori *</label>
+                      <button 
+                        type="button" 
+                        @click="isCustomKategori = !isCustomKategori"
+                        class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        {{ isCustomKategori ? '← Master' : '+ Baru' }}
+                      </button>
+                    </div>
+                    <div v-if="!isCustomKategori">
+                      <select 
+                        v-model="form.kategori" 
+                        required 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      >
+                        <option v-for="k in kategoriOptions" :key="k.id || k" :value="k.nama || k">
+                          {{ k.nama || k }}
+                        </option>
+                        <option v-if="form.kategori && !kategoriOptions.some(k => (k.nama || k) === form.kategori)" :value="form.kategori">
+                          {{ form.kategori }}
+                        </option>
+                      </select>
+                    </div>
+                    <div v-else>
+                      <input 
+                        type="text" 
+                        v-model="form.customKategori" 
+                        required 
+                        placeholder="Kategori baru..." 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1 text-xs">Penyelenggara / Seksi</label>
                   <input 
                     type="text" 
-                    v-model="form.thumbnail" 
-                    placeholder="URL gambar thumbnail atau unggah foto..." 
-                    class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs outline-none"
+                    v-model="form.penyelenggara" 
+                    placeholder="Kelurahan Kraksaan Wetan" 
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
                   />
-                  <label class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl text-xs cursor-pointer whitespace-nowrap">
-                    <span>{{ uploadingThumbnail ? 'Mengunggah...' : 'Unggah Foto' }}</span>
-                    <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleThumbnailUpload" :disabled="uploadingThumbnail" />
-                  </label>
-                  <button v-if="form.thumbnail" type="button" @click="form.thumbnail = ''" class="px-2 py-1 bg-rose-50 text-rose-700 rounded-lg text-xs font-semibold">Hapus</button>
                 </div>
-                <p class="text-[10px] text-slate-500">Format gambar: JPG, PNG, WebP, SVG (Maks. 10MB).</p>
+
+                <!-- Banner Media -->
+                <div class="space-y-1.5 pt-1">
+                  <label class="block font-bold text-slate-700 text-xs">Banner (Lanskap 16:9)</label>
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-16 h-11 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
+                      <img v-if="form.banner" :src="form.banner" alt="Banner" class="w-full h-full object-cover" />
+                      <span v-else class="text-[9px] text-slate-400">Kosong</span>
+                    </div>
+                    <div class="flex-1 flex gap-1.5">
+                      <input 
+                        type="text" 
+                        v-model="form.banner" 
+                        placeholder="URL atau pilih file..." 
+                        class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs outline-none"
+                      />
+                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs">
+                        <span>{{ uploadingBanner ? '...' : 'Unggah' }}</span>
+                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleBannerUpload" :disabled="uploadingBanner" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Thumbnail Media -->
+                <div class="space-y-1.5 pt-1">
+                  <label class="block font-bold text-slate-700 text-xs">Thumbnail (Kotak 1:1)</label>
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-11 h-11 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
+                      <img v-if="form.thumbnail" :src="form.thumbnail" alt="Thumbnail" class="w-full h-full object-cover" />
+                      <span v-else class="text-[9px] text-slate-400">Kosong</span>
+                    </div>
+                    <div class="flex-1 flex gap-1.5">
+                      <input 
+                        type="text" 
+                        v-model="form.thumbnail" 
+                        placeholder="URL atau pilih file..." 
+                        class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs outline-none"
+                      />
+                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs">
+                        <span>{{ uploadingThumbnail ? '...' : 'Unggah' }}</span>
+                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleThumbnailUpload" :disabled="uploadingThumbnail" />
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Dokumen Lampiran PDF -->
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <label class="block font-bold text-slate-900 text-xs">File Dokumen Lampiran PDF (Opsional)</label>
-            <div class="flex gap-2">
-              <input 
-                type="text" 
-                v-model="form.file" 
-                placeholder="URL atau nama file dokumen PDF lampiran..." 
-                class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white text-xs outline-none"
-              />
-              <label class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs cursor-pointer whitespace-nowrap flex items-center gap-1">
-                <span>{{ uploadingFile ? 'Mengunggah...' : 'Unggah PDF' }}</span>
-                <input type="file" accept="application/pdf" class="hidden" @change="handlePdfUpload" :disabled="uploadingFile" />
-              </label>
-              <button v-if="form.file" type="button" @click="form.file = ''" class="px-2.5 py-2 bg-rose-50 text-rose-700 rounded-xl text-xs font-semibold">Hapus</button>
+          <!-- Sticky Footer Actions -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-xs text-slate-400 italic hidden sm:inline">Kolom bertanda * wajib diisi</span>
+            <div class="flex items-center gap-2.5 ml-auto">
+              <button 
+                type="button" 
+                @click="showModal = false" 
+                class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs cursor-pointer transition"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="saving"
+                class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold text-xs shadow-xs cursor-pointer transition"
+              >
+                <span v-if="saving">Menyimpan...</span>
+                <span v-else>{{ editId ? 'Simpan Perubahan' : 'Terbitkan Pengumuman' }}</span>
+              </button>
             </div>
-            <p class="text-[10px] text-slate-500">Format dokumen: Khusus PDF resmi kedinasan (Maks. 10MB).</p>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Uraian Isi Pengumuman *</label>
-            <textarea 
-              rows="4" 
-              v-model="form.isi" 
-              required 
-              placeholder="Rincian informasi pengumuman..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModal = false" 
-              class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving"
-              class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold"
-            >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>Simpan Pengumuman</span>
-            </button>
           </div>
         </form>
       </div>
@@ -265,8 +331,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const uploadingBanner = ref(false);
@@ -274,6 +343,7 @@ const uploadingThumbnail = ref(false);
 const uploadingFile = ref(false);
 const pengumumanList = ref([]);
 const kategoriOptions = ref([]);
+const isCustomKategori = ref(false);
 const showModal = ref(false);
 const editId = ref(null);
 const successMsg = ref('');
@@ -282,6 +352,7 @@ const form = reactive({
   judul: '',
   prioritas: 'Penting',
   kategori: 'Kedinasan',
+  customKategori: '',
   penyelenggara: 'Kelurahan Kraksaan Wetan',
   banner: '',
   thumbnail: '',
@@ -306,6 +377,8 @@ const loadData = async () => {
 };
 
 const openModal = (item = null) => {
+  isCustomKategori.value = false;
+  form.customKategori = '';
   if (item) {
     editId.value = item.id;
     form.judul = item.judul;
@@ -343,12 +416,12 @@ const handleBannerUpload = async (e) => {
   if (!file) return;
 
   if (!isValidImageFile(file)) {
-    alert('Format file banner tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.error('Format file banner tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
     e.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file banner terlalu besar! Maksimal 10MB.');
+    toast.error('Ukuran file banner terlalu besar! Maksimal 10MB.');
     e.target.value = '';
     return;
   }
@@ -358,9 +431,10 @@ const handleBannerUpload = async (e) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       form.banner = res.data.url;
+      toast.success('Banner pengumuman berhasil diunggah!');
     }
   } catch (err) {
-    alert('Gagal mengunggah banner: ' + (err.response?.data?.message || err.message));
+    toast.error('Gagal mengunggah banner: ' + (err.response?.data?.message || err.message));
   } finally {
     uploadingBanner.value = false;
     e.target.value = '';
@@ -372,12 +446,12 @@ const handleThumbnailUpload = async (e) => {
   if (!file) return;
 
   if (!isValidImageFile(file)) {
-    alert('Format file thumbnail tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.error('Format file thumbnail tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
     e.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file thumbnail terlalu besar! Maksimal 10MB.');
+    toast.error('Ukuran file thumbnail terlalu besar! Maksimal 10MB.');
     e.target.value = '';
     return;
   }
@@ -387,9 +461,10 @@ const handleThumbnailUpload = async (e) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       form.thumbnail = res.data.url;
+      toast.success('Thumbnail pengumuman berhasil diunggah!');
     }
   } catch (err) {
-    alert('Gagal mengunggah thumbnail: ' + (err.response?.data?.message || err.message));
+    toast.error('Gagal mengunggah thumbnail: ' + (err.response?.data?.message || err.message));
   } finally {
     uploadingThumbnail.value = false;
     e.target.value = '';
@@ -404,12 +479,12 @@ const handlePdfUpload = async (e) => {
   const isValidPdf = file.type === 'application/pdf' || ext === 'pdf';
 
   if (!isValidPdf) {
-    alert('Format file dokumen tidak valid! Harap pilih file dokumen PDF (.pdf).');
+    toast.error('Format file dokumen tidak valid! Harap pilih file dokumen PDF (.pdf).');
     e.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file dokumen terlalu besar! Maksimal 10MB.');
+    toast.error('Ukuran file dokumen terlalu besar! Maksimal 10MB.');
     e.target.value = '';
     return;
   }
@@ -419,9 +494,10 @@ const handlePdfUpload = async (e) => {
     const res = await AdminService.uploadFile(file, 'document');
     if (res.data?.url) {
       form.file = res.data.url;
+      toast.success('Lampiran PDF berhasil diunggah!');
     }
   } catch (err) {
-    alert('Gagal mengunggah dokumen PDF: ' + (err.response?.data?.message || err.message));
+    toast.error('Gagal mengunggah dokumen PDF: ' + (err.response?.data?.message || err.message));
   } finally {
     uploadingFile.value = false;
     e.target.value = '';
@@ -431,12 +507,19 @@ const handlePdfUpload = async (e) => {
 const saveItem = async () => {
   saving.value = true;
   try {
-    const res = await AdminService.savePengumuman(form, editId.value);
-    successMsg.value = res.message || 'Pengumuman berhasil disimpan ke database!';
+    const payload = { ...form };
+    if (isCustomKategori.value && form.customKategori?.trim()) {
+      payload.kategori = form.customKategori.trim();
+    }
+    const res = await AdminService.savePengumuman(payload, editId.value);
+    const msg = res.message || 'Pengumuman berhasil disimpan ke database!';
+    successMsg.value = msg;
+    toast.success(msg, editId.value ? 'Pengumuman Diperbarui' : 'Pengumuman Diterbitkan');
     showModal.value = false;
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan pengumuman: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan pengumuman.';
+    toast.error('Gagal menyimpan pengumuman: ' + errMsg);
   } finally {
     saving.value = false;
   }
@@ -446,10 +529,12 @@ const deleteItem = async (id) => {
   if (!confirm('Apakah Anda yakin ingin menghapus pengumuman ini?')) return;
   try {
     await AdminService.deletePengumuman(id);
-    successMsg.value = 'Pengumuman berhasil dihapus.';
+    const msg = 'Pengumuman berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Pengumuman Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus pengumuman.');
+    toast.error('Gagal menghapus pengumuman.');
   }
 };
 

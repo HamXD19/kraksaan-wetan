@@ -155,6 +155,25 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kecamatan</label>
+              <input type="text" v-model="profilForm.kecamatan" placeholder="Kraksaan" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kabupaten / Kota</label>
+              <input type="text" v-model="profilForm.kabupaten" placeholder="Kabupaten Probolinggo" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Provinsi</label>
+              <input type="text" v-model="profilForm.provinsi" placeholder="Jawa Timur" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Kode Pos</label>
+              <input type="text" v-model="profilForm.kode_pos" placeholder="67282" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+            </div>
+          </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label class="block font-bold text-slate-700 mb-1">Telepon Kantor</label>
@@ -174,12 +193,20 @@
 
           <div>
             <label class="block font-bold text-slate-700 mb-1">Deskripsi Ringkas Wilayah *</label>
-            <textarea rows="3" v-model="profilForm.deskripsi" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"></textarea>
+            <RichTextEditor 
+              v-model="profilForm.deskripsi" 
+              placeholder="Tulis ringkasan profil wilayah kelurahan..." 
+              height="180px"
+            />
           </div>
 
           <div>
             <label class="block font-bold text-slate-700 mb-1">Sejarah Kelurahan</label>
-            <textarea rows="4" v-model="profilForm.sejarah" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"></textarea>
+            <RichTextEditor 
+              v-model="profilForm.sejarah" 
+              placeholder="Tuliskan riwayat sejarah berdirinya kelurahan..." 
+              height="240px"
+            />
           </div>
 
           <div>
@@ -195,7 +222,7 @@
           <!-- Bagian Pimpinan Lurah -->
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-4 mt-6">
             <h4 class="font-bold text-slate-900 text-sm">Data Kepala Kelurahan (Lurah)</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label class="block font-bold text-slate-700 mb-1">Nama Lurah</label>
                 <input type="text" v-model="profilForm.lurah_nama" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white" />
@@ -203,6 +230,10 @@
               <div>
                 <label class="block font-bold text-slate-700 mb-1">NIP Lurah</label>
                 <input type="text" v-model="profilForm.lurah_nip" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Jabatan Pimpinan</label>
+                <input type="text" v-model="profilForm.lurah_jabatan" placeholder="Lurah Kraksaan Wetan" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white" />
               </div>
             </div>
 
@@ -254,7 +285,11 @@
 
             <div>
               <label class="block font-bold text-slate-700 mb-1">Sambutan Lurah</label>
-              <textarea rows="3" v-model="profilForm.lurah_sambutan" class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white"></textarea>
+              <RichTextEditor 
+                v-model="profilForm.lurah_sambutan" 
+                placeholder="Tuliskan kata sambutan Kepala Kelurahan..." 
+                height="200px"
+              />
             </div>
 
           </div>
@@ -352,9 +387,19 @@
     </template>
 
     <!-- Modal Aparatur -->
-    <div v-if="showPerangkatModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs" @click.self="showPerangkatModal = false">
+    <div v-if="showPerangkatModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs">
       <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
-        <h4 class="text-base font-bold text-slate-900 mb-4">{{ perangkatEditId ? 'Edit Aparatur' : 'Tambah Aparatur' }}</h4>
+        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+          <h4 class="text-base font-bold text-slate-900">{{ perangkatEditId ? 'Edit Aparatur' : 'Tambah Aparatur' }}</h4>
+          <button 
+            type="button" 
+            @click="showPerangkatModal = false" 
+            class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
         <form @submit.prevent="savePerangkat" class="space-y-3 text-xs sm:text-sm">
           <div>
             <label class="block font-bold text-slate-700 mb-1">Nama Lengkap *</label>
@@ -381,8 +426,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService, KelurahanService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const uploadingLogo = ref(false);
@@ -407,12 +455,12 @@ const handleLogoUpload = async (event) => {
   if (!file) return;
 
   if (!isValidImageFile(file)) {
-    alert('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.warning('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).', 'Format Tidak Didukung');
     event.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file logo terlalu besar! Maksimal 10MB.');
+    toast.warning('Ukuran file logo terlalu besar! Maksimal 10MB.', 'File Terlalu Besar');
     event.target.value = '';
     return;
   }
@@ -422,10 +470,13 @@ const handleLogoUpload = async (event) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       profilForm.logo = res.data.url;
-      successMsg.value = 'Logo baru berhasil diunggah! Jangan lupa klik tombol "Simpan Perubahan Profil" di bawah.';
+      const msg = 'Logo baru berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
+      successMsg.value = msg;
+      toast.success(msg, 'Upload Logo Berhasil');
     }
   } catch (err) {
-    alert('Gagal mengunggah logo: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message;
+    toast.error('Gagal mengunggah logo: ' + errText, 'Upload Gagal');
   } finally {
     uploadingLogo.value = false;
     event.target.value = '';
@@ -437,12 +488,12 @@ const handleHeroUpload = async (event) => {
   if (!file) return;
 
   if (!isValidImageFile(file)) {
-    alert('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.warning('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).', 'Format Tidak Didukung');
     event.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file foto hero terlalu besar! Maksimal 10MB.');
+    toast.warning('Ukuran file foto hero terlalu besar! Maksimal 10MB.', 'File Terlalu Besar');
     event.target.value = '';
     return;
   }
@@ -452,10 +503,13 @@ const handleHeroUpload = async (event) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       profilForm.hero_image = res.data.url;
-      successMsg.value = 'Foto latar hero banner berhasil diunggah! Jangan lupa klik tombol "Simpan Perubahan Profil" di bawah.';
+      const msg = 'Foto latar hero banner berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
+      successMsg.value = msg;
+      toast.success(msg, 'Upload Hero Berhasil');
     }
   } catch (err) {
-    alert('Gagal mengunggah foto hero: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message;
+    toast.error('Gagal mengunggah foto hero: ' + errText, 'Upload Gagal');
   } finally {
     uploadingHero.value = false;
     event.target.value = '';
@@ -467,12 +521,12 @@ const handleLurahFotoUpload = async (event) => {
   if (!file) return;
 
   if (!isValidImageFile(file)) {
-    alert('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.warning('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).', 'Format Tidak Didukung');
     event.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file foto Lurah terlalu besar! Maksimal 10MB.');
+    toast.warning('Ukuran file foto Lurah terlalu besar! Maksimal 10MB.', 'File Terlalu Besar');
     event.target.value = '';
     return;
   }
@@ -482,10 +536,13 @@ const handleLurahFotoUpload = async (event) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       profilForm.lurah_foto = res.data.url;
-      successMsg.value = 'Foto Lurah berhasil diunggah! Jangan lupa klik tombol "Simpan Perubahan Profil" di bawah.';
+      const msg = 'Foto Lurah berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
+      successMsg.value = msg;
+      toast.success(msg, 'Upload Foto Lurah');
     }
   } catch (err) {
-    alert('Gagal mengunggah foto Lurah: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message;
+    toast.error('Gagal mengunggah foto Lurah: ' + errText, 'Upload Gagal');
   } finally {
     uploadingLurahFoto.value = false;
     event.target.value = '';
@@ -495,6 +552,10 @@ const handleLurahFotoUpload = async (event) => {
 
 const profilForm = reactive({
   nama: '',
+  kecamatan: '',
+  kabupaten: '',
+  provinsi: '',
+  kode_pos: '',
   logo: '',
   hero_mode: 'slider',
   hero_image: '',
@@ -527,6 +588,10 @@ const loadData = async () => {
   try {
     const data = await KelurahanService.getProfil();
     profilForm.nama = data.nama || '';
+    profilForm.kecamatan = data.kecamatan || '';
+    profilForm.kabupaten = data.kabupaten || '';
+    profilForm.provinsi = data.provinsi || '';
+    profilForm.kode_pos = data.kode_pos || '';
     profilForm.logo = data.logo || '';
     profilForm.hero_mode = data.hero_mode || 'slider';
     profilForm.hero_image = data.hero_image || '';
@@ -542,6 +607,7 @@ const loadData = async () => {
     profilForm.halo_sae_link = data.halo_sae_link || 'https://halosae.probolinggokab.go.id';
     profilForm.lurah_nama = data.lurah?.nama || '';
     profilForm.lurah_nip = data.lurah?.nip || '';
+    profilForm.lurah_jabatan = data.lurah?.jabatan || 'Lurah Kraksaan Wetan';
     profilForm.lurah_sambutan = data.lurah?.sambutan || '';
     profilForm.lurah_foto = data.lurah?.foto || '';
     misiText.value = (data.misi || []).join('\n');
@@ -559,10 +625,13 @@ const saveProfil = async () => {
   profilForm.misi = misiText.value.split('\n').map(s => s.trim()).filter(s => s.length > 0);
   try {
     const res = await AdminService.updateProfil(profilForm);
-    successMsg.value = res.message || 'Profil kelurahan berhasil diperbarui!';
+    const msg = res.message || 'Profil kelurahan berhasil diperbarui!';
+    successMsg.value = msg;
+    toast.success(msg, 'Profil Kelurahan');
     window.dispatchEvent(new CustomEvent('profil-updated', { detail: res.data }));
   } catch (err) {
-    alert('Gagal menyimpan profil: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';
+    toast.error('Gagal menyimpan profil: ' + errText, 'Gagal Menyimpan');
   } finally {
     saving.value = false;
   }
@@ -587,10 +656,13 @@ const savePerangkat = async () => {
   try {
     await AdminService.savePerangkat(perangkatForm, perangkatEditId.value);
     showPerangkatModal.value = false;
-    successMsg.value = 'Data aparatur berhasil disimpan!';
+    const msg = perangkatEditId.value ? 'Data aparatur berhasil diperbarui!' : 'Aparatur baru berhasil ditambahkan!';
+    successMsg.value = msg;
+    toast.success(msg, 'Aparatur Kelurahan');
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan aparatur.');
+    const errText = err.response?.data?.message || err.message || 'Gagal menyimpan data';
+    toast.error('Gagal menyimpan aparatur: ' + errText, 'Gagal Menyimpan');
   }
 };
 
@@ -598,10 +670,13 @@ const deletePerangkat = async (id) => {
   if (!confirm('Hapus aparatur ini?')) return;
   try {
     await AdminService.deletePerangkat(id);
-    successMsg.value = 'Aparatur berhasil dihapus.';
+    const msg = 'Aparatur berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Aparatur Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus aparatur.');
+    const errText = err.response?.data?.message || err.message || 'Gagal menghapus data';
+    toast.error('Gagal menghapus aparatur: ' + errText, 'Gagal Menghapus');
   }
 };
 

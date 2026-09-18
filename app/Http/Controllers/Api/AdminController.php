@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\AgendaKegiatan;
 use App\Models\Berita;
+use App\Models\Dokumen;
 use App\Models\Galeri;
 use App\Models\Layanan;
 use App\Models\Lembaga;
@@ -12,12 +14,11 @@ use App\Models\Lingkungan;
 use App\Models\MasterKategori;
 use App\Models\Pengumuman;
 use App\Models\PerangkatKelurahan;
-use App\Models\Pesan;
 use App\Models\ProfilKelurahan;
-use App\Models\ServiceRequest;
 use App\Models\Statistik;
 use App\Models\TransparansiAnggaran;
 use App\Models\User;
+use App\Services\FileStorageHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -255,28 +256,57 @@ class AdminController extends Controller
                 'file.mimes' => 'Format file tidak didukung. Hanya file gambar (JPG, JPEG, PNG, WEBP, SVG) yang diperbolehkan.',
                 'file.max' => 'Ukuran file gambar tidak boleh melebihi 10MB.',
             ]);
-        } elseif ($type === 'document') {
+        } elseif ($type === 'document' || $type === 'pdf') {
             $request->validate([
-                'file' => 'required|file|mimes:pdf|max:10240',
+                'file' => [
+                    'required',
+                    'file',
+                    'max:10240',
+                    function ($attribute, $value, $fail) {
+                        $ext = strtolower($value->getClientOriginalExtension());
+                        $mime = $value->getMimeType();
+                        $allowedMimes = [
+                            'application/pdf',
+                            'application/x-pdf',
+                            'application/acrobat',
+                            'applications/vnd.pdf',
+                            'text/pdf',
+                            'text/x-pdf',
+                        ];
+                        if ($ext !== 'pdf' && ! in_array($mime, $allowedMimes, true)) {
+                            $fail('Format dokumen tidak didukung. Hanya file PDF yang diperbolehkan.');
+                        }
+                    },
+                ],
             ], [
                 'file.required' => 'File dokumen wajib dipilih.',
                 'file.file' => 'Input harus berupa file yang valid.',
-                'file.mimes' => 'Format dokumen tidak didukung. Hanya file PDF yang diperbolehkan.',
                 'file.max' => 'Ukuran dokumen tidak boleh melebihi 10MB.',
+            ]);
+        } elseif ($type === 'video') {
+            $request->validate([
+                'file' => 'required|file|mimes:mp4,mov,ogg,qt,webm,mkv|max:51200',
+            ], [
+                'file.required' => 'File video wajib dipilih.',
+                'file.file' => 'Input harus berupa file yang valid.',
+                'file.mimes' => 'Format file video tidak didukung. Hanya format (MP4, WEBM, MOV, MKV, OGG) yang diperbolehkan.',
+                'file.max' => 'Ukuran file video tidak boleh melebihi 50MB.',
             ]);
         } else {
             $request->validate([
-                'file' => 'required|file|mimes:jpeg,png,jpg,webp,svg,pdf|max:10240',
+                'file' => 'required|file|mimes:jpeg,png,jpg,webp,svg,pdf,mp4,webm,mov,mkv|max:51200',
             ], [
                 'file.required' => 'File wajib dipilih.',
                 'file.file' => 'Input harus berupa file yang valid.',
-                'file.mimes' => 'Format file tidak didukung. Hanya file gambar atau PDF yang diperbolehkan.',
-                'file.max' => 'Ukuran file tidak boleh melebihi 10MB.',
+                'file.mimes' => 'Format file tidak didukung. Hanya file gambar, PDF, atau video yang diperbolehkan.',
+                'file.max' => 'Ukuran file tidak boleh melebihi 50MB.',
             ]);
         }
 
         $file = $request->file('file');
-        $filename = Str::random(20).'.'.$file->getClientOriginalExtension();
+        $rawExt = strtolower($file->getClientOriginalExtension());
+        $ext = $rawExt ?: (($type === 'document' || $type === 'pdf') ? 'pdf' : 'jpg');
+        $filename = Str::random(24).'.'.$ext;
         $path = $file->storeAs('uploads', $filename, 'public');
 
         ActivityLog::record(
@@ -309,22 +339,16 @@ class AdminController extends Controller
                 'counts' => [
                     'berita' => Berita::count(),
                     'pengumuman' => Pengumuman::count(),
+                    'dokumen' => Dokumen::count(),
                     'layanan' => Layanan::count(),
                     'galeri' => Galeri::count(),
-                    'pesan_baru' => Pesan::where('status', 'baru')->count(),
-                    'total_pesan' => Pesan::count(),
                     'aparatur' => PerangkatKelurahan::count(),
                     'lembaga' => Lembaga::count(),
                     'transparansi' => TransparansiAnggaran::count(),
                     'staff' => User::count(),
-                    'pengajuan_menunggu' => ServiceRequest::where('status', 'Menunggu Verifikasi')->count(),
-                    'pengajuan_aktif' => ServiceRequest::where('status', '!=', 'Selesai')->count(),
-                    'pengajuan_arsip' => ServiceRequest::where('status', 'Selesai')->count(),
-                    'total_pengajuan' => ServiceRequest::count(),
                 ],
-                'recent_pengajuan' => ServiceRequest::with('layanan')->latest('submitted_at')->take(5)->get(),
-                'recent_pesan' => Pesan::latest()->take(5)->get(),
                 'recent_berita' => Berita::latest()->take(5)->get(),
+                'recent_pesan' => [],
             ],
         ]);
     }
@@ -371,6 +395,8 @@ class AdminController extends Controller
             'dilihat' => 0,
         ]);
 
+        $this->ensureMasterKategori('berita', $validated['kategori'] ?? null);
+
         ActivityLog::record(
             action: 'create',
             module: 'berita',
@@ -400,7 +426,13 @@ class AdminController extends Controller
             'gambar' => 'nullable|string',
         ]);
 
+        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $berita->gambar) {
+            FileStorageHelper::deleteFileIfLocal($berita->gambar);
+        }
+
         $berita->update($validated);
+
+        $this->ensureMasterKategori('berita', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -443,9 +475,20 @@ class AdminController extends Controller
      * ---------------------------------------------------- */
     public function getPengumuman(): JsonResponse
     {
+        $items = Pengumuman::latest()->get()->map(function ($item) {
+            $fileUrl = null;
+            if (! empty($item->file)) {
+                $fileUrl = url("/api/pengumuman/{$item->id}/unduh");
+            }
+
+            return array_merge($item->toArray(), [
+                'file_url' => $fileUrl,
+            ]);
+        });
+
         return response()->json([
             'status' => 'success',
-            'data' => Pengumuman::latest()->get(),
+            'data' => $items,
         ]);
     }
 
@@ -466,6 +509,7 @@ class AdminController extends Controller
         $validated['tanggal'] = $validated['tanggal'] ?? now()->translatedFormat('d F Y');
 
         $pengumuman = Pengumuman::create($validated);
+        $this->ensureMasterKategori('pengumuman', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'create',
@@ -498,7 +542,19 @@ class AdminController extends Controller
             'kategori' => 'nullable|string|max:100',
         ]);
 
+        if (array_key_exists('file', $validated) && $validated['file'] !== $pengumuman->file) {
+            FileStorageHelper::deleteFileIfLocal($pengumuman->file);
+        }
+        if (array_key_exists('banner', $validated) && $validated['banner'] !== $pengumuman->banner) {
+            FileStorageHelper::deleteFileIfLocal($pengumuman->banner);
+        }
+        if (array_key_exists('thumbnail', $validated) && $validated['thumbnail'] !== $pengumuman->thumbnail) {
+            FileStorageHelper::deleteFileIfLocal($pengumuman->thumbnail);
+        }
+
         $pengumuman->update($validated);
+
+        $this->ensureMasterKategori('pengumuman', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -537,6 +593,221 @@ class AdminController extends Controller
     }
 
     /* ----------------------------------------------------
+     * DOKUMEN PUBLIK CRUD
+     * ---------------------------------------------------- */
+    public function getDokumen(Request $request): JsonResponse
+    {
+        $query = Dokumen::latest('id');
+
+        if ($request->filled('kategori') && $request->kategori !== 'Semua') {
+            $query->where('kategori', $request->kategori);
+        }
+
+        if ($request->filled('subkategori') && $request->subkategori !== 'Semua') {
+            $query->where('subkategori', $request->subkategori);
+        }
+
+        if ($request->filled('periode') && $request->periode !== 'Semua') {
+            $query->where('periode', $request->periode);
+        }
+
+        if ($request->filled('tahun') && $request->tahun !== 'Semua') {
+            $query->where(function ($q) use ($request) {
+                $q->where('tahun', $request->tahun)
+                    ->orWhere('tahun_selesai', $request->tahun);
+            });
+        }
+
+        if ($request->filled('status')) {
+            if ($request->status === 'aktif') {
+                $query->where('aktif', true);
+            } elseif ($request->status === 'nonaktif') {
+                $query->where('aktif', false);
+            }
+        }
+
+        if ($request->filled('q')) {
+            $search = trim($request->q);
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                    ->orWhere('nomor_dokumen', 'like', "%{$search}%")
+                    ->orWhere('subkategori', 'like', "%{$search}%")
+                    ->orWhere('deskripsi', 'like', "%{$search}%");
+            });
+        }
+
+        $items = $query->get()->map(function ($item) {
+            return array_merge($item->toArray(), [
+                'file_url' => url("/api/dokumen/{$item->id}/unduh"),
+                'preview_url' => asset('storage/'.ltrim($item->file, '/')),
+            ]);
+        });
+
+        // Kategori tree for Dokumen from MasterKategori
+        $masterKategoriTree = MasterKategori::where('modul', 'dokumen')
+            ->whereNull('parent_id')
+            ->where('is_aktif', true)
+            ->with(['subkategoris' => function ($q) {
+                $q->where('is_aktif', true);
+            }])
+            ->orderBy('urutan')
+            ->orderBy('nama')
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $items,
+            'summary' => [
+                'total' => Dokumen::count(),
+                'aktif' => Dokumen::where('aktif', true)->count(),
+                'total_unduhan' => (int) Dokumen::sum('diunduh'),
+            ],
+            'meta' => [
+                'kategori_list' => Dokumen::distinct()->whereNotNull('kategori')->pluck('kategori')->filter()->values(),
+                'subkategori_list' => Dokumen::distinct()->whereNotNull('subkategori')->pluck('subkategori')->filter()->values(),
+                'tahun_list' => Dokumen::distinct()->whereNotNull('tahun')->orderByDesc('tahun')->pluck('tahun')->filter()->values(),
+                'master_kategori_tree' => $masterKategoriTree,
+            ],
+        ]);
+    }
+
+    public function storeDokumen(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'nomor_dokumen' => 'nullable|string|max:100',
+            'kategori' => 'required|string|max:100',
+            'subkategori' => 'nullable|string|max:100',
+            'periode' => 'required|string|max:50',
+            'tahun' => 'nullable|string|max:10',
+            'tahun_selesai' => 'nullable|string|max:10',
+            'periode_ke' => 'nullable|string|max:50',
+            'tanggal_publikasi' => 'nullable|date',
+            'deskripsi' => 'nullable|string',
+            'file' => 'required|string',
+            'nama_file_asli' => 'nullable|string|max:255',
+            'ukuran_file' => 'nullable|string|max:50',
+            'aktif' => 'nullable|boolean',
+        ]);
+
+        $validated['aktif'] = $request->boolean('aktif', true);
+        $validated['tahun'] = $validated['tahun'] ?? date('Y');
+        $validated['tanggal_publikasi'] = $validated['tanggal_publikasi'] ?? date('Y-m-d');
+
+        $dokumen = Dokumen::create($validated);
+        $this->ensureMasterKategori('dokumen', $validated['kategori'] ?? null, $validated['subkategori'] ?? null);
+
+        ActivityLog::record(
+            action: 'create',
+            module: 'dokumen',
+            description: "Menambahkan dokumen publik: \"{$dokumen->judul}\"",
+            properties: ['dokumen_id' => $dokumen->id, 'judul' => $dokumen->judul],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dokumen berhasil ditambahkan.',
+            'data' => $dokumen,
+        ]);
+    }
+
+    public function updateDokumen(Request $request, int $id): JsonResponse
+    {
+        $dokumen = Dokumen::findOrFail($id);
+
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'nomor_dokumen' => 'nullable|string|max:100',
+            'kategori' => 'required|string|max:100',
+            'subkategori' => 'nullable|string|max:100',
+            'periode' => 'required|string|max:50',
+            'tahun' => 'nullable|string|max:10',
+            'tahun_selesai' => 'nullable|string|max:10',
+            'periode_ke' => 'nullable|string|max:50',
+            'tanggal_publikasi' => 'nullable|date',
+            'deskripsi' => 'nullable|string',
+            'file' => 'required|string',
+            'nama_file_asli' => 'nullable|string|max:255',
+            'ukuran_file' => 'nullable|string|max:50',
+            'aktif' => 'nullable|boolean',
+        ]);
+
+        $validated['aktif'] = $request->boolean('aktif', true);
+        if (empty($validated['tanggal_publikasi'])) {
+            $validated['tanggal_publikasi'] = $dokumen->tanggal_publikasi ?: date('Y-m-d');
+        }
+
+        if (array_key_exists('file', $validated) && $validated['file'] !== $dokumen->file) {
+            FileStorageHelper::deleteFileIfLocal($dokumen->file);
+        }
+
+        $dokumen->update($validated);
+
+        $this->ensureMasterKategori('dokumen', $validated['kategori'] ?? null, $validated['subkategori'] ?? null);
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'dokumen',
+            description: "Memperbarui dokumen publik: \"{$dokumen->judul}\"",
+            properties: ['dokumen_id' => $dokumen->id, 'judul' => $dokumen->judul],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dokumen berhasil diperbarui.',
+            'data' => $dokumen,
+        ]);
+    }
+
+    public function deleteDokumen(Request $request, int $id): JsonResponse
+    {
+        $dokumen = Dokumen::findOrFail($id);
+        $judul = $dokumen->judul;
+        $dokumenId = $dokumen->id;
+        $filePath = $dokumen->file;
+
+        $dokumen->delete();
+
+        FileStorageHelper::deleteFileIfLocal($filePath);
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'dokumen',
+            description: "Menghapus dokumen publik: \"{$judul}\"",
+            properties: ['dokumen_id' => $dokumenId, 'judul' => $judul],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dokumen berhasil dihapus.',
+        ]);
+    }
+
+    public function toggleDokumenStatus(Request $request, int $id): JsonResponse
+    {
+        $dokumen = Dokumen::findOrFail($id);
+        $dokumen->aktif = ! $dokumen->aktif;
+        $dokumen->save();
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'dokumen',
+            description: ($dokumen->aktif ? 'Mengaktifkan' : 'Menonaktifkan')." dokumen: \"{$dokumen->judul}\"",
+            properties: ['dokumen_id' => $dokumen->id, 'aktif' => $dokumen->aktif],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status dokumen berhasil diubah.',
+            'data' => $dokumen,
+        ]);
+    }
+
+    /* ----------------------------------------------------
      * LAYANAN CRUD
      * ---------------------------------------------------- */
     public function getLayanan(): JsonResponse
@@ -567,6 +838,7 @@ class AdminController extends Controller
         $validated['biaya'] = $validated['biaya'] ?? 'Gratis (Rp 0)';
 
         $layanan = Layanan::create($validated);
+        $this->ensureMasterKategori('layanan', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'create',
@@ -600,6 +872,7 @@ class AdminController extends Controller
         ]);
 
         $layanan->update($validated);
+        $this->ensureMasterKategori('layanan', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -689,6 +962,7 @@ class AdminController extends Controller
         }
 
         $galeri = Galeri::create($validated);
+        $this->ensureMasterKategori('galeri', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'create',
@@ -744,7 +1018,13 @@ class AdminController extends Controller
             }
         }
 
+        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $galeri->gambar) {
+            FileStorageHelper::deleteFileIfLocal($galeri->gambar);
+        }
+
         $galeri->update($validated);
+
+        $this->ensureMasterKategori('galeri', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -791,6 +1071,10 @@ class AdminController extends Controller
 
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
+            'kecamatan' => 'nullable|string|max:100',
+            'kabupaten' => 'nullable|string|max:100',
+            'provinsi' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:20',
             'alamat' => 'required|string',
             'telepon' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:100',
@@ -811,6 +1095,17 @@ class AdminController extends Controller
             'halo_sae_wa' => 'nullable|string|max:50',
             'halo_sae_link' => 'nullable|string|max:255',
         ]);
+
+        // Bersihkan file lama jika berkas diubah atau direset
+        if (array_key_exists('logo', $validated) && $validated['logo'] !== $profil->logo) {
+            FileStorageHelper::deleteFileIfLocal($profil->logo);
+        }
+        if (array_key_exists('hero_image', $validated) && $validated['hero_image'] !== $profil->hero_image) {
+            FileStorageHelper::deleteFileIfLocal($profil->hero_image);
+        }
+        if (array_key_exists('lurah_foto', $validated) && $validated['lurah_foto'] !== $profil->lurah_foto) {
+            FileStorageHelper::deleteFileIfLocal($profil->lurah_foto);
+        }
 
         $profil->update($validated);
 
@@ -866,6 +1161,10 @@ class AdminController extends Controller
             'foto' => 'nullable|string',
             'urutan' => 'nullable|integer',
         ]);
+
+        if (array_key_exists('foto', $validated) && $validated['foto'] !== $p->foto) {
+            FileStorageHelper::deleteFileIfLocal($p->foto);
+        }
 
         $p->update($validated);
 
@@ -1051,6 +1350,7 @@ class AdminController extends Controller
         $validated['aktif'] = $validated['aktif'] ?? true;
 
         $lembaga = Lembaga::create($validated);
+        $this->ensureMasterKategori('lembaga', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'create',
@@ -1088,7 +1388,13 @@ class AdminController extends Controller
             'aktif' => 'nullable|boolean',
         ]);
 
+        if (array_key_exists('logo', $validated) && $validated['logo'] !== $lembaga->logo) {
+            FileStorageHelper::deleteFileIfLocal($lembaga->logo);
+        }
+
         $lembaga->update($validated);
+
+        $this->ensureMasterKategori('lembaga', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -1229,6 +1535,7 @@ class AdminController extends Controller
         $validated['aktif'] = $validated['aktif'] ?? true;
 
         $item = TransparansiAnggaran::create($validated);
+        $this->ensureMasterKategori('transparansi', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'create',
@@ -1269,6 +1576,7 @@ class AdminController extends Controller
         ]);
 
         $item->update($validated);
+        $this->ensureMasterKategori('transparansi', $validated['kategori'] ?? null);
 
         ActivityLog::record(
             action: 'update',
@@ -1528,10 +1836,21 @@ class AdminController extends Controller
      * ---------------------------------------------------- */
     public function getMasterKategori(Request $request): JsonResponse
     {
-        $query = MasterKategori::orderBy('modul')->orderBy('urutan')->orderBy('nama');
+        $query = MasterKategori::with(['parent:id,nama,slug', 'subkategoris'])
+            ->orderBy('modul')
+            ->orderBy('urutan')
+            ->orderBy('nama');
 
         if ($request->filled('modul') && $request->modul !== 'semua') {
             $query->where('modul', $request->modul);
+        }
+
+        if ($request->has('parent_id')) {
+            if ($request->parent_id === 'null' || $request->parent_id === '') {
+                $query->whereNull('parent_id');
+            } else {
+                $query->where('parent_id', $request->parent_id);
+            }
         }
 
         return response()->json([
@@ -1543,7 +1862,8 @@ class AdminController extends Controller
     public function storeMasterKategori(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'modul' => 'required|string|in:berita,pengumuman,layanan,galeri,lembaga,transparansi',
+            'modul' => 'required|string|max:50',
+            'parent_id' => 'nullable|integer|exists:master_kategoris,id',
             'nama' => 'required|string|max:100',
             'slug' => 'nullable|string|max:100',
             'keterangan' => 'nullable|string',
@@ -1581,7 +1901,7 @@ class AdminController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Master kategori berhasil ditambahkan.',
-            'data' => $kategori,
+            'data' => $kategori->load(['parent', 'subkategoris']),
         ]);
     }
 
@@ -1590,7 +1910,8 @@ class AdminController extends Controller
         $kategori = MasterKategori::findOrFail($id);
 
         $validated = $request->validate([
-            'modul' => 'required|string|in:berita,pengumuman,layanan,galeri,lembaga,transparansi',
+            'modul' => 'required|string|max:50',
+            'parent_id' => 'nullable|integer|exists:master_kategoris,id',
             'nama' => 'required|string|max:100',
             'slug' => 'nullable|string|max:100',
             'keterangan' => 'nullable|string',
@@ -1630,7 +1951,7 @@ class AdminController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Master kategori berhasil diperbarui.',
-            'data' => $kategori,
+            'data' => $kategori->load(['parent', 'subkategoris']),
         ]);
     }
 
@@ -1732,5 +2053,235 @@ class AdminController extends Controller
             'status' => 'success',
             'data' => $users,
         ]);
+    }
+
+    // =========================================================================
+    // MODUL AGENDA KEGIATAN KELURAHAN (Staff Konten & Super Admin)
+    // =========================================================================
+
+    public function getAgenda(Request $request): JsonResponse
+    {
+        $query = AgendaKegiatan::query();
+
+        if ($request->filled('status') && $request->status !== 'semua') {
+            $now = now();
+            switch ($request->status) {
+                case 'akan_datang':
+                    $query->where('is_aktif', true)->where('tanggal_mulai', '>', $now);
+                    break;
+                case 'berlangsung':
+                    $query->where('is_aktif', true)->where('tanggal_mulai', '<=', $now)->where('tanggal_selesai', '>=', $now);
+                    break;
+                case 'selesai':
+                    $query->where('tanggal_selesai', '<', $now);
+                    break;
+                case 'nonaktif':
+                    $query->where('is_aktif', false);
+                    break;
+            }
+        }
+
+        if ($request->filled('kategori') && $request->kategori !== 'Semua') {
+            $query->where('kategori', $request->kategori);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('judul', 'like', "%{$s}%")
+                    ->orWhere('deskripsi', 'like', "%{$s}%")
+                    ->orWhere('lokasi', 'like', "%{$s}%")
+                    ->orWhere('penyelenggara', 'like', "%{$s}%");
+            });
+        }
+
+        $items = $query->orderBy('tanggal_mulai', 'desc')->get();
+
+        $now = now();
+        $totalAll = AgendaKegiatan::count();
+        $totalBerlangsung = AgendaKegiatan::where('is_aktif', true)->where('tanggal_mulai', '<=', $now)->where('tanggal_selesai', '>=', $now)->count();
+        $totalAkanDatang = AgendaKegiatan::where('is_aktif', true)->where('tanggal_mulai', '>', $now)->count();
+        $totalSelesai = AgendaKegiatan::where('tanggal_selesai', '<', $now)->count();
+        $totalNonaktif = AgendaKegiatan::where('is_aktif', false)->count();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $items,
+            'counts' => [
+                'total' => $totalAll,
+                'berlangsung' => $totalBerlangsung,
+                'akan_datang' => $totalAkanDatang,
+                'selesai' => $totalSelesai,
+                'nonaktif' => $totalNonaktif,
+            ],
+        ]);
+    }
+
+    public function storeAgenda(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'foto' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'penyelenggara' => 'nullable|string|max:150',
+            'kategori' => 'nullable|string|max:100',
+            'is_aktif' => 'nullable|boolean',
+        ]);
+
+        $slugBase = Str::slug($validated['judul']);
+        $slug = $slugBase;
+        $counter = 1;
+        while (AgendaKegiatan::where('slug', $slug)->exists()) {
+            $slug = $slugBase.'-'.$counter;
+            $counter++;
+        }
+        $validated['slug'] = $slug;
+        $validated['is_aktif'] = $request->has('is_aktif') ? (bool) $request->is_aktif : true;
+        $validated['kategori'] = $validated['kategori'] ?: 'Umum';
+
+        $agenda = AgendaKegiatan::create($validated);
+        $this->ensureMasterKategori('agenda', $agenda->kategori);
+
+        ActivityLog::record(
+            action: 'create',
+            module: 'agenda',
+            description: "Menambahkan agenda kegiatan baru: \"{$agenda->judul}\"",
+            properties: ['agenda_id' => $agenda->id, 'judul' => $agenda->judul],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Agenda kegiatan berhasil ditambahkan.',
+            'data' => $agenda,
+        ]);
+    }
+
+    public function updateAgenda(Request $request, int $id): JsonResponse
+    {
+        $agenda = AgendaKegiatan::findOrFail($id);
+
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'foto' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'required|date|after_or_equal:tanggal_mulai',
+            'penyelenggara' => 'nullable|string|max:150',
+            'kategori' => 'nullable|string|max:100',
+            'is_aktif' => 'nullable|boolean',
+        ]);
+
+        if ($agenda->judul !== $validated['judul']) {
+            $slugBase = Str::slug($validated['judul']);
+            $slug = $slugBase;
+            $counter = 1;
+            while (AgendaKegiatan::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = $slugBase.'-'.$counter;
+                $counter++;
+            }
+            $validated['slug'] = $slug;
+        }
+
+        $validated['is_aktif'] = $request->has('is_aktif') ? (bool) $request->is_aktif : $agenda->is_aktif;
+        $validated['kategori'] = $validated['kategori'] ?: 'Umum';
+
+        if (array_key_exists('foto', $validated) && $validated['foto'] !== $agenda->foto) {
+            FileStorageHelper::deleteFileIfLocal($agenda->foto);
+        }
+
+        $agenda->update($validated);
+
+        $this->ensureMasterKategori('agenda', $agenda->kategori);
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'agenda',
+            description: "Memperbarui agenda kegiatan: \"{$agenda->judul}\"",
+            properties: ['agenda_id' => $agenda->id, 'judul' => $agenda->judul],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Agenda kegiatan berhasil diperbarui.',
+            'data' => $agenda,
+        ]);
+    }
+
+    public function toggleAktifAgenda(Request $request, int $id): JsonResponse
+    {
+        $agenda = AgendaKegiatan::findOrFail($id);
+        $agenda->is_aktif = ! $agenda->is_aktif;
+        $agenda->save();
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'agenda',
+            description: "Mengubah status publikasi agenda \"{$agenda->judul}\" menjadi ".($agenda->is_aktif ? 'Aktif' : 'Nonaktif'),
+            properties: ['agenda_id' => $agenda->id, 'is_aktif' => $agenda->is_aktif],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status agenda berhasil diperbarui menjadi '.($agenda->is_aktif ? 'Aktif' : 'Nonaktif').'.',
+            'data' => $agenda,
+        ]);
+    }
+
+    public function deleteAgenda(Request $request, int $id): JsonResponse
+    {
+        $agenda = AgendaKegiatan::findOrFail($id);
+        $title = $agenda->judul;
+        $agenda->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'agenda',
+            description: "Menghapus agenda kegiatan: \"{$title}\"",
+            properties: ['agenda_id' => $id, 'judul' => $title],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Agenda kegiatan berhasil dihapus.',
+        ]);
+    }
+
+    /**
+     * Pastikan kategori (dan subkategori opsional) terdaftar pada Master Kategori untuk modul terkait.
+     */
+    private function ensureMasterKategori(string $modul, ?string $kategori, ?string $subkategori = null): void
+    {
+        if (empty($kategori)) {
+            return;
+        }
+
+        $clean = trim($kategori);
+        if ($clean === '' || $clean === 'Umum') {
+            return;
+        }
+
+        $parent = MasterKategori::firstOrCreate(
+            ['modul' => $modul, 'nama' => $clean],
+            ['slug' => Str::slug($clean), 'is_aktif' => true, 'warna' => 'emerald']
+        );
+
+        if (! empty($subkategori)) {
+            $cleanSub = trim($subkategori);
+            if ($cleanSub !== '' && $cleanSub !== 'Umum') {
+                $subSlug = Str::slug($clean.'-'.$cleanSub);
+                MasterKategori::firstOrCreate(
+                    ['modul' => $modul, 'nama' => $cleanSub, 'parent_id' => $parent->id],
+                    ['slug' => $subSlug, 'is_aktif' => true, 'warna' => $parent->warna ?: 'emerald']
+                );
+            }
+        }
     }
 }

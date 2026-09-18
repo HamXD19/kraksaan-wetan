@@ -69,9 +69,15 @@
                 </span>
               </td>
               <td class="py-3 px-4">
-                <div class="flex items-center gap-2">
-                  <span class="w-3 h-3 rounded-full shrink-0" :class="getColorCircleClass(kat.warna)"></span>
-                  <span class="font-bold text-slate-900 text-xs sm:text-sm">{{ kat.nama }}</span>
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full shrink-0" :class="getColorCircleClass(kat.warna)"></span>
+                    <span class="font-bold text-slate-900 text-xs sm:text-sm">{{ kat.nama }}</span>
+                  </div>
+                  <div v-if="kat.parent" class="text-[11px] text-slate-400 pl-4.5 flex items-center gap-1">
+                    <span class="text-slate-300">↳</span>
+                    <span>Subkategori dari: <strong class="text-slate-600 font-semibold">{{ kat.parent.nama }}</strong></span>
+                  </div>
                 </div>
               </td>
               <td class="py-3 px-4 font-mono text-[11px] text-slate-500">{{ kat.slug }}</td>
@@ -110,104 +116,152 @@
     <!-- Modal Form Tambah / Edit -->
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
-      @click.self="showModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
-        <h3 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-          {{ editId ? 'Sunting Master Kategori' : 'Tambah Master Kategori Baru' }}
-        </h3>
-
-        <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden">
+        <!-- Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
           <div>
-            <label class="block font-bold text-slate-700 mb-1">Modul Induk *</label>
-            <select 
-              v-model="form.modul" 
-              required 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white font-semibold"
-            >
-              <option value="berita">Berita Kelurahan</option>
-              <option value="pengumuman">Pengumuman Kedinasan</option>
-              <option value="layanan">Layanan Masyarakat (SOP)</option>
-              <option value="galeri">Galeri Foto & Dokumentasi</option>
-              <option value="lembaga">Lembaga Kemasyarakatan (LKK)</option>
-              <option value="transparansi">Transparansi Anggaran</option>
-            </select>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              {{ editId ? 'Sunting Master Kategori' : 'Tambah Master Kategori Baru' }}
+            </h3>
+            <p class="text-xs text-slate-500">Kelola kategori taksonomi untuk seluruh modul portal kelurahan.</p>
           </div>
+          <button 
+            type="button" 
+            @click="showModal = false" 
+            class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup Formulir"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
 
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Nama Kategori *</label>
-            <input 
-              type="text" 
-              v-model="form.nama" 
-              required 
-              placeholder="Contoh: Kependudukan, Infrastruktur, dll." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            />
-          </div>
+        <form @submit.prevent="saveItem" class="flex flex-col flex-1 overflow-hidden">
+          <!-- Inner Scrollable Form Content -->
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Modul Induk *</label>
+                <select 
+                  v-model="form.modul" 
+                  required 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white font-semibold"
+                >
+                  <option value="berita">Berita Kelurahan</option>
+                  <option value="pengumuman">Pengumuman Kedinasan</option>
+                  <option value="layanan">Layanan Masyarakat (SOP)</option>
+                  <option value="dokumen">Dokumen Publik (PDF)</option>
+                  <option value="galeri">Galeri Foto & Dokumentasi</option>
+                  <option value="lembaga">Lembaga Kemasyarakatan (LKK)</option>
+                  <option value="transparansi">Transparansi Anggaran</option>
+                </select>
+              </div>
 
-          <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Nama Kategori / Subkategori *</label>
+                <input 
+                  type="text" 
+                  v-model="form.nama" 
+                  required 
+                  placeholder="Contoh: Kependudukan, Realisasi Anggaran, dll." 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
+                />
+              </div>
+            </div>
+
+            <!-- Pilihan Parent Kategori (Hierarki) -->
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Warna Label</label>
+              <label class="block font-bold text-slate-700 mb-1">
+                Kategori Induk / Parent 
+                <span class="text-xs font-normal text-slate-400">(Pilih jika entri ini adalah Subkategori)</span>
+              </label>
               <select 
-                v-model="form.warna" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
+                v-model="form.parent_id" 
+                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
               >
-                <option value="emerald">Emerald (Hijau Kelurahan)</option>
-                <option value="blue">Blue (Biru Informasi)</option>
-                <option value="amber">Amber (Kuning Keemasan)</option>
-                <option value="rose">Rose (Merah Muda)</option>
-                <option value="purple">Purple (Ungu Lembaga)</option>
+                <option :value="null">-- [Kategori Utama / Tanpa Induk] --</option>
+                <option v-for="pk in availableParentKategoris" :key="pk.id" :value="pk.id">
+                  ↳ {{ pk.nama }}
+                </option>
               </select>
             </div>
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Warna Label</label>
+                <select 
+                  v-model="form.warna" 
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
+                >
+                  <option value="emerald">Emerald (Hijau Kelurahan)</option>
+                  <option value="blue">Blue (Biru Informasi)</option>
+                  <option value="amber">Amber (Kuning Keemasan)</option>
+                  <option value="rose">Rose (Merah Muda)</option>
+                  <option value="purple">Purple (Ungu Lembaga)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Urutan Prioritas</label>
+                <input 
+                  type="number" 
+                  v-model="form.urutan" 
+                  min="0"
+                  class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
+                />
+              </div>
+            </div>
+
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Urutan Prioritas</label>
-              <input 
-                type="number" 
-                v-model="form.urutan" 
-                min="0"
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
+              <label class="block font-bold text-slate-700 mb-1">Deskripsi / Keterangan (Opsional)</label>
+              <RichTextEditor 
+                v-model="form.keterangan" 
+                placeholder="Penjelasan ringkas peruntukan kategori..." 
+                height="130px"
+                maxHeight="190px"
               />
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2">
+              <input 
+                type="checkbox" 
+                id="is_aktif" 
+                v-model="form.is_aktif" 
+                class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+              />
+              <label for="is_aktif" class="font-bold text-slate-700 cursor-pointer select-none text-xs">Status Kategori Aktif</label>
             </div>
           </div>
 
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Deskripsi / Keterangan (Opsional)</label>
-            <textarea 
-              rows="3" 
-              v-model="form.keterangan" 
-              placeholder="Penjelasan ringkas peruntukan kategori..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <div class="flex items-center gap-2 pt-2">
-            <input 
-              type="checkbox" 
-              id="is_aktif" 
-              v-model="form.is_aktif" 
-              class="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
-            />
-            <label for="is_aktif" class="font-bold text-slate-700 cursor-pointer">Status Kategori Aktif</label>
-          </div>
-
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModal = false" 
-              class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving"
-              class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold"
-            >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>Simpan Kategori</span>
-            </button>
+          <!-- Sticky Footer Action Bar -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <div class="text-xs text-slate-400">
+              <span v-if="editId" class="text-emerald-700 font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Mode Sunting Kategori
+              </span>
+              <span v-else class="text-slate-500">
+                Menambah kategori baru
+              </span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <button 
+                type="button" 
+                @click="showModal = false" 
+                class="px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 font-bold transition text-xs sm:text-sm cursor-pointer"
+              >
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="saving"
+                class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold transition shadow-xs text-xs sm:text-sm cursor-pointer flex items-center gap-1.5"
+              >
+                <span v-if="saving">Menyimpan...</span>
+                <span v-else>Simpan Kategori</span>
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -218,8 +272,11 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const kategoris = ref([]);
@@ -233,6 +290,7 @@ const moduleTabs = [
   { id: 'berita', label: 'Berita' },
   { id: 'pengumuman', label: 'Pengumuman' },
   { id: 'layanan', label: 'Layanan (SOP)' },
+  { id: 'dokumen', label: 'Dokumen' },
   { id: 'galeri', label: 'Galeri Foto' },
   { id: 'lembaga', label: 'Lembaga' },
   { id: 'transparansi', label: 'Transparansi' },
@@ -240,6 +298,7 @@ const moduleTabs = [
 
 const form = reactive({
   modul: 'berita',
+  parent_id: null,
   nama: '',
   keterangan: '',
   warna: 'emerald',
@@ -257,6 +316,10 @@ const loadData = async () => {
     loading.value = false;
   }
 };
+
+const availableParentKategoris = computed(() => {
+  return kategoris.value.filter(k => k.modul === form.modul && !k.parent_id && k.id !== editId.value);
+});
 
 const filteredKategoris = computed(() => {
   if (activeModuleTab.value === 'semua') {
@@ -297,6 +360,7 @@ function openModal(item = null) {
   if (item) {
     editId.value = item.id;
     form.modul = item.modul;
+    form.parent_id = item.parent_id || null;
     form.nama = item.nama;
     form.keterangan = item.keterangan || '';
     form.warna = item.warna || 'emerald';
@@ -305,6 +369,7 @@ function openModal(item = null) {
   } else {
     editId.value = null;
     form.modul = activeModuleTab.value !== 'semua' ? activeModuleTab.value : 'berita';
+    form.parent_id = null;
     form.nama = '';
     form.keterangan = '';
     form.warna = 'emerald';
@@ -323,11 +388,14 @@ async function saveItem() {
     } else {
       res = await AdminService.storeMasterKategori(form);
     }
-    successMsg.value = res.message || 'Master kategori berhasil disimpan!';
+    const msg = res?.message || (editId.value ? 'Master kategori berhasil diperbarui!' : 'Master kategori baru berhasil disimpan!');
+    successMsg.value = msg;
+    toast.success(msg, 'Master Kategori');
     showModal.value = false;
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan master kategori: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';
+    toast.error('Gagal menyimpan master kategori: ' + errText, 'Gagal Menyimpan');
   } finally {
     saving.value = false;
   }
@@ -337,10 +405,13 @@ async function deleteItem(id) {
   if (!confirm('Apakah Anda yakin ingin menghapus kategori ini?')) return;
   try {
     await AdminService.deleteMasterKategori(id);
-    successMsg.value = 'Kategori berhasil dihapus.';
+    const msg = 'Kategori berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Kategori Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus kategori: ' + (err.response?.data?.message || err.message));
+    const errText = err.response?.data?.message || err.message;
+    toast.error('Gagal menghapus kategori: ' + errText, 'Gagal Menghapus');
   }
 }
 

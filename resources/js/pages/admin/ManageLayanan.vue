@@ -40,6 +40,11 @@
               <td class="py-3 px-4 max-w-sm">
                 <p class="font-bold text-slate-900">{{ l.judul }}</p>
                 <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{{ l.deskripsi }}</p>
+                <div v-if="l.slug" class="mt-1">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-600 border border-slate-200" title="Slug URL Layanan">
+                    slug: {{ l.slug }}
+                  </span>
+                </div>
               </td>
               <td class="py-3 px-4">
                 <span class="px-2.5 py-1 rounded-md bg-slate-100 font-semibold text-[11px]">
@@ -85,125 +90,173 @@
     <!-- Modal Form Tambah / Edit -->
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
-      @click.self="showModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-        <h3 class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100">
-          {{ editId ? 'Sunting Layanan' : 'Tambah Layanan Baru' }}
-        </h3>
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+        <!-- Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              {{ editId ? 'Sunting Layanan Publik' : 'Tambah Layanan Baru' }}
+            </h3>
+            <p class="text-xs text-slate-500">Kelola standar operasional prosedur (SOP), syarat berkas, dan alur permohonan.</p>
+          </div>
+          <button 
+            type="button" 
+            @click="showModal = false" 
+            class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
 
-        <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Nama Layanan *</label>
-              <input 
-                type="text" 
-                v-model="form.judul" 
-                required 
-                placeholder="Contoh: Surat Pengantar SKCK" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
+        <!-- Form with Scrollable Interior & Sticky Footer -->
+        <form @submit.prevent="saveItem" class="flex flex-col flex-1 overflow-hidden">
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left Column: Primary Content (Nama, Deskripsi & Alur) -->
+              <div class="lg:col-span-7 space-y-4">
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Nama Layanan *</label>
+                  <input 
+                    type="text" 
+                    v-model="form.judul" 
+                    required 
+                    placeholder="Contoh: Surat Pengantar SKCK" 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat *</label>
+                  <RichTextEditor 
+                    v-model="form.deskripsi" 
+                    placeholder="Deskripsi peruntukan layanan..." 
+                    height="140px"
+                    maxHeight="220px"
+                  />
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">Alur Prosedur Pengurusan</label>
+                  <RichTextEditor 
+                    v-model="form.alur" 
+                    placeholder="Langkah pengajuan hingga pengambilan dokumen..." 
+                    height="160px"
+                    maxHeight="240px"
+                  />
+                </div>
+              </div>
+
+              <!-- Right Column: Meta, Waktu, Biaya, Persyaratan -->
+              <div class="lg:col-span-5 space-y-3.5 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block font-bold text-slate-700 text-xs">Kategori Layanan *</label>
+                    <button 
+                      type="button" 
+                      @click="isCustomKategori = !isCustomKategori"
+                      class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                    >
+                      {{ isCustomKategori ? '← Master' : '+ Baru' }}
+                    </button>
+                  </div>
+                  <div v-if="!isCustomKategori">
+                    <select 
+                      v-model="form.kategori" 
+                      required 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    >
+                      <option v-for="k in kategoriOptions" :key="k.id || k" :value="k.nama || k">
+                        {{ k.nama || k }}
+                      </option>
+                      <option v-if="form.kategori && !kategoriOptions.some(k => (k.nama || k) === form.kategori)" :value="form.kategori">
+                        {{ form.kategori }}
+                      </option>
+                    </select>
+                  </div>
+                  <div v-else>
+                    <input 
+                      type="text" 
+                      v-model="form.customKategori" 
+                      required 
+                      placeholder="Kategori baru..." 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1 text-xs">Ikon Tipe Layanan</label>
+                  <select 
+                    v-model="form.icon" 
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                  >
+                    <option value="Users">Users (Kependudukan)</option>
+                    <option value="Home">Home (Domisili)</option>
+                    <option value="Briefcase">Briefcase (Usaha / SKU)</option>
+                    <option value="HeartHandshake">HeartHandshake (SKTM/Bansos)</option>
+                    <option value="ShieldCheck">ShieldCheck (SKCK)</option>
+                    <option value="FileText">FileText (Umum)</option>
+                  </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Estimasi Waktu</label>
+                    <input 
+                      type="text" 
+                      v-model="form.waktu" 
+                      placeholder="10 - 15 Menit" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Biaya / Tarif</label>
+                    <input 
+                      type="text" 
+                      v-model="form.biaya" 
+                      placeholder="Gratis (Rp 0)" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1 text-xs">Persyaratan Berkas (1 baris per syarat)</label>
+                  <textarea 
+                    rows="4" 
+                    v-model="persyaratanText" 
+                    placeholder="Surat pengantar RT dan RW&#10;Fotokopi KTP dan KK&#10;Pas foto 3x4" 
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs leading-relaxed"
+                  ></textarea>
+                </div>
+              </div>
             </div>
+          </div>
 
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Kategori Layanan *</label>
-              <select 
-                v-model="form.kategori" 
-                required 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
+          <!-- Sticky Footer Actions -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-xs text-slate-400 italic hidden sm:inline">Kolom bertanda * wajib diisi</span>
+            <div class="flex items-center gap-2.5 ml-auto">
+              <button 
+                type="button" 
+                @click="showModal = false" 
+                class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs cursor-pointer transition"
               >
-                <option v-for="k in kategoriOptions" :key="k.id" :value="k.nama">
-                  {{ k.nama }}
-                </option>
-              </select>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Ikon Tipe</label>
-              <select 
-                v-model="form.icon" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
+                Batal
+              </button>
+              <button 
+                type="submit" 
+                :disabled="saving"
+                class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold text-xs shadow-xs cursor-pointer transition"
               >
-                <option value="Users">Users (Kependudukan)</option>
-                <option value="Home">Home (Domisili)</option>
-                <option value="Briefcase">Briefcase (Usaha / SKU)</option>
-                <option value="HeartHandshake">HeartHandshake (SKTM/Bansos)</option>
-                <option value="ShieldCheck">ShieldCheck (SKCK)</option>
-                <option value="FileText">FileText (Umum)</option>
-              </select>
+                <span v-if="saving">Menyimpan...</span>
+                <span v-else>{{ editId ? 'Simpan Perubahan' : 'Simpan Layanan' }}</span>
+              </button>
             </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Estimasi Waktu</label>
-              <input 
-                type="text" 
-                v-model="form.waktu" 
-                placeholder="10 - 15 Menit" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Biaya Layanan</label>
-              <input 
-                type="text" 
-                v-model="form.biaya" 
-                placeholder="Gratis (Rp 0)" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Deskripsi Singkat *</label>
-            <textarea 
-              rows="2" 
-              v-model="form.deskripsi" 
-              required 
-              placeholder="Deskripsi peruntukan layanan..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Persyaratan Berkas (1 baris per syarat)</label>
-            <textarea 
-              rows="4" 
-              v-model="persyaratanText" 
-              placeholder="Surat pengantar RT dan RW&#10;Fotokopi KTP dan KK&#10;Pas foto 3x4" 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Alur Prosedur Pengurusan</label>
-            <textarea 
-              rows="2" 
-              v-model="form.alur" 
-              placeholder="Langkah pengajuan hingga pengambilan dokumen..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModal = false" 
-              class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving"
-              class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold"
-            >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>Simpan Layanan</span>
-            </button>
           </div>
         </form>
       </div>
@@ -214,8 +267,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const layananList = ref([]);
@@ -224,10 +280,12 @@ const editId = ref(null);
 const successMsg = ref('');
 const persyaratanText = ref('');
 const kategoriOptions = ref([]);
+const isCustomKategori = ref(false);
 
 const form = reactive({
   judul: '',
   kategori: 'Kependudukan',
+  customKategori: '',
   icon: 'FileText',
   deskripsi: '',
   persyaratan: [],
@@ -253,6 +311,8 @@ const loadData = async () => {
 };
 
 const openModal = (item = null) => {
+  isCustomKategori.value = false;
+  form.customKategori = '';
   if (item) {
     editId.value = item.id;
     form.judul = item.judul;
@@ -266,7 +326,7 @@ const openModal = (item = null) => {
   } else {
     editId.value = null;
     form.judul = '';
-    form.kategori = 'Kependudukan';
+    form.kategori = (kategoriOptions.value[0]?.nama || kategoriOptions.value[0]) || 'Kependudukan';
     form.icon = 'FileText';
     form.deskripsi = '';
     form.alur = '';
@@ -285,12 +345,19 @@ const saveItem = async () => {
     .filter(s => s.length > 0);
 
   try {
-    const res = await AdminService.saveLayanan(form, editId.value);
-    successMsg.value = res.message || 'Layanan berhasil disimpan!';
+    const payload = { ...form };
+    if (isCustomKategori.value && form.customKategori?.trim()) {
+      payload.kategori = form.customKategori.trim();
+    }
+    const res = await AdminService.saveLayanan(payload, editId.value);
+    const msg = res.message || 'Layanan berhasil disimpan!';
+    successMsg.value = msg;
+    toast.success(msg, editId.value ? 'Layanan Diperbarui' : 'Layanan Ditambahkan');
     showModal.value = false;
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan layanan: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan layanan.';
+    toast.error('Gagal menyimpan layanan: ' + errMsg);
   } finally {
     saving.value = false;
   }
@@ -300,10 +367,12 @@ const deleteItem = async (id) => {
   if (!confirm('Hapus layanan ini dari daftar?')) return;
   try {
     await AdminService.deleteLayanan(id);
-    successMsg.value = 'Layanan berhasil dihapus.';
+    const msg = 'Layanan berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Layanan Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus layanan.');
+    toast.error('Gagal menghapus layanan.');
   }
 };
 
@@ -312,12 +381,12 @@ const toggleAktifLayanan = async (item) => {
   try {
     await AdminService.toggleAktifLayanan(item.id, newStatus);
     item.aktif = newStatus;
-    successMsg.value = `Status aktif layanan "${item.judul}" berhasil diubah menjadi ${newStatus ? 'Aktif' : 'Nonaktif'}.`;
-    setTimeout(() => {
-      successMsg.value = '';
-    }, 3000);
+    const msg = `Status aktif layanan "${item.judul}" berhasil diubah menjadi ${newStatus ? 'Aktif' : 'Nonaktif'}.`;
+    successMsg.value = msg;
+    toast.success(msg, 'Status Layanan Diperbarui');
   } catch (err) {
-    alert('Gagal mengubah status aktif layanan: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal mengubah status aktif layanan.';
+    toast.error('Gagal mengubah status aktif layanan: ' + errMsg);
   }
 };
 

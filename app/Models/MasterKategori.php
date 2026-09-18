@@ -15,6 +15,7 @@ class MasterKategori extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
+        'parent_id' => 'integer',
         'is_aktif' => 'boolean',
         'urutan' => 'integer',
     ];
@@ -24,6 +25,16 @@ class MasterKategori extends Model
     public function getAktifAttribute(): bool
     {
         return (bool) ($this->attributes['is_aktif'] ?? true);
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(MasterKategori::class, 'parent_id');
+    }
+
+    public function subkategoris()
+    {
+        return $this->hasMany(MasterKategori::class, 'parent_id')->orderBy('urutan')->orderBy('nama');
     }
 
     public static function boot()
@@ -45,5 +56,15 @@ class MasterKategori extends Model
     public function scopeAktif($query)
     {
         return $query->where('is_aktif', true);
+    }
+
+    public function scopeKategoriUtama($query)
+    {
+        return $query->whereNull('parent_id');
+    }
+
+    public function scopeSubkategori($query)
+    {
+        return $query->whereNotNull('parent_id');
     }
 }

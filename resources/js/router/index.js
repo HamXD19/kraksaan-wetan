@@ -86,6 +86,16 @@ const routes = [
         meta: { title: 'Detail Galeri - Kelurahan Kraksaan Wetan' }
       },
       {
+        path: 'dokumen',
+        name: 'dokumen',
+        component: () => import('../pages/Dokumen.vue'),
+        meta: { title: 'Unduh Dokumen Kelurahan (PDF) - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'unduh-dokumen',
+        redirect: '/dokumen'
+      },
+      {
         path: 'pelayanan',
         name: 'pelayanan',
         component: () => import('../pages/Pelayanan.vue'),
@@ -106,6 +116,22 @@ const routes = [
       {
         path: 'informasi-publik/transparansi',
         redirect: '/transparansi'
+      },
+      {
+        path: 'agenda',
+        name: 'agenda',
+        component: () => import('../pages/Agenda.vue'),
+        meta: { title: 'Agenda Kegiatan - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'agenda/:slug',
+        name: 'agenda-detail',
+        component: () => import('../pages/AgendaDetail.vue'),
+        meta: { title: 'Detail Agenda Kegiatan - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'informasi-publik/agenda',
+        redirect: '/agenda'
       }
     ]
   },
@@ -165,6 +191,18 @@ const routes = [
         name: 'admin-galeri',
         component: () => import('../pages/admin/ManageGaleri.vue'),
         meta: { title: 'Kelola Galeri Foto - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+      },
+      {
+        path: 'agenda',
+        name: 'admin-agenda',
+        component: () => import('../pages/admin/ManageAgenda.vue'),
+        meta: { title: 'Kelola Agenda Kegiatan - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+      },
+      {
+        path: 'dokumen',
+        name: 'admin-dokumen',
+        component: () => import('../pages/admin/ManageDokumen.vue'),
+        meta: { title: 'Kelola Dokumen PDF - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten', 'staff_administrasi'] }
       },
       {
         path: 'profil',

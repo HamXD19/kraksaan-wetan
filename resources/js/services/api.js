@@ -69,20 +69,6 @@ export const KelurahanService = {
         return res.data?.data || res.data;
     },
 
-    async submitPengajuan(formData) {
-        const res = await apiClient.post('/pelayanan/pengajuan', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        });
-        return res.data;
-    },
-
-    async trackPengajuan(data) {
-        const res = await apiClient.post('/pelayanan/tracking', data);
-        return res.data?.data || res.data;
-    },
-
     async getBerita(params = {}) {
         try {
             const res = await apiClient.get('/berita', { params });
@@ -123,6 +109,20 @@ export const KelurahanService = {
         }
     },
 
+    async getDokumen(params = {}) {
+        try {
+            const res = await apiClient.get('/dokumen', { params });
+            return res.data;
+        } catch (e) {
+            console.warn('API /dokumen error:', e);
+            return { status: 'error', data: [], meta: { total: 0, kategori_list: [], tahun_list: [] } };
+        }
+    },
+
+    getDokumenUnduhUrl(id) {
+        return `/api/dokumen/${id}/unduh`;
+    },
+
     async getGaleri() {
         try {
             const res = await apiClient.get('/galeri');
@@ -143,11 +143,6 @@ export const KelurahanService = {
             if (found) return found;
             throw e;
         }
-    },
-
-    async kirimKontak(data) {
-        const res = await apiClient.post('/kontak', data);
-        return res.data;
     },
 
     async getLembaga() {
@@ -179,6 +174,16 @@ export const KelurahanService = {
             console.warn('API /kategori fallback:', e);
             return [];
         }
+    },
+
+    async getAgenda(params = {}) {
+        const res = await apiClient.get('/agenda', { params });
+        return res.data;
+    },
+
+    async getAgendaBySlug(slug) {
+        const res = await apiClient.get(`/agenda/${slug}`);
+        return res.data?.data || res.data;
     }
 };
 
@@ -243,6 +248,10 @@ export const AdminService = {
         return res.data?.data;
     },
 
+    getToken() {
+        return localStorage.getItem('kw_admin_token') || '';
+    },
+
     async updatePassword(data) {
         return (await apiClient.put('/admin/password', data)).data;
     },
@@ -292,6 +301,24 @@ export const AdminService = {
     },
     async deletePengumuman(id) {
         return (await apiClient.delete(`/admin/pengumuman/${id}`)).data;
+    },
+
+    // Dokumen Publik (PDF)
+    async getDokumen(params = {}) {
+        const res = await apiClient.get('/admin/dokumen', { params });
+        return res.data;
+    },
+    async saveDokumen(data, id = null) {
+        if (id) {
+            return (await apiClient.put(`/admin/dokumen/${id}`, data)).data;
+        }
+        return (await apiClient.post('/admin/dokumen', data)).data;
+    },
+    async deleteDokumen(id) {
+        return (await apiClient.delete(`/admin/dokumen/${id}`)).data;
+    },
+    async toggleDokumenStatus(id) {
+        return (await apiClient.put(`/admin/dokumen/${id}/toggle-status`)).data;
     },
 
     // Pengajuan Pelayanan Online
@@ -386,18 +413,6 @@ export const AdminService = {
         return (await apiClient.delete(`/admin/lingkungan/${id}`)).data;
     },
 
-    // Pesan / Aspirasi
-    async getPesan() {
-        const res = await apiClient.get('/admin/pesan');
-        return res.data?.data;
-    },
-    async updateStatusPesan(id, status) {
-        return (await apiClient.put(`/admin/pesan/${id}/status`, { status })).data;
-    },
-    async deletePesan(id) {
-        return (await apiClient.delete(`/admin/pesan/${id}`)).data;
-    },
-
     // Lembaga Kemasyarakatan (LKK)
     async getLembaga() {
         const res = await apiClient.get('/admin/lembaga');
@@ -476,6 +491,24 @@ export const AdminService = {
     async getActivityLogUsers() {
         const res = await apiClient.get('/admin/activity-logs/users');
         return res.data?.data || [];
+    },
+
+    // Kelola Agenda Kegiatan
+    async getAgenda(params = {}) {
+        const res = await apiClient.get('/admin/agenda', { params });
+        return res.data;
+    },
+    async saveAgenda(data, id = null) {
+        if (id) {
+            return (await apiClient.put(`/admin/agenda/${id}`, data)).data;
+        }
+        return (await apiClient.post('/admin/agenda', data)).data;
+    },
+    async toggleAktifAgenda(id) {
+        return (await apiClient.put(`/admin/agenda/${id}/toggle-aktif`)).data;
+    },
+    async deleteAgenda(id) {
+        return (await apiClient.delete(`/admin/agenda/${id}`)).data;
     }
 };
 

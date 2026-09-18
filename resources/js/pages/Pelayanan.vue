@@ -3,39 +3,28 @@
     <Breadcrumb :items="[{ label: 'Standar Operasional Prosedur (SOP) Pelayanan' }]" />
 
     <!-- Header Section -->
-    <section class="bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <span class="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-              Standar Pelayanan Publik Kelurahan
-            </span>
-            <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Katalog SOP Pelayanan Masyarakat</h1>
-            <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl leading-relaxed">
-              Panduan resmi Standar Operasional Prosedur (SOP), daftar persyaratan berkas, alur tahapan permohonan, estimasi waktu penyelesaian, dan kepastian tarif layanan di Kelurahan Kraksaan Wetan.
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <a 
-              href="#panduan-umum"
-              class="px-5 py-3 rounded-xl bg-emerald-800/90 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 border border-emerald-600/50"
-            >
-              <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              Alur Pengurusan
-            </a>
-            <router-link 
-              to="/kontak"
-              class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-md"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-              Hubungi Petugas
-            </router-link>
-          </div>
-        </div>
+    <HeroPageHeader 
+      badge-text="Standar Pelayanan Publik Kelurahan"
+      title="Katalog SOP Pelayanan Masyarakat"
+      description="Panduan resmi Standar Operasional Prosedur (SOP), daftar persyaratan berkas, alur tahapan permohonan, estimasi waktu penyelesaian, dan kepastian tarif layanan di Kelurahan Kraksaan Wetan."
+    >
+      <div class="flex items-center gap-2 mt-4">
+        <a 
+          href="#panduan-umum"
+          class="px-5 py-3 rounded-xl bg-emerald-800/90 hover:bg-emerald-800 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 border border-emerald-600/50"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Alur Pengurusan
+        </a>
+        <router-link 
+          to="/kontak"
+          class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-md"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+          Hubungi Petugas
+        </router-link>
       </div>
-    </section>
+    </HeroPageHeader>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-10">
       <!-- Highlight Banner: Bebas Biaya -->
@@ -240,7 +229,6 @@
     <div 
       v-if="activeSop" 
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs animate-fade-in"
-      @click.self="activeSop = null"
     >
       <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200 flex flex-col">
         <!-- Modal Header -->
@@ -266,9 +254,10 @@
           <!-- Deskripsi Layanan -->
           <div>
             <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider mb-2">Deskripsi Layanan</h4>
-            <p class="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
-              {{ activeSop.deskripsi }}
-            </p>
+            <div 
+              class="text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100 rich-content"
+              v-html="activeSop.deskripsi"
+            ></div>
           </div>
 
           <!-- Parameter Waktu & Biaya -->
@@ -310,9 +299,11 @@
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
               Alur Standar Operasional Prosedur (SOP)
             </h4>
-            <div v-if="activeSop.alur" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed whitespace-pre-line">
-              {{ activeSop.alur }}
-            </div>
+            <div 
+              v-if="activeSop.alur" 
+              class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-700 leading-relaxed rich-content"
+              v-html="activeSop.alur"
+            ></div>
             <div v-else class="space-y-2">
               <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-start gap-3">
                 <span class="w-5 h-5 rounded-full bg-emerald-700 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">1</span>
@@ -351,6 +342,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 
@@ -417,5 +409,29 @@ function resetFilter() {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+.rich-content :deep(p) {
+  margin-bottom: 0.5rem;
+}
+.rich-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+.rich-content :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+.rich-content :deep(ol) {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+.rich-content :deep(li) {
+  margin-bottom: 0.25rem;
+}
+.rich-content :deep(a) {
+  color: #047857;
+  text-decoration: underline;
 }
 </style>

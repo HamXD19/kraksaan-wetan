@@ -34,7 +34,7 @@ import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Navbar from '../components/Navbar.vue';
 import Footer from '../components/Footer.vue';
-import { scanAndObserveElements } from '../directives/vReveal';
+import { scanAndObserveElements, initAutoScrollReveal } from '../directives/vReveal';
 
 const route = useRoute();
 const showScrollTop = ref(false);
@@ -49,11 +49,9 @@ const scrollToTop = () => {
 
 const triggerRevealScan = () => {
   nextTick(() => {
-    // Run scan multiple times to catch delayed API data fetches
     scanAndObserveElements();
-    setTimeout(scanAndObserveElements, 100);
-    setTimeout(scanAndObserveElements, 350);
-    setTimeout(scanAndObserveElements, 700);
+    setTimeout(scanAndObserveElements, 150);
+    setTimeout(scanAndObserveElements, 500);
   });
 };
 
@@ -63,6 +61,7 @@ watch(() => route.fullPath, () => {
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
+  initAutoScrollReveal();
   triggerRevealScan();
 });
 

@@ -2,15 +2,12 @@
   <div class="pb-16">
     <Breadcrumb :items="[{ label: 'Informasi Publik' }]" />
 
-    <section class="bg-emerald-900 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Keterbukaan Informasi & Data</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Informasi Publik & Data Wilayah</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl">
-          Akses data agregat kependudukan, statistik wilayah, laporan transparansi, dan informasi publik Kelurahan Kraksaan Wetan.
-        </p>
-      </div>
-    </section>
+    <!-- Hero Banner Header -->
+    <HeroPageHeader 
+      badge-text="Keterbukaan Informasi & Data"
+      title="Informasi Publik & Data Wilayah"
+      description="Akses data agregat kependudukan, statistik wilayah, laporan transparansi, dan informasi publik Kelurahan Kraksaan Wetan."
+    />
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-16">
       <LoadingSpinner v-if="loading" />
@@ -139,33 +136,52 @@
             </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-              <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Anggaran Kelurahan</span>
-              <h4 class="font-bold text-slate-900 text-base mb-2">Alokasi Dana Kelurahan (ADK)</h4>
-              <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                Transparansi pemanfaatan pos dana sarana prasarana fisik lingkungan dan pemberdayaan masyarakat se-Kelurahan Kraksaan Wetan.
-              </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Jadwal & Agenda</span>
+                <h4 class="font-bold text-slate-900 text-base mb-2">Agenda Kegiatan Kelurahan</h4>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Informasi jadwal musrenbang, posyandu, kerja bakti, peringatan hari besar, dan kegiatan kemasyarakatan terkini.
+                </p>
+              </div>
+              <router-link to="/agenda" class="text-xs font-bold text-emerald-700 hover:underline inline-flex items-center gap-1">
+                <span>Lihat Agenda Kegiatan &rarr;</span>
+              </router-link>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Anggaran Kelurahan</span>
+                <h4 class="font-bold text-slate-900 text-base mb-2">Alokasi Dana Kelurahan (ADK)</h4>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Transparansi pemanfaatan pos dana sarana prasarana fisik lingkungan dan pemberdayaan masyarakat se-Kelurahan Kraksaan Wetan.
+                </p>
+              </div>
               <router-link to="/transparansi" class="text-xs font-bold text-emerald-700 hover:underline inline-flex items-center gap-1">
                 <span>Rincian Pos Dana &rarr;</span>
               </router-link>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-              <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Program Bantuan Sosial</span>
-              <h4 class="font-bold text-slate-900 text-base mb-2">Verifikasi DTKS & P3KE</h4>
-              <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                Penyaluran bantuan beras CBP, PKH, BPNT, dan BLT diverifikasi berkala melalui musyawarah kelurahan agar tepat sasaran bagi keluarga prasejahtera.
-              </p>
-              <span class="inline-block px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-medium">Pengawasan Tiga Pilar</span>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Program Bantuan Sosial</span>
+                <h4 class="font-bold text-slate-900 text-base mb-2">Verifikasi DTKS & P3KE</h4>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Penyaluran bantuan beras CBP, PKH, BPNT, dan BLT diverifikasi berkala melalui musyawarah kelurahan agar tepat sasaran.
+                </p>
+              </div>
+              <span class="inline-block px-3 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-medium self-start">Pengawasan Tiga Pilar</span>
             </div>
 
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-              <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Perencanaan Pembangunan</span>
-              <h4 class="font-bold text-slate-900 text-base mb-2">Hasil Musrenbangkel</h4>
-              <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                Dokumen berita acara prioritas usulan pembangunan warga dari rembuk RT/RW yang diteruskan ke Musrenbang Kecamatan Kraksaan.
-              </p>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+              <div>
+                <span class="text-xs font-bold uppercase text-emerald-700 block mb-2">Perencanaan Pembangunan</span>
+                <h4 class="font-bold text-slate-900 text-base mb-2">Hasil Musrenbangkel</h4>
+                <p class="text-xs text-slate-600 leading-relaxed mb-4">
+                  Dokumen berita acara prioritas usulan pembangunan warga dari rembuk RT/RW yang diteruskan ke Musrenbang Kecamatan Kraksaan.
+                </p>
+              </div>
               <router-link to="/berita" class="text-xs font-bold text-emerald-700 hover:underline">
                 Baca Liputan Musrenbangkel &rarr;
               </router-link>
@@ -180,6 +196,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 

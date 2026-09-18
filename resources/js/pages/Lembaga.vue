@@ -4,15 +4,11 @@
     <Breadcrumb :items="[{ label: 'Pemerintahan', to: '/pemerintahan' }, { label: 'Lembaga Kemasyarakatan' }]" />
 
     <!-- Hero Header Section -->
-    <section class="bg-emerald-900 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Mitra Pembangunan & Pemberdayaan</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Lembaga Kemasyarakatan Kelurahan (LKK)</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl leading-relaxed">
-          Wadah partisipasi aktif masyarakat, gotong royong, dan sinergi kemitraan bersama Pemerintah Kelurahan Kraksaan Wetan dalam perencanaan, pelaksanaan, dan pelestarian pembangunan.
-        </p>
-      </div>
-    </section>
+    <HeroPageHeader 
+      badge-text="Mitra Pembangunan & Pemberdayaan"
+      title="Lembaga Kemasyarakatan Kelurahan (LKK)"
+      description="Wadah partisipasi aktif masyarakat, gotong royong, dan sinergi kemitraan bersama Pemerintah Kelurahan Kraksaan Wetan dalam perencanaan, pelaksanaan, dan pelestarian pembangunan."
+    />
 
     <!-- Main Content Container -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-10">
@@ -20,7 +16,7 @@
 
       <template v-else>
         <!-- Filter Kategori & Info Ringkas -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-5 reveal">
           <!-- Kategori Tabs -->
           <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full">
             <button 
@@ -42,9 +38,10 @@
         <!-- Cards Grid Lembaga Kemasyarakatan -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div 
-            v-for="item in filteredLembaga" 
+            v-for="(item, idx) in filteredLembaga" 
             :key="item.id"
-            class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between overflow-hidden"
+            class="bg-white rounded-3xl border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between overflow-hidden reveal"
+            :class="`delay-${((idx % 3) + 1) * 75}`"
           >
             <!-- Card Header & Profil -->
             <div class="p-6 sm:p-7 space-y-5">
@@ -76,9 +73,7 @@
               </div>
 
               <!-- Deskripsi -->
-              <p class="text-xs text-slate-600 leading-relaxed">
-                {{ item.deskripsi }}
-              </p>
+              <div class="text-xs text-slate-600 leading-relaxed rich-content" v-html="item.deskripsi"></div>
 
               <!-- Struktur / Pimpinan & Kontak -->
               <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
@@ -164,6 +159,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 
@@ -235,3 +231,29 @@ onMounted(async () => {
   }
 });
 </script>
+
+<style scoped>
+.rich-content :deep(p) {
+  margin-bottom: 0.35rem;
+}
+.rich-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+.rich-content :deep(ul) {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0.35rem 0;
+}
+.rich-content :deep(ol) {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin: 0.35rem 0;
+}
+.rich-content :deep(li) {
+  margin-bottom: 0.15rem;
+}
+.rich-content :deep(a) {
+  color: #047857;
+  text-decoration: underline;
+}
+</style>

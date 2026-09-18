@@ -2,19 +2,16 @@
   <div class="pb-16">
     <Breadcrumb :items="[{ label: 'Berita & Pengumuman' }]" />
 
-    <section class="bg-emerald-900 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Warta Kraksaan Wetan</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Pusat Berita & Pengumuman</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl">
-          Publikasi resmi seputar agenda kegiatan kelurahan, kebijakan pemerintah, giat masyarakat, dan pengumuman kedinasan.
-        </p>
-      </div>
-    </section>
+    <!-- Hero Banner Header -->
+    <HeroPageHeader 
+      badge-text="Warta Kraksaan Wetan"
+      title="Pusat Berita & Pengumuman"
+      description="Publikasi resmi seputar agenda kegiatan kelurahan, kebijakan pemerintah, giat masyarakat, dan pengumuman kedinasan."
+    />
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10">
       <!-- Search & Tab Bar -->
-      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs mb-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-xs mb-8 flex flex-col md:flex-row items-center justify-between gap-4 reveal">
         <!-- Main Tab Switcher -->
         <div class="flex items-center gap-2 w-full md:w-auto">
           <button 
@@ -51,7 +48,7 @@
       </div>
 
       <!-- Categories for Berita -->
-      <div v-if="activeMainTab === 'berita'" class="flex flex-wrap items-center gap-2 mb-8">
+      <div v-if="activeMainTab === 'berita'" class="flex flex-wrap items-center gap-2 mb-8 reveal delay-75">
         <button 
           v-for="k in kategoriList" 
           :key="k"
@@ -72,9 +69,11 @@
         <div v-if="activeMainTab === 'berita'">
           <div v-if="beritaList.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <NewsCard 
-              v-for="b in beritaList" 
+              v-for="(b, idx) in beritaList" 
               :key="b.id" 
               :berita="b" 
+              class="reveal"
+              :class="`delay-${((idx % 3) + 1) * 75}`"
             />
           </div>
           <div v-else class="text-center py-16 bg-white rounded-2xl border border-slate-200">
@@ -87,9 +86,11 @@
           <div v-if="pengumumanList.length > 0">
             <div class="space-y-4">
               <AnnouncementCard 
-                v-for="p in pengumumanList" 
+                v-for="(p, idx) in pengumumanList" 
                 :key="p.id" 
                 :pengumuman="p" 
+                class="reveal"
+                :class="`delay-${((idx % 4) + 1) * 75}`"
               />
             </div>
           </div>
@@ -103,9 +104,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import NewsCard from '../components/NewsCard.vue';
 import AnnouncementCard from '../components/AnnouncementCard.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';

@@ -2,23 +2,21 @@
   <div class="pb-16">
     <Breadcrumb :items="[{ label: 'Pemerintahan' }]" />
 
-    <section class="bg-emerald-900 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Penyelenggaraan Pemerintahan</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Pemerintahan Kelurahan Kraksaan Wetan</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl">
-          Sinergi kepemimpinan kelurahan, aparatur sipil, pimpinan RT/RW, dan lembaga kemasyarakatan.
-        </p>
-      </div>
-    </section>
+    <!-- Hero Banner Header -->
+    <HeroPageHeader 
+      badge-text="Penyelenggaraan Pemerintahan"
+      title="Pemerintahan Kelurahan Kraksaan Wetan"
+      description="Sinergi kepemimpinan kelurahan, aparatur sipil, pimpinan RT/RW, dan lembaga kemasyarakatan."
+      :profil="profil"
+    />
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-16">
       <LoadingSpinner v-if="loading" />
       <template v-else>
         <!-- Section 1: Profil Lurah (#lurah) -->
-        <section id="lurah" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm">
+        <section id="lurah" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm reveal">
           <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-            <div class="md:col-span-4 text-center">
+            <div class="md:col-span-4 text-center reveal-left delay-75">
               <div class="w-48 h-56 mx-auto rounded-2xl overflow-hidden shadow-lg border-4 border-emerald-100 bg-slate-100">
                 <img 
                   :src="profil.lurah?.foto || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'" 
@@ -31,7 +29,7 @@
               <p class="text-[11px] text-slate-500">NIP. {{ profil.lurah?.nip }}</p>
             </div>
 
-            <div class="md:col-span-8 space-y-4">
+            <div class="md:col-span-8 space-y-4 reveal-right delay-100">
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider">
                 <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
                 Sambutan Kepala Kelurahan
@@ -43,14 +41,14 @@
                 "{{ profil.lurah?.sambutan }}"
               </blockquote>
               <p class="text-xs text-slate-600 leading-relaxed">
-                Pemerintah Kelurahan Kraksaan Wetan terus berkomitmen meningkatkan sarana digitalisasi pelayanan, menjembatani aspirasi masyarakat ke tingkat kecamatan dan kabupaten, serta mengawal pembangunan berbasis gotong royong.
+                Pemerintah {{ profil.nama || 'Kelurahan Kraksaan Wetan' }} terus berkomitmen meningkatkan sarana digitalisasi pelayanan, menjembatani aspirasi masyarakat ke tingkat kecamatan dan kabupaten, serta mengawal pembangunan berbasis gotong royong.
               </p>
             </div>
           </div>
         </section>
 
         <!-- Section 2: Perangkat Kelurahan (#perangkat) -->
-        <section id="perangkat" class="scroll-mt-24">
+        <section id="perangkat" class="scroll-mt-24 reveal">
           <div class="text-center max-w-2xl mx-auto mb-10">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -68,7 +66,8 @@
             <div 
               v-for="(p, i) in profil.perangkat" 
               :key="i"
-              class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:shadow-md transition"
+              class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:shadow-md transition reveal"
+              :class="`delay-${((i % 3) + 1) * 75}`"
             >
               <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center text-sm mb-4">
                 {{ p.nama.charAt(0) }}
@@ -81,7 +80,7 @@
         </section>
 
         <!-- Section 3: Rukun Tetangga & RW (#rtrw) -->
-        <section id="rtrw" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm">
+        <section id="rtrw" class="scroll-mt-24 bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-sm reveal">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
               <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
@@ -90,11 +89,11 @@
               </div>
               <h2 class="text-2xl font-bold text-slate-900 tracking-tight">Rukun Warga (RW) & Rukun Tetangga (RT)</h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-1">
-                Kelurahan Kraksaan Wetan terbagi atas 7 RW dan 28 RT yang tersebar di wilayah strategis.
+                {{ profil.nama || 'Kelurahan Kraksaan Wetan' }} terbagi atas {{ statistik.rw || 7 }} RW dan {{ statistik.rt || 22 }} RT yang tersebar di wilayah strategis.
               </p>
             </div>
             <div class="text-xs font-semibold px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 self-start sm:self-auto">
-              Total 7 RW &bull; 28 RT
+              Total {{ statistik.rw || 7 }} RW &bull; {{ statistik.rt || 22 }} RT
             </div>
           </div>
 
@@ -102,7 +101,7 @@
             <div 
               v-for="lingk in statistik.lingkungan" 
               :key="lingk.nama"
-              class="p-4 rounded-xl bg-slate-50 border border-slate-200"
+              class="p-4 rounded-xl bg-slate-50 border border-slate-200 reveal delay-75"
             >
               <div class="flex items-center justify-between mb-1">
                 <h4 class="font-bold text-slate-900 text-xs sm:text-sm">{{ lingk.nama }}</h4>
@@ -114,7 +113,7 @@
         </section>
 
         <!-- Section 4: Lembaga Kemasyarakatan (#lembaga) -->
-        <section id="lembaga" class="scroll-mt-24">
+        <section id="lembaga" class="scroll-mt-24 reveal">
           <div class="text-center max-w-2xl mx-auto mb-10">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
               <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
@@ -130,9 +129,10 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             <div 
-              v-for="l in lembagaList" 
+              v-for="(l, idx) in lembagaList" 
               :key="l.id"
-              class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between"
+              class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition flex flex-col justify-between reveal"
+              :class="`delay-${((idx % 3) + 1) * 75}`"
             >
               <div>
                 <div class="flex items-center justify-between gap-2 mb-4">
@@ -183,6 +183,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
 

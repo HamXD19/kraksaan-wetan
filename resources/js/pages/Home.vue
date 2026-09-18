@@ -72,26 +72,30 @@
                 Membangun Bersama Warga, Melayani dengan Sepenuh Hati
               </h2>
               <p class="text-sm font-semibold text-emerald-700">
-                Sambutan Lurah Kraksaan Wetan
+                Sambutan {{ profil.lurah?.jabatan || 'Lurah Kraksaan Wetan' }}
               </p>
             </div>
 
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic border-l-4 border-emerald-600 pl-4 py-1">
-              "{{ profil.sambutan_lurah || 'Selamat datang di website resmi Kelurahan Kraksaan Wetan. Media ini kami dedikasikan sebagai wujud transparansi, keterbukaan informasi publik, dan percepatan pelayanan administrasi bagi seluruh warga masyarakat tercinta.' }}"
+            <p v-if="profil.deskripsi" class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              {{ profil.deskripsi }}
+            </p>
+
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed italic border-l-4 border-emerald-600 pl-4 py-1 bg-emerald-50/50 rounded-r-xl">
+              "{{ profil.sambutan_lurah || profil.lurah?.sambutan || 'Selamat datang di website resmi Kelurahan Kraksaan Wetan. Media ini kami dedikasikan sebagai wujud transparansi, keterbukaan informasi publik, dan percepatan pelayanan administrasi bagi seluruh warga masyarakat tercinta.' }}"
             </p>
 
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-2">
               <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 reveal delay-100">
-                <p class="text-[11px] text-slate-400 font-semibold uppercase">Status</p>
-                <p class="text-sm font-bold text-slate-800 mt-0.5">Kelurahan Mandiri</p>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Kecamatan</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">{{ profil.kecamatan || 'Kraksaan' }}</p>
               </div>
               <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 reveal delay-200">
-                <p class="text-[11px] text-slate-400 font-semibold uppercase">Tipologi</p>
-                <p class="text-sm font-bold text-slate-800 mt-0.5">Perkotaan / Jasa</p>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Kabupaten</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">{{ profil.kabupaten || 'Probolinggo' }}</p>
               </div>
               <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all duration-300 transform hover:-translate-y-0.5 col-span-2 sm:col-span-1 reveal delay-300">
-                <p class="text-[11px] text-slate-400 font-semibold uppercase">Kecamatan</p>
-                <p class="text-sm font-bold text-slate-800 mt-0.5">Kraksaan</p>
+                <p class="text-[11px] text-slate-400 font-semibold uppercase">Provinsi</p>
+                <p class="text-sm font-bold text-slate-800 mt-0.5">{{ profil.provinsi || 'Jawa Timur' }}</p>
               </div>
             </div>
 
@@ -129,14 +133,14 @@
           label="Jumlah Penduduk" 
           :value="statistik.penduduk || 6842" 
           unit="Jiwa" 
-          subtext="L: 3.390 | P: 3.452"
+          :subtext="statistik.laki_laki && statistik.perempuan ? `L: ${Number(statistik.laki_laki).toLocaleString('id-ID')} | P: ${Number(statistik.perempuan).toLocaleString('id-ID')}` : 'L: 3.390 | P: 3.452'"
           class="reveal delay-75"
         />
         <StatisticCard 
           label="Kepala Keluarga" 
           :value="statistik.kk || 2185" 
           unit="KK" 
-          subtext="Tersebar di 7 RW"
+          :subtext="statistik.rw ? `Tersebar di ${statistik.rw} RW` : 'Tersebar di 7 RW'"
           class="reveal delay-150"
         />
         <StatisticCard 
@@ -148,7 +152,7 @@
         />
         <StatisticCard 
           label="Rukun Tetangga (RT)" 
-          :value="statistik.rt || 28" 
+          :value="statistik.rt || 22" 
           unit="RT" 
           subtext="Pelayanan Lingkungan"
           class="reveal delay-250"
@@ -157,7 +161,7 @@
           label="Luas Wilayah" 
           :value="statistik.luas_wilayah || '1.84'" 
           unit="km²" 
-          subtext="Kepadatan 3.718/km²"
+          :subtext="statistik.kepadatan ? `Kepadatan: ${statistik.kepadatan}` : 'Kepadatan 3.718/km²'"
           class="col-span-2 sm:col-span-1 reveal delay-300"
         />
       </div>

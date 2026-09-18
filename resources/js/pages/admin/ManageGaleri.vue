@@ -137,214 +137,228 @@
     </div>
 
     <!-- Modal Form Tambah / Edit -->
+    <!-- Modal Form Tambah / Edit -->
     <div 
       v-if="showModal" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
-      @click.self="showModal = false"
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs"
     >
-      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 my-8">
-        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
-          <h3 class="text-lg font-bold text-slate-900">
-            {{ editId ? 'Sunting Item Galeri' : 'Tambah Media Galeri Baru' }}
-          </h3>
-          <button @click="showModal = false" class="text-slate-400 hover:text-slate-600 text-lg cursor-pointer">&times;</button>
+      <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden">
+        <!-- Sticky Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+          <div>
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              {{ editId ? 'Sunting Item Galeri' : 'Tambah Media Galeri Baru' }}
+            </h3>
+            <p class="text-xs text-slate-500">Unggah foto dokumentasi kegiatan atau tautkan video dokumentasi resmi.</p>
+          </div>
+          <button 
+            type="button" 
+            @click="showModal = false" 
+            class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+            title="Tutup"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
 
-        <form @submit.prevent="saveItem" class="space-y-4 text-xs sm:text-sm">
-          <!-- Type Selector: Foto vs Video Dokumentasi -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1.5">Tipe Dokumentasi *</label>
-            <div class="grid grid-cols-2 gap-3">
+        <!-- Form with Scrollable Interior & Sticky Footer -->
+        <form @submit.prevent="saveItem" class="flex flex-col flex-1 overflow-hidden">
+          <div class="p-5 sm:p-6 overflow-y-auto flex-1 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              <!-- Left Column: Media & Type -->
+              <div class="lg:col-span-6 space-y-4">
+                <!-- Type Selector: Foto vs Video Dokumentasi -->
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1.5">Tipe Dokumentasi *</label>
+                  <div class="grid grid-cols-2 gap-3">
+                    <button 
+                      type="button" 
+                      @click="form.tipe = 'foto'"
+                      class="py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      :class="form.tipe === 'foto' 
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-500/20 shadow-xs' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      <span>Foto Kegiatan</span>
+                    </button>
+
+                    <button 
+                      type="button" 
+                      @click="form.tipe = 'video'"
+                      class="py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+                      :class="form.tipe === 'video' 
+                        ? 'bg-rose-50 border-rose-500 text-rose-800 ring-2 ring-rose-500/20 shadow-xs' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    >
+                      <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                      <span>Video Dokumentasi</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Judul Input -->
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1">
+                    {{ form.tipe === 'video' ? 'Judul Video Dokumentasi *' : 'Judul Foto Kegiatan *' }}
+                  </label>
+                  <input 
+                    type="text" 
+                    v-model="form.judul" 
+                    required 
+                    :placeholder="form.tipe === 'video' ? 'Contoh: Liputan Penyaluran Bantuan Pangan...' : 'Contoh: Kerja Bakti RW 03 Kauman...'" 
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-medium"
+                  />
+                </div>
+
+                <!-- Section Khusus Video Dokumentasi -->
+                <div v-if="form.tipe === 'video'" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-3">
+                  <div>
+                    <label class="block font-bold text-rose-950 mb-1 text-xs flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                      <span>Tautan / URL Video YouTube *</span>
+                    </label>
+                    <input 
+                      type="url" 
+                      v-model="form.video_url" 
+                      required 
+                      placeholder="https://www.youtube.com/watch?v=..." 
+                      class="w-full px-3 py-1.5 rounded-xl border border-rose-200 bg-white focus:ring-2 focus:ring-rose-500 outline-none text-xs"
+                    />
+                  </div>
+
+                  <!-- Live Video Preview -->
+                  <div v-if="youtubeId" class="space-y-1.5">
+                    <div class="aspect-video w-full rounded-xl overflow-hidden bg-black shadow-inner">
+                      <iframe 
+                        :src="`https://www.youtube-nocookie.com/embed/${youtubeId}`" 
+                        class="w-full h-full"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section Khusus Foto Kegiatan -->
+                <div v-else class="space-y-2">
+                  <label class="block font-bold text-slate-700 mb-1">Berkas Foto Kegiatan *</label>
+                  <div class="flex gap-2">
+                    <input 
+                      type="text" 
+                      v-model="form.gambar" 
+                      required 
+                      placeholder="URL foto atau pilih unggah..." 
+                      class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                    />
+                    <label class="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl cursor-pointer text-center text-xs flex items-center justify-center gap-1.5 shadow-xs transition shrink-0">
+                      <span v-if="uploading">...</span>
+                      <span v-else class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        Unggah
+                      </span>
+                      <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleFileUpload" :disabled="uploading" />
+                    </label>
+                  </div>
+                  <!-- Preview Foto -->
+                  <div v-if="form.gambar" class="relative rounded-xl overflow-hidden h-36 bg-slate-100 border border-slate-200 shadow-2xs">
+                    <img :src="form.gambar" alt="Pratinjau" class="w-full h-full object-cover" />
+                    <button 
+                      type="button" 
+                      @click="form.gambar = ''" 
+                      class="absolute top-2 right-2 px-2 py-0.5 rounded-lg bg-black/70 text-white text-[10px] hover:bg-black cursor-pointer"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Column: Kategori, Tanggal & Deskripsi -->
+              <div class="lg:col-span-6 space-y-4 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <div class="flex items-center justify-between mb-1">
+                      <label class="block font-bold text-slate-700 text-xs">Kategori *</label>
+                      <button 
+                        type="button" 
+                        @click="isCustomKategori = !isCustomKategori"
+                        class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 cursor-pointer"
+                      >
+                        {{ isCustomKategori ? '← Master' : '+ Baru' }}
+                      </button>
+                    </div>
+                    <div v-if="!isCustomKategori">
+                      <select 
+                        v-model="form.kategori" 
+                        required 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      >
+                        <option v-for="k in kategoriOptions" :key="k.id || k" :value="k.nama || k">
+                          {{ k.nama || k }}
+                        </option>
+                        <option v-if="form.kategori && !kategoriOptions.some(k => (k.nama || k) === form.kategori)" :value="form.kategori">
+                          {{ form.kategori }}
+                        </option>
+                      </select>
+                    </div>
+                    <div v-else>
+                      <input 
+                        type="text" 
+                        v-model="form.customKategori" 
+                        required 
+                        placeholder="Kategori baru..." 
+                        class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1 text-xs">Tanggal Kegiatan</label>
+                    <input 
+                      type="text" 
+                      v-model="form.tanggal" 
+                      placeholder="14 September 2026" 
+                      class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
+                    />
+                  </div>
+                </div>
+
+                <!-- Keterangan / Deskripsi -->
+                <div>
+                  <label class="block font-bold text-slate-700 mb-1 text-xs">Keterangan / Deskripsi Kegiatan</label>
+                  <RichTextEditor 
+                    v-model="form.deskripsi" 
+                    placeholder="Keterangan singkat rekam jejak kegiatan atau isi konten video..." 
+                    height="180px"
+                    maxHeight="280px"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky Footer Actions -->
+          <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+            <span class="text-xs text-slate-400 italic hidden sm:inline">Kolom bertanda * wajib diisi</span>
+            <div class="flex items-center gap-2.5 ml-auto">
               <button 
                 type="button" 
-                @click="form.tipe = 'foto'"
-                class="py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                :class="form.tipe === 'foto' 
-                  ? 'bg-emerald-50 border-emerald-500 text-emerald-800 ring-2 ring-emerald-500/20 shadow-xs' 
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
+                @click="showModal = false" 
+                class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold text-xs cursor-pointer transition"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                <span>Foto Kegiatan</span>
+                Batal
               </button>
-
               <button 
-                type="button" 
-                @click="form.tipe = 'video'"
-                class="py-2.5 px-3 rounded-xl border font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
-                :class="form.tipe === 'video' 
-                  ? 'bg-rose-50 border-rose-500 text-rose-800 ring-2 ring-rose-500/20 shadow-xs' 
-                  : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
+                type="submit" 
+                :disabled="saving"
+                class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:scale-95 disabled:opacity-50 text-white font-bold text-xs transition-all duration-200 cursor-pointer shadow-xs"
               >
-                <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                <span>Video Dokumentasi</span>
+                <span v-if="saving">Menyimpan...</span>
+                <span v-else>{{ editId ? 'Perbarui Data' : 'Simpan ke Galeri' }}</span>
               </button>
             </div>
-          </div>
-
-          <!-- Judul Input -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">
-              {{ form.tipe === 'video' ? 'Judul Video Dokumentasi *' : 'Judul Foto Kegiatan *' }}
-            </label>
-            <input 
-              type="text" 
-              v-model="form.judul" 
-              required 
-              :placeholder="form.tipe === 'video' ? 'Contoh: Liputan Penyaluran Bantuan Pangan Kraksaan Wetan' : 'Contoh: Kerja Bakti RW 03 Kauman'" 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Kategori *</label>
-              <select 
-                v-model="form.kategori" 
-                required 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white"
-              >
-                <option v-for="k in kategoriOptions" :key="k.id" :value="k.nama">
-                  {{ k.nama }}
-                </option>
-                <option v-if="form.kategori && !kategoriOptions.some(k => k.nama === form.kategori)" :value="form.kategori">
-                  {{ form.kategori }}
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-slate-700 mb-1">Tanggal Kegiatan</label>
-              <input 
-                type="text" 
-                v-model="form.tanggal" 
-                placeholder="14 September 2026" 
-                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-            </div>
-          </div>
-
-          <!-- Section Khusus Video Dokumentasi -->
-          <div v-if="form.tipe === 'video'" class="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-3">
-            <div>
-              <label class="block font-bold text-rose-950 mb-1 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-rose-600" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                <span>Tautan / URL Video Dokumentasi *</span>
-              </label>
-              <input 
-                type="url" 
-                v-model="form.video_url" 
-                required 
-                placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..." 
-                class="w-full px-3.5 py-2 rounded-xl border border-rose-200 bg-white focus:ring-2 focus:ring-rose-500 outline-none text-xs"
-              />
-              <p class="text-[11px] text-rose-700/90 mt-1">
-                Salin tautan video dari YouTube untuk ditampilkan sebagai video dokumentasi.
-              </p>
-            </div>
-
-            <!-- Live Video Preview -->
-            <div v-if="youtubeId" class="space-y-2 pt-1">
-              <div class="flex items-center justify-between text-[11px]">
-                <span class="font-bold text-emerald-700 flex items-center gap-1">
-                  ✓ Video Terdeteksi: <code class="bg-white px-1.5 py-0.5 rounded border border-emerald-300 font-mono">{{ youtubeId }}</code>
-                </span>
-                <span class="text-slate-500">Pratinjau Video:</span>
-              </div>
-              <div class="aspect-video w-full rounded-xl overflow-hidden bg-black shadow-inner">
-                <iframe 
-                  :src="`https://www.youtube-nocookie.com/embed/${youtubeId}`" 
-                  class="w-full h-full"
-                  frameborder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowfullscreen
-                ></iframe>
-              </div>
-            </div>
-
-            <!-- Opsional Custom Thumbnail for Video -->
-            <div class="pt-2 border-t border-rose-200/60">
-              <label class="block font-semibold text-slate-700 mb-1 text-xs">
-                Foto Sampul / Thumbnail Kustom (Opsional)
-              </label>
-              <div class="flex gap-2">
-                <input 
-                  type="text" 
-                  v-model="form.gambar" 
-                  placeholder="Kosongkan untuk memakai thumbnail otomatis" 
-                  class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs outline-none focus:ring-2 focus:ring-emerald-600"
-                />
-                <label class="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-semibold rounded-xl cursor-pointer text-xs flex items-center gap-1 border border-slate-200">
-                  <span>Pilih File</span>
-                  <input type="file" accept="image/*" class="hidden" @change="handleFileUpload" :disabled="uploading" />
-                </label>
-              </div>
-              <p class="text-[10px] text-slate-500 mt-1">
-                * Jika dikosongkan, sistem secara otomatis memasang thumbnail resmi dari video.
-              </p>
-            </div>
-          </div>
-
-          <!-- Section Khusus Foto Kegiatan -->
-          <div v-else class="space-y-2">
-            <label class="block font-bold text-slate-700 mb-1">Foto Kegiatan *</label>
-            <div class="flex flex-col sm:flex-row gap-2">
-              <input 
-                type="text" 
-                v-model="form.gambar" 
-                required 
-                placeholder="https://... atau pilih upload file" 
-                class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-              />
-              <label class="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold rounded-xl cursor-pointer text-center text-xs flex items-center justify-center gap-1.5 border border-emerald-200">
-                <span v-if="uploading">Mengunggah...</span>
-                <span v-else class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                  Unggah Foto
-                </span>
-                <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleFileUpload" :disabled="uploading" />
-              </label>
-            </div>
-            <!-- Preview Foto -->
-            <div v-if="form.gambar" class="mt-2 relative rounded-xl overflow-hidden h-32 bg-slate-100 border border-slate-200">
-              <img :src="form.gambar" alt="Pratinjau" class="w-full h-full object-cover" />
-              <button 
-                type="button" 
-                @click="form.gambar = ''" 
-                class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] hover:bg-black cursor-pointer"
-              >
-                Hapus
-              </button>
-            </div>
-          </div>
-
-          <!-- Keterangan / Deskripsi -->
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Keterangan / Deskripsi Kegiatan</label>
-            <textarea 
-              rows="3" 
-              v-model="form.deskripsi" 
-              placeholder="Keterangan singkat rekam jejak kegiatan atau isi konten video..." 
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"
-            ></textarea>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-            <button 
-              type="button" 
-              @click="showModal = false" 
-              class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold cursor-pointer"
-            >
-              Batal
-            </button>
-            <button 
-              type="submit" 
-              :disabled="saving"
-              class="px-5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:scale-95 disabled:opacity-50 text-white font-bold transition-all duration-200 cursor-pointer shadow-sm"
-            >
-              <span v-if="saving">Menyimpan...</span>
-              <span v-else>{{ editId ? 'Perbarui Data' : 'Simpan ke Galeri' }}</span>
-            </button>
           </div>
         </form>
       </div>
@@ -355,13 +369,17 @@
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
+import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
 const uploading = ref(false);
 const galeriList = ref([]);
 const kategoriOptions = ref([]);
+const isCustomKategori = ref(false);
 const showModal = ref(false);
 const editId = ref(null);
 const successMsg = ref('');
@@ -370,6 +388,7 @@ const adminFilter = ref('semua');
 const form = reactive({
   judul: '',
   kategori: 'Pemerintahan',
+  customKategori: '',
   tipe: 'foto',
   tanggal: '',
   gambar: '',
@@ -408,12 +427,12 @@ const handleFileUpload = async (event) => {
   const isValidImage = (allowedMimeTypes.includes(file.type) || file.type.startsWith('image/')) && allowedExts.includes(ext);
 
   if (!isValidImage) {
-    alert('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.error('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
     event.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    alert('Ukuran file foto terlalu besar! Maksimal 10MB.');
+    toast.error('Ukuran file foto terlalu besar! Maksimal 10MB.');
     event.target.value = '';
     return;
   }
@@ -423,10 +442,10 @@ const handleFileUpload = async (event) => {
     const res = await AdminService.uploadFile(file, 'image');
     if (res.data?.url) {
       form.gambar = res.data.url;
-      successMsg.value = 'Foto berhasil diunggah!';
+      toast.success('Foto dokumentasi berhasil diunggah!');
     }
   } catch (err) {
-    alert('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
+    toast.error('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
   } finally {
     uploading.value = false;
     event.target.value = '';
@@ -450,19 +469,21 @@ const loadData = async () => {
 };
 
 const openModal = (item = null) => {
+  isCustomKategori.value = false;
+  form.customKategori = '';
   if (item) {
     editId.value = item.id;
     form.judul = item.judul;
     form.kategori = item.kategori;
     form.tipe = item.tipe || 'foto';
-    form.tanggal = item.tanggal;
+    form.tanggal = item.tanggal ? item.tanggal.substring(0, 10) : '';
     form.gambar = item.gambar || '';
     form.video_url = item.video_url || '';
     form.deskripsi = item.deskripsi || '';
   } else {
     editId.value = null;
     form.judul = '';
-    form.kategori = kategoriOptions.value.length > 0 ? kategoriOptions.value[0].nama : 'Pemerintahan';
+    form.kategori = kategoriOptions.value.length > 0 ? (kategoriOptions.value[0]?.nama || kategoriOptions.value[0]) : 'Pemerintahan';
     form.tipe = 'foto';
     form.tanggal = '';
     form.gambar = '';
@@ -474,28 +495,34 @@ const openModal = (item = null) => {
 
 const saveItem = async () => {
   if (form.tipe === 'video' && !form.video_url) {
-    alert('Harap masukkan tautan video dokumentasi!');
+    toast.error('Harap masukkan tautan video dokumentasi YouTube!');
     return;
   }
   if (form.tipe === 'foto' && !form.gambar) {
-    alert('Harap masukkan atau unggah foto dokumentasi!');
+    toast.error('Harap pilih atau unggah foto dokumentasi terlebih dahulu!');
     return;
   }
 
   saving.value = true;
   try {
     const payload = { ...form };
+    if (isCustomKategori.value && form.customKategori?.trim()) {
+      payload.kategori = form.customKategori.trim();
+    }
     // Jika video dan thumbnail dikosongkan, pasang auto thumbnail YouTube
     if (payload.tipe === 'video' && !payload.gambar && autoThumbnailUrl.value) {
       payload.gambar = autoThumbnailUrl.value;
     }
 
     const res = await AdminService.saveGaleri(payload, editId.value);
-    successMsg.value = res.message || 'Data galeri berhasil disimpan!';
+    const msg = res.message || 'Data galeri berhasil disimpan!';
+    successMsg.value = msg;
+    toast.success(msg, editId.value ? 'Galeri Diperbarui' : 'Galeri Ditambahkan');
     showModal.value = false;
     await loadData();
   } catch (err) {
-    alert('Gagal menyimpan galeri: ' + (err.response?.data?.message || err.message));
+    const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan galeri.';
+    toast.error('Gagal menyimpan galeri: ' + errMsg);
   } finally {
     saving.value = false;
   }
@@ -505,10 +532,12 @@ const deleteItem = async (id) => {
   if (!confirm('Hapus item ini dari galeri?')) return;
   try {
     await AdminService.deleteGaleri(id);
-    successMsg.value = 'Item galeri berhasil dihapus.';
+    const msg = 'Item galeri berhasil dihapus.';
+    successMsg.value = msg;
+    toast.success(msg, 'Galeri Dihapus');
     await loadData();
   } catch (err) {
-    alert('Gagal menghapus item galeri.');
+    toast.error('Gagal menghapus item galeri.');
   }
 };
 

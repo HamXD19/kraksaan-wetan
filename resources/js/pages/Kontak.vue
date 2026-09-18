@@ -2,20 +2,18 @@
   <div class="pb-16">
     <Breadcrumb :items="[{ label: 'Kontak & Pengaduan' }]" />
 
-    <section class="bg-gradient-to-r from-emerald-950 via-emerald-900 to-emerald-950 text-white py-12 px-4 border-b border-emerald-800">
-      <div class="max-w-7xl mx-auto">
-        <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Pusat Layanan & Saluran Aspirasi</span>
-        <h1 class="text-3xl sm:text-4xl font-extrabold mt-1 tracking-tight">Hubungi Kami & Saluran Pengaduan Resmi</h1>
-        <p class="text-xs sm:text-sm text-emerald-200 mt-2 max-w-2xl leading-relaxed">
-          Sampaikan kritik, saran, pengaduan infrastruktur, kedaruratan, atau permohonan informasi publik melalui kanal pengaduan resmi terpadu Pemerintah Kelurahan Kraksaan Wetan.
-        </p>
-      </div>
-    </section>
+    <!-- Hero Banner Header -->
+    <HeroPageHeader 
+      badge-text="Pusat Layanan & Saluran Aspirasi"
+      title="Hubungi Kami & Saluran Pengaduan Resmi"
+      description="Sampaikan kritik, saran, pengaduan infrastruktur, kedaruratan, atau permohonan informasi publik melalui kanal pengaduan resmi terpadu Pemerintah Kelurahan Kraksaan Wetan."
+      :profil="profil"
+    />
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 space-y-12">
       <!-- Portal Pengaduan Resmi: SP4N LAPOR! & WhatsApp Halo SAE Probolinggo -->
       <div class="space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 reveal">
           <div>
             <span class="text-xs font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-amber-500"></span>
@@ -30,7 +28,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Portal 1: Website SP4N-LAPOR! -->
-          <div class="bg-gradient-to-br from-white via-rose-50/30 to-white p-6 sm:p-8 rounded-3xl border border-rose-200/80 shadow-xs hover:shadow-md hover:border-rose-400 transition-all flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-white via-rose-50/30 to-white p-6 sm:p-8 rounded-3xl border border-rose-200/80 shadow-xs hover:shadow-md hover:border-rose-400 transition-all flex flex-col justify-between reveal-left delay-75">
             <div>
               <div class="flex items-start justify-between gap-4">
                 <div class="flex items-center gap-3.5">
@@ -86,7 +84,7 @@
           </div>
 
           <!-- Portal 2: WhatsApp Halo SAE (Pemkab Probolinggo) -->
-          <div class="bg-gradient-to-br from-white via-emerald-50/40 to-white p-6 sm:p-8 rounded-3xl border border-emerald-200/80 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all flex flex-col justify-between">
+          <div class="bg-gradient-to-br from-white via-emerald-50/40 to-white p-6 sm:p-8 rounded-3xl border border-emerald-200/80 shadow-xs hover:shadow-md hover:border-emerald-400 transition-all flex flex-col justify-between reveal-right delay-150">
             <div>
               <div class="flex items-start justify-between gap-4">
                 <div class="flex items-center gap-3.5">
@@ -156,7 +154,7 @@
 
       <!-- Info Kontak & Jam Layanan -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-gradient-to-br from-emerald-950 to-emerald-900 text-white p-6 sm:p-8 rounded-3xl shadow-sm space-y-4">
+        <div class="bg-gradient-to-br from-emerald-950 to-emerald-900 text-white p-6 sm:p-8 rounded-3xl shadow-sm space-y-4 reveal-left delay-75">
           <h3 class="text-xl font-bold text-amber-300">Informasi Kantor Kelurahan</h3>
           <div class="space-y-4 text-xs sm:text-sm">
             <div>
@@ -178,7 +176,7 @@
           </div>
         </div>
 
-        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between">
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between reveal-right delay-150">
           <div>
             <h4 class="font-bold text-slate-900 text-lg mb-2">Kanal Informasi & Media Sosial Resmi</h4>
             <p class="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
@@ -207,7 +205,7 @@
       </div>
 
       <!-- Peta Google Maps Section -->
-      <div>
+      <div class="reveal-scale delay-100">
         <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
           Peta Lokasi Kantor Kelurahan
@@ -221,6 +219,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumb from '../components/Breadcrumb.vue';
+import HeroPageHeader from '../components/HeroPageHeader.vue';
 import LocationMap from '../components/LocationMap.vue';
 import { KelurahanService } from '../services/api';
 

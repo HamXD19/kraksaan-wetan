@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Media Type Tabs & Category Filter Bar -->
-    <div v-if="showFilter" class="space-y-4 mb-8">
+    <div v-if="showFilter" class="space-y-4 mb-8 reveal">
       <!-- Media Type Pill Switcher -->
       <div class="flex items-center justify-center">
         <div class="inline-flex p-1.5 rounded-2xl bg-white border border-slate-200 shadow-xs gap-1">
@@ -68,8 +68,8 @@
         v-for="(item, index) in filteredItems" 
         :key="item.id"
         :to="`/galeri/${item.id}`"
-        :style="{ animationDelay: `${(index % 9) * 70}ms` }"
-        class="animate-fade-in-up group relative h-64 rounded-2xl overflow-hidden cursor-pointer shadow-xs hover:shadow-2xl border border-slate-200/90 hover:border-emerald-500/40 transition-all duration-300 transform hover:-translate-y-2 block"
+        class="reveal group relative h-64 rounded-2xl overflow-hidden cursor-pointer shadow-xs hover:shadow-2xl border border-slate-200/90 hover:border-emerald-500/40 transition-all duration-300 transform hover:-translate-y-2 block"
+        :class="`delay-${((index % 3) + 1) * 75}`"
       >
         <img 
           :src="item.gambar" 

@@ -1,9 +1,9 @@
 <template>
   <div class="min-h-screen bg-[#132b23] flex items-center justify-center p-3 sm:p-6 lg:p-10 relative overflow-hidden font-sans" data-no-sound="true">
-    <!-- Atmospheric Gunung Bromo Page Backdrop -->
+    <!-- Atmospheric Page Backdrop (Menggunakan Foto Hero Dinamis) -->
     <div 
       class="absolute inset-0 bg-cover bg-center filter blur-xl brightness-[0.20] scale-110 pointer-events-none"
-      style="background-image: url('/images/gunung-bromo.jpg');"
+      :style="{ backgroundImage: `url('${heroImage}')` }"
     ></div>
     <div class="absolute inset-0 bg-[#0f241d]/75 pointer-events-none"></div>
 
@@ -21,13 +21,13 @@
     <div class="w-full max-w-5xl rounded-3xl sm:rounded-[2.5rem] shadow-2xl shadow-slate-950/80 overflow-hidden border border-emerald-800/40 flex flex-col md:flex-row relative z-10 bg-[#17382e]">
       
       <!-- ========================================================================= -->
-      <!-- LEFT SECTION: GUNUNG BROMO AS BACKGROUND (Clean & Full)                   -->
+      <!-- LEFT SECTION: HERO IMAGE AS BACKGROUND (Clean & Full)                     -->
       <!-- ========================================================================= -->
       <div class="w-full md:w-[56%] relative p-6 sm:p-10 flex flex-col justify-between overflow-hidden z-20 min-h-[300px] sm:min-h-[380px] md:min-h-[580px] group">
-        <!-- Full-Bleed Bromo Background Image -->
+        <!-- Full-Bleed Hero Background Image -->
         <img 
-          src="/images/gunung-bromo.jpg" 
-          alt="Gunung Bromo Kabupaten Probolinggo" 
+          :src="heroImage" 
+          alt="Latar Hero Kelurahan Kraksaan Wetan" 
           class="absolute inset-0 w-full h-full object-cover object-center transform scale-105 group-hover:scale-110 transition-transform duration-1000"
         />
         
@@ -241,7 +241,16 @@
 
     <!-- MODAL 1: Forgot Password Dialog -->
     <div v-if="showForgotModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200 relative">
+        <button 
+          type="button" 
+          @click="showForgotModal = false" 
+          class="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          title="Tutup"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
         <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </div>
@@ -265,7 +274,16 @@
 
     <!-- MODAL 2: Hubungi Admin / Bantuan Akun -->
     <div v-if="showHelpModal" class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200">
+      <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-slate-800 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in duration-200 relative">
+        <button 
+          type="button" 
+          @click="showHelpModal = false" 
+          class="absolute top-4 right-4 p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          title="Tutup"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+
         <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
         </div>
@@ -314,16 +332,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { AdminService } from '../../services/api';
+import { AdminService, KelurahanService } from '../../services/api';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const router = useRouter();
 const email = ref('');
 const password = ref('');
 const showPassword = ref(false);
 const loading = ref(false);
 const errorMsg = ref('');
+
+// Dynamic Hero Background
+const profil = ref(null);
+const heroImage = computed(() => profil.value?.hero_image || '/images/hero-bromo-vector.jpg');
+
+const loadProfil = async () => {
+  try {
+    const res = await KelurahanService.getProfil();
+    profil.value = res.data?.data || res.data || res;
+  } catch (err) {
+    console.warn('Gagal memuat hero profil:', err);
+  }
+};
 
 // Captcha Security Code State
 const captchaSvg = ref('');
@@ -352,11 +385,14 @@ const loadCaptcha = async () => {
 
 onMounted(() => {
   loadCaptcha();
+  loadProfil();
 });
 
 const handleLogin = async () => {
   if (!captchaInput.value || captchaInput.value.trim().length < 5) {
-    errorMsg.value = 'Silakan masukkan 5 karakter kode acak keamanan (Captcha).';
+    const msg = 'Silakan masukkan 5 karakter kode acak keamanan (Captcha).';
+    errorMsg.value = msg;
+    toast.warning(msg, 'Kode Captcha Wajib');
     return;
   }
 
@@ -370,14 +406,19 @@ const handleLogin = async () => {
       captcha_key: captchaKey.value
     });
     if (res.status === 'success') {
+      toast.success('Login berhasil! Mengalihkan ke dashboard...', 'Selamat Datang');
       router.push('/admin');
     } else {
-      errorMsg.value = res.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.';
+      const msg = res.message || 'Login gagal. Periksa kembali email dan kata sandi Anda.';
+      errorMsg.value = msg;
+      toast.error(msg, 'Login Gagal');
       captchaInput.value = '';
       loadCaptcha();
     }
   } catch (err) {
-    errorMsg.value = err.response?.data?.message || 'Email, kata sandi, atau kode keamanan tidak sesuai.';
+    const msg = err.response?.data?.message || 'Email, kata sandi, atau kode keamanan tidak sesuai.';
+    errorMsg.value = msg;
+    toast.error(msg, 'Autentikasi Gagal');
     captchaInput.value = '';
     loadCaptcha();
   } finally {
