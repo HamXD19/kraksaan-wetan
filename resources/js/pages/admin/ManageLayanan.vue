@@ -1095,7 +1095,12 @@ const loadData = async () => {
       AdminService.getLayanan(),
       AdminService.getMasterKategori('layanan')
     ]);
-    layananList.value = data || [];
+    if (data && Array.isArray(data)) {
+      const existingNew = layananList.value.filter(item => !data.some(l => l.id === item.id));
+      layananList.value = [...existingNew, ...data];
+    } else if (data) {
+      layananList.value = data;
+    }
     kategoriOptions.value = kats || [];
   } catch (e) {
     console.error(e);
@@ -1186,6 +1191,14 @@ const saveItem = async () => {
     successMsg.value = msg;
     toast.success(msg, editId.value ? 'Layanan Diperbarui' : 'Layanan Ditambahkan');
     showModal.value = false;
+    if (res?.data) {
+      if (editId.value) {
+        const idx = layananList.value.findIndex(l => l.id === editId.value);
+        if (idx !== -1) layananList.value[idx] = res.data;
+      } else {
+        layananList.value.unshift(res.data);
+      }
+    }
     await loadData();
   } catch (err) {
     const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan layanan.';

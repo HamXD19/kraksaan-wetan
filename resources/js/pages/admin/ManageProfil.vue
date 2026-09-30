@@ -865,6 +865,9 @@ const saveProfil = async () => {
     const msg = res.message || 'Profil kelurahan berhasil diperbarui!';
     successMsg.value = msg;
     toast.success(msg, 'Profil Kelurahan');
+    if (res?.data) {
+      Object.assign(profilForm, res.data);
+    }
     window.dispatchEvent(new CustomEvent('profil-updated', { detail: res.data }));
   } catch (err) {
     const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';

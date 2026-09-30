@@ -478,7 +478,12 @@ const loadData = async () => {
       AdminService.getBerita(),
       AdminService.getMasterKategori('berita')
     ]);
-    beritaList.value = beritas || [];
+    if (beritas && Array.isArray(beritas)) {
+      const existingNew = beritaList.value.filter(item => !beritas.some(b => b.id === item.id));
+      beritaList.value = [...existingNew, ...beritas];
+    } else if (beritas) {
+      beritaList.value = beritas;
+    }
     kategoriOptions.value = kats || [];
   } catch (e) {
     console.error(e);
@@ -529,6 +534,14 @@ const saveItem = async () => {
     successMsg.value = msg;
     toast.success(msg, editId.value ? 'Berita Diperbarui' : 'Berita Diterbitkan');
     showModal.value = false;
+    if (res?.data) {
+      if (editId.value) {
+        const idx = beritaList.value.findIndex(b => b.id === editId.value);
+        if (idx !== -1) beritaList.value[idx] = res.data;
+      } else {
+        beritaList.value.unshift(res.data);
+      }
+    }
     await loadData();
   } catch (err) {
     const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan berita.';

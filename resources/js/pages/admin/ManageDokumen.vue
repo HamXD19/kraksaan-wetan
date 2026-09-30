@@ -1191,7 +1191,13 @@ const fetchDokumen = async () => {
     if (filterStatus.value !== 'semua') params.status = filterStatus.value;
 
     const res = await AdminService.getDokumen(params);
-    dokumenList.value = res.data || [];
+    const fetched = res.data || [];
+    if (Array.isArray(fetched)) {
+      const existingNew = dokumenList.value.filter(item => !fetched.some(d => d.id === item.id));
+      dokumenList.value = [...existingNew, ...fetched];
+    } else {
+      dokumenList.value = fetched;
+    }
     summary.value = res.summary || { total: dokumenList.value.length, aktif: 0, total_unduhan: 0 };
     meta.value = res.meta || { kategori_list: [], subkategori_list: [], periode_list: [], tahun_list: [], master_kategori_tree: [] };
 
@@ -1400,15 +1406,22 @@ const saveDokumen = async () => {
     };
 
     if (isEditing.value && form.value.id) {
-      await AdminService.saveDokumen(payload, form.value.id);
+      const res = await AdminService.saveDokumen(payload, form.value.id);
       const msg = `Dokumen "${payload.judul}" berhasil diperbarui.`;
       successMsg.value = msg;
       toast.success(msg, 'Dokumen Diperbarui');
+      if (res?.data) {
+        const idx = dokumenList.value.findIndex(d => d.id === form.value.id);
+        if (idx !== -1) dokumenList.value[idx] = res.data;
+      }
     } else {
-      await AdminService.saveDokumen(payload);
+      const res = await AdminService.saveDokumen(payload);
       const msg = `Dokumen "${payload.judul}" berhasil diterbitkan.`;
       successMsg.value = msg;
       toast.success(msg, 'Dokumen Diterbitkan');
+      if (res?.data) {
+        dokumenList.value.unshift(res.data);
+      }
     }
 
     closeModal();

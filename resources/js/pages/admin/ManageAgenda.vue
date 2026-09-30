@@ -524,7 +524,12 @@ const loadData = async () => {
 
     const res = await AdminService.getAgenda(params);
     if (res && res.data) {
-      agendaList.value = res.data;
+      if (Array.isArray(res.data)) {
+        const existingNew = agendaList.value.filter(item => !res.data.some(a => a.id === item.id));
+        agendaList.value = [...existingNew, ...res.data];
+      } else {
+        agendaList.value = res.data;
+      }
       counts.value = res.counts || { total: 0, berlangsung: 0, akan_datang: 0, selesai: 0, nonaktif: 0 };
     }
   } catch (err) {
@@ -657,6 +662,14 @@ const saveAgenda = async () => {
     const msg = res.message || (editId.value ? 'Agenda kegiatan berhasil diperbarui!' : 'Agenda kegiatan baru berhasil ditambahkan!');
     toast.success(msg, 'Agenda Kegiatan');
     showModal.value = false;
+    if (res?.data) {
+      if (editId.value) {
+        const idx = agendaList.value.findIndex(a => a.id === editId.value);
+        if (idx !== -1) agendaList.value[idx] = res.data;
+      } else {
+        agendaList.value.unshift(res.data);
+      }
+    }
     await loadData();
   } catch (err) {
     const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';

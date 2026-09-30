@@ -847,6 +847,8 @@ const saveVisualSettings = async () => {
     const msg = res?.message || 'Pengaturan Logo dan Hero Banner berhasil disimpan!';
     toast.success(msg, 'Pengaturan Disimpan');
     showAlert(msg, 'success');
+    if (res?.data?.logo) formVisual.value.logo = res.data.logo;
+    if (res?.data?.hero_image) formVisual.value.hero_image = res.data.hero_image;
     previewLogo.value = '';
     previewHero.value = '';
     // Kirim custom event agar navbar dan komponen lain langsung terupdate secara reaktif
@@ -865,7 +867,13 @@ const loadHalamanList = async () => {
   loadingHalaman.value = true;
   try {
     const res = await AdminService.getHalamanKustom();
-    halamanList.value = res?.data || [];
+    const fetched = res?.data || [];
+    if (Array.isArray(fetched)) {
+      const existingNew = halamanList.value.filter(item => !fetched.some(h => h.id === item.id));
+      halamanList.value = [...existingNew, ...fetched];
+    } else {
+      halamanList.value = fetched;
+    }
   } catch (err) {
     console.error('Gagal mengambil daftar halaman kustom:', err);
   } finally {
@@ -988,13 +996,20 @@ const submitHalamanForm = async () => {
   savingPage.value = true;
   try {
     if (modal.value.isEdit) {
-      await AdminService.saveHalamanKustom(pageForm.value, modal.value.targetId);
+      const res = await AdminService.saveHalamanKustom(pageForm.value, modal.value.targetId);
       toast.success('Halaman kustom berhasil diperbarui!');
       showAlert('Halaman kustom berhasil diperbarui!');
+      if (res?.data) {
+        const idx = halamanList.value.findIndex(h => h.id === modal.value.targetId);
+        if (idx !== -1) halamanList.value[idx] = res.data;
+      }
     } else {
-      await AdminService.saveHalamanKustom(pageForm.value);
+      const res = await AdminService.saveHalamanKustom(pageForm.value);
       toast.success('Halaman kustom baru dan sub-menu berhasil dibuat!');
       showAlert('Halaman kustom baru dan sub-menu berhasil dibuat!');
+      if (res?.data) {
+        halamanList.value.unshift(res.data);
+      }
     }
 
     closeModal();

@@ -408,7 +408,12 @@ const loadData = async () => {
       AdminService.getPengumuman(),
       AdminService.getMasterKategori('pengumuman')
     ]);
-    pengumumanList.value = data || [];
+    if (data && Array.isArray(data)) {
+      const existingNew = pengumumanList.value.filter(item => !data.some(p => p.id === item.id));
+      pengumumanList.value = [...existingNew, ...data];
+    } else if (data) {
+      pengumumanList.value = data;
+    }
     kategoriOptions.value = kats || [];
   } catch (e) {
     console.error(e);
@@ -573,6 +578,14 @@ const saveItem = async () => {
     successMsg.value = msg;
     toast.success(msg, editId.value ? 'Pengumuman Diperbarui' : 'Pengumuman Diterbitkan');
     showModal.value = false;
+    if (res?.data) {
+      if (editId.value) {
+        const idx = pengumumanList.value.findIndex(p => p.id === editId.value);
+        if (idx !== -1) pengumumanList.value[idx] = res.data;
+      } else {
+        pengumumanList.value.unshift(res.data);
+      }
+    }
     await loadData();
   } catch (err) {
     const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan pengumuman.';

@@ -467,7 +467,12 @@ const loadData = async () => {
       AdminService.getGaleri(),
       AdminService.getMasterKategori('galeri')
     ]);
-    galeriList.value = galeris || [];
+    if (galeris && Array.isArray(galeris)) {
+      const existingNew = galeriList.value.filter(item => !galeris.some(g => g.id === item.id));
+      galeriList.value = [...existingNew, ...galeris];
+    } else if (galeris) {
+      galeriList.value = galeris;
+    }
     kategoriOptions.value = kats || [];
   } catch (e) {
     console.error(e);
@@ -528,6 +533,14 @@ const saveItem = async () => {
     successMsg.value = msg;
     toast.success(msg, editId.value ? 'Galeri Diperbarui' : 'Galeri Ditambahkan');
     showModal.value = false;
+    if (res?.data) {
+      if (editId.value) {
+        const idx = galeriList.value.findIndex(g => g.id === editId.value);
+        if (idx !== -1) galeriList.value[idx] = res.data;
+      } else {
+        galeriList.value.unshift(res.data);
+      }
+    }
     await loadData();
   } catch (err) {
     const errMsg = err.response?.data?.message || err.message || 'Gagal menyimpan galeri.';
