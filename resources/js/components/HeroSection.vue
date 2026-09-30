@@ -4,6 +4,7 @@
     <div class="absolute inset-0 z-0 overflow-hidden">
       <img 
         :src="heroImage" 
+        @error="$event.target.src = '/images/hero-bromo-vector.jpg'"
         alt="Gunung Bromo - Kabupaten Probolinggo" 
         class="w-full h-full object-cover object-[center_35%] animate-ken-burns pointer-events-none"
         fetchpriority="high"

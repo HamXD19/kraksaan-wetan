@@ -14,6 +14,7 @@
             <div class="w-12 h-14 shrink-0 flex items-center justify-center">
               <img 
                 :src="profil?.logo || '/images/logo-probolinggo.png'" 
+                @error="$event.target.src = '/images/logo-probolinggo.png'"
                 :alt="profil?.nama || 'Logo Kelurahan Kraksaan Wetan'" 
                 class="w-full h-full object-contain drop-shadow-sm" 
               />

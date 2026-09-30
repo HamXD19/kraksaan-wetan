@@ -19,6 +19,7 @@
             <img 
               v-if="profil?.logo" 
               :src="profil.logo" 
+              @error="$event.target.src = '/images/logo-probolinggo.png'"
               alt="Logo Kelurahan" 
               class="w-full h-full object-contain" 
             />

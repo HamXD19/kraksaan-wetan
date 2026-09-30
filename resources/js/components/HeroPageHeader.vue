@@ -4,6 +4,7 @@
     <div class="absolute inset-0 z-0 overflow-hidden">
       <img 
         :src="heroImageUrl" 
+        @error="$event.target.src = '/images/hero-bromo-vector.jpg'"
         alt="Latar Hero Kelurahan Kraksaan Wetan" 
         class="w-full h-full object-cover object-[center_35%] pointer-events-none"
         fetchpriority="high"

@@ -73,7 +73,7 @@
           <div class="flex flex-col sm:flex-row items-center gap-6">
             <!-- Logo Preview Box -->
             <div class="w-24 h-28 sm:w-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-2.5 flex items-center justify-center flex-shrink-0 shadow-xs">
-              <img v-if="previewLogo || formVisual.logo" :src="previewLogo || formVisual.logo" alt="Logo Kelurahan" class="w-full h-full object-contain drop-shadow-xs" />
+              <img v-if="previewLogo || formVisual.logo" :src="previewLogo || formVisual.logo" @error="$event.target.src = '/images/logo-probolinggo.png'" alt="Logo Kelurahan" class="w-full h-full object-contain drop-shadow-xs" />
               <div v-else class="w-full h-full flex flex-col items-center justify-center text-center">
                 <svg viewBox="0 0 80 96" class="w-12 h-14" fill="none">
                   <path d="M40 2L76 18V50C76 72 40 94 40 94C40 94 4 72 4 50V18L40 2Z" fill="#047857" stroke="#f59e0b" stroke-width="3"/>
@@ -134,6 +134,7 @@
           <div class="relative w-full h-40 sm:h-56 rounded-2xl overflow-hidden border border-slate-200 bg-emerald-950 shadow-inner group">
             <img 
               :src="previewHero || formVisual.hero_image || '/images/hero-bromo-vector.jpg'" 
+              @error="$event.target.src = '/images/hero-bromo-vector.jpg'"
               alt="Pratinjau Hero Banner" 
               class="w-full h-full object-cover object-[center_35%] transition-transform duration-300 group-hover:scale-105"
             />
@@ -752,6 +753,40 @@ const loadProfilVisual = async () => {
   }
 };
 
+const compressImage = (file, maxWidth, maxHeight, quality = 0.85) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxHeight) {
+          if (width / height > maxWidth / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const isPng = file.type === 'image/png' || file.type === 'image/svg+xml';
+        const mime = isPng ? 'image/png' : 'image/jpeg';
+        resolve(canvas.toDataURL(mime, quality));
+      };
+      img.onerror = () => resolve(e.target.result);
+      img.src = e.target.result;
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+};
+
 const handleLogoUpload = async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
@@ -763,29 +798,19 @@ const handleLogoUpload = async (event) => {
     return;
   }
 
-  // Tampilkan pratinjau instan seketika di peramban menggunakan FileReader
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    previewLogo.value = dataUrl;
-    formVisual.value.logo = dataUrl;
-  };
-  reader.readAsDataURL(file);
-
   uploadingLogo.value = true;
   try {
-    const res = await AdminService.uploadFile(file, 'image');
-    const uploadedUrl = res?.data?.url || res?.url;
-    if (uploadedUrl) {
-      formVisual.value.logo = uploadedUrl;
-      const msg = 'Logo baru berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
-      toast.success(msg, 'Logo Diunggah');
+    const compressedDataUrl = await compressImage(file, 400, 400, 0.9);
+    if (compressedDataUrl) {
+      previewLogo.value = compressedDataUrl;
+      formVisual.value.logo = compressedDataUrl;
+      const msg = 'Logo baru siap dipasang! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
+      toast.success(msg, 'Logo Dipilih');
       showAlert(msg);
     }
   } catch (err) {
-    // JANGAN hapus previewLogo agar pratinjau tetap tampak di mata pengguna
-    const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
-    toast.warning('Pratinjau logo lokal siap disimpan: ' + errText, 'Pratinjau Lokal');
+    const errText = err.message || 'Gagal memproses gambar';
+    toast.warning('Pratinjau logo: ' + errText, 'Pratinjau');
   } finally {
     uploadingLogo.value = false;
     event.target.value = '';
@@ -803,29 +828,19 @@ const handleHeroUpload = async (event) => {
     return;
   }
 
-  // Tampilkan pratinjau instan seketika di peramban menggunakan FileReader
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    previewHero.value = dataUrl;
-    formVisual.value.hero_image = dataUrl;
-  };
-  reader.readAsDataURL(file);
-
   uploadingHero.value = true;
   try {
-    const res = await AdminService.uploadFile(file, 'image');
-    const uploadedUrl = res?.data?.url || res?.url;
-    if (uploadedUrl) {
-      formVisual.value.hero_image = uploadedUrl;
-      const msg = 'Foto latar hero banner berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
-      toast.success(msg, 'Hero Banner Diunggah');
+    const compressedDataUrl = await compressImage(file, 1600, 900, 0.85);
+    if (compressedDataUrl) {
+      previewHero.value = compressedDataUrl;
+      formVisual.value.hero_image = compressedDataUrl;
+      const msg = 'Foto latar hero banner siap dipasang! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
+      toast.success(msg, 'Hero Banner Dipilih');
       showAlert(msg);
     }
   } catch (err) {
-    // JANGAN hapus previewHero agar pratinjau tetap tampak di mata pengguna
-    const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
-    toast.warning('Pratinjau hero lokal siap disimpan: ' + errText, 'Pratinjau Lokal');
+    const errText = err.message || 'Gagal memproses gambar';
+    toast.warning('Pratinjau hero: ' + errText, 'Pratinjau');
   } finally {
     uploadingHero.value = false;
     event.target.value = '';

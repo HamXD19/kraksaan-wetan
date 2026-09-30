@@ -1282,8 +1282,14 @@ class AdminController extends Controller
         ]);
 
         // Simpan data gambar base64 ke file fisik jika diterima dalam format data URI
+        $isVercel = ! empty(env('VERCEL')) || ! empty(getenv('VERCEL')) || isset($_SERVER['VERCEL']) || ! empty($_ENV['VERCEL']);
         foreach (['logo', 'hero_image', 'lurah_foto'] as $imageField) {
             if (! empty($validated[$imageField]) && preg_match('/^data:image\/(\w+);base64,/', $validated[$imageField], $matches)) {
+                if ($isVercel) {
+                    // Di serverless Vercel: simpan langsung sebagai Base64 Data URI di database (LONGTEXT)
+                    // agar tidak hilang saat container berganti atau /tmp di-reset
+                    continue;
+                }
                 $rawExt = strtolower($matches[1]);
                 $ext = match ($rawExt) {
                     'jpeg' => 'jpg',
