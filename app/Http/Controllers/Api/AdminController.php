@@ -335,7 +335,7 @@ class AdminController extends Controller
             'status' => 'success',
             'message' => 'File berhasil diunggah.',
             'data' => [
-                'url' => asset('storage/'.$path),
+                'url' => '/storage/'.$path,
                 'path' => $path,
                 'filename' => $file->getClientOriginalName(),
             ],
@@ -707,7 +707,7 @@ class AdminController extends Controller
         $items = $query->get()->map(function ($item) {
             return array_merge($item->toArray(), [
                 'file_url' => url("/api/dokumen/{$item->id}/unduh"),
-                'preview_url' => asset('storage/'.ltrim($item->file, '/')),
+                'preview_url' => '/storage/'.ltrim($item->file, '/'),
             ]);
         });
 
@@ -1191,6 +1191,25 @@ class AdminController extends Controller
             'custom_nav_menus.*.*.url' => 'required|string|max:500',
             'custom_nav_menus.*.*.target' => 'nullable|string|in:_self,_blank',
         ]);
+
+        // Simpan data gambar base64 ke file fisik jika diterima dalam format data URI
+        foreach (['logo', 'hero_image', 'lurah_foto'] as $imageField) {
+            if (! empty($validated[$imageField]) && preg_match('/^data:image\/(\w+);base64,/', $validated[$imageField], $matches)) {
+                $rawExt = strtolower($matches[1]);
+                $ext = match ($rawExt) {
+                    'jpeg' => 'jpg',
+                    'svg+xml' => 'svg',
+                    default => $rawExt,
+                };
+                $base64Content = substr($validated[$imageField], strpos($validated[$imageField], ',') + 1);
+                $decoded = base64_decode($base64Content);
+                if ($decoded !== false) {
+                    $filename = Str::random(24).'.'.$ext;
+                    Storage::disk('public')->put('uploads/'.$filename, $decoded);
+                    $validated[$imageField] = '/storage/uploads/'.$filename;
+                }
+            }
+        }
 
         // Bersihkan file lama jika berkas diubah atau direset
         if (array_key_exists('logo', $validated) && $validated['logo'] !== $profil->logo) {

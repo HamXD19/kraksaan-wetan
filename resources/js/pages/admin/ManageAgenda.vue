@@ -616,8 +616,9 @@ const handlePhotoUpload = async (event) => {
   uploadingPhoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      form.foto = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      form.foto = uploadedUrl;
       toast.success('Foto poster kegiatan berhasil diunggah.', 'Upload Berhasil');
     }
   } catch (err) {

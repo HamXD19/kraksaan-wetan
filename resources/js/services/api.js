@@ -3,7 +3,7 @@ import { mockProfil, mockStatistik, mockLayanan, mockBerita, mockPengumuman, moc
 
 const apiClient = axios.create({
     baseURL: '/api',
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
@@ -333,8 +333,9 @@ export const AdminService = {
         formData.append('type', type);
         const res = await apiClient.post('/admin/upload', formData, {
             headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+                'Content-Type': undefined
+            },
+            timeout: 60000
         });
         return res.data;
     },

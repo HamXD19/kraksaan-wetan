@@ -406,7 +406,7 @@ class KelurahanController extends Controller
         }
 
         $dokumen = $query->orderByDesc('id')->get()->map(function ($doc) {
-            $storageUrl = asset('storage/'.ltrim($doc->file, '/'));
+            $storageUrl = '/storage/'.ltrim($doc->file, '/');
             $previewUrl = url("/api/dokumen/{$doc->id}/pratinjau");
             $unduhUrl = url("/api/dokumen/{$doc->id}/unduh");
 

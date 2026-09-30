@@ -440,8 +440,9 @@ const handleFileUpload = async (event) => {
   uploading.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      form.gambar = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      form.gambar = uploadedUrl;
       toast.success('Foto dokumentasi berhasil diunggah!');
     }
   } catch (err) {

@@ -580,8 +580,9 @@ const handleLogoUpload = async (event) => {
   uploadingLogo.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      profilForm.logo = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      profilForm.logo = uploadedUrl;
       const msg = 'Logo baru berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
       successMsg.value = msg;
       toast.success(msg, 'Upload Logo Berhasil');
@@ -613,8 +614,9 @@ const handleHeroUpload = async (event) => {
   uploadingHero.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      profilForm.hero_image = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      profilForm.hero_image = uploadedUrl;
       const msg = 'Foto latar hero banner berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
       successMsg.value = msg;
       toast.success(msg, 'Upload Hero Berhasil');
@@ -646,8 +648,9 @@ const handleLurahFotoUpload = async (event) => {
   uploadingLurahFoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      profilForm.lurah_foto = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      profilForm.lurah_foto = uploadedUrl;
       const msg = 'Foto Lurah berhasil diunggah! Klik "Simpan Perubahan Profil" untuk menerapkan.';
       successMsg.value = msg;
       toast.success(msg, 'Upload Foto Lurah');
@@ -679,8 +682,9 @@ const handlePerangkatFotoUpload = async (event) => {
   uploadingPerangkatFoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      perangkatForm.foto = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      perangkatForm.foto = uploadedUrl;
       toast.success('Foto aparatur berhasil diunggah!');
     }
   } catch (err) {

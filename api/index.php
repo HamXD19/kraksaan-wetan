@@ -20,6 +20,21 @@ if (isset($_GET['__route__'])) {
     $_SERVER['PATH_INFO'] = $_SERVER['HTTP_X_MATCHED_PATH'];
 }
 
+// Pastikan header Authorization selalu tersedia untuk autentikasi API admin
+if (! isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('getallheaders')) {
+        $headers = getallheaders();
+        foreach ($headers as $key => $val) {
+            if (strcasecmp($key, 'Authorization') === 0) {
+                $_SERVER['HTTP_AUTHORIZATION'] = $val;
+                break;
+            }
+        }
+    }
+}
+
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
 

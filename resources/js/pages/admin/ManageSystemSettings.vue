@@ -73,7 +73,7 @@
           <div class="flex flex-col sm:flex-row items-center gap-6">
             <!-- Logo Preview Box -->
             <div class="w-24 h-28 sm:w-28 sm:h-32 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-2.5 flex items-center justify-center flex-shrink-0 shadow-xs">
-              <img v-if="formVisual.logo" :src="formVisual.logo" alt="Logo Kelurahan" class="w-full h-full object-contain drop-shadow-xs" />
+              <img v-if="previewLogo || formVisual.logo" :src="previewLogo || formVisual.logo" alt="Logo Kelurahan" class="w-full h-full object-contain drop-shadow-xs" />
               <div v-else class="w-full h-full flex flex-col items-center justify-center text-center">
                 <svg viewBox="0 0 80 96" class="w-12 h-14" fill="none">
                   <path d="M40 2L76 18V50C76 72 40 94 40 94C40 94 4 72 4 50V18L40 2Z" fill="#047857" stroke="#f59e0b" stroke-width="3"/>
@@ -133,7 +133,7 @@
           <!-- Banner Preview Box -->
           <div class="relative w-full h-40 sm:h-56 rounded-2xl overflow-hidden border border-slate-200 bg-emerald-950 shadow-inner group">
             <img 
-              :src="formVisual.hero_image || '/images/hero-bromo-vector.jpg'" 
+              :src="previewHero || formVisual.hero_image || '/images/hero-bromo-vector.jpg'" 
               alt="Pratinjau Hero Banner" 
               class="w-full h-full object-cover object-[center_35%] transition-transform duration-300 group-hover:scale-105"
             />
@@ -144,7 +144,7 @@
                 Pratinjau Tampilan Hero Banner Beranda
               </span>
               <span class="text-[10px] text-emerald-200 bg-emerald-900/80 px-2.5 py-1 rounded-lg backdrop-blur-xs font-bold">
-                {{ formVisual.hero_image ? 'Kustom' : 'Default' }}
+                {{ previewHero || formVisual.hero_image ? 'Kustom' : 'Default' }}
               </span>
             </div>
           </div>
@@ -179,13 +179,18 @@
           </div>
         </div>
 
-        <div class="flex justify-end pt-2">
+        <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-2">
+          <span v-if="uploadingLogo || uploadingHero" class="text-xs text-amber-700 font-semibold animate-pulse flex items-center gap-1.5">
+            <svg class="w-4 h-4 animate-spin text-amber-600" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            Sedang mengunggah berkas gambar ke server...
+          </span>
           <button 
             type="submit" 
-            :disabled="savingVisual" 
-            class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition flex items-center gap-2"
+            :disabled="savingVisual || uploadingLogo || uploadingHero" 
+            class="px-6 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition flex items-center gap-2 cursor-pointer"
           >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <svg v-if="savingVisual" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>{{ savingVisual ? 'Menyimpan Pengaturan...' : 'Simpan Logo & Hero Banner' }}</span>
           </button>
         </div>
@@ -653,11 +658,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { KelurahanService, AdminService } from '../../services/api';
 import RichTextEditor from '../../components/RichTextEditor.vue';
+import { useToast } from '../../composables/useToast';
 
+const toast = useToast();
 const activeTab = ref('visual');
 const uploadingLogo = ref(false);
 const uploadingHero = ref(false);
 const savingVisual = ref(false);
+const previewLogo = ref('');
+const previewHero = ref('');
 
 const alert = ref({
   show: false,
@@ -744,31 +753,35 @@ const loadProfilVisual = async () => {
 };
 
 const handleLogoUpload = async (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files?.[0];
   if (!file) return;
 
   if (file.size > 10 * 1024 * 1024) {
+    toast.error('Ukuran berkas logo terlalu besar (maksimal 10MB)', 'File Terlalu Besar');
     showAlert('Ukuran berkas logo terlalu besar (maksimal 10MB)', 'error');
+    event.target.value = '';
     return;
   }
 
-  // Tampilkan pratinjau instan seketika menggunakan Data URL
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    formVisual.value.logo = e.target.result;
-  };
-  reader.readAsDataURL(file);
-
+  // Tampilkan pratinjau instan seketika di peramban
+  previewLogo.value = URL.createObjectURL(file);
   uploadingLogo.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
     const uploadedUrl = res?.data?.url || res?.url;
     if (uploadedUrl) {
       formVisual.value.logo = uploadedUrl;
+      const msg = 'Logo baru berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
+      toast.success(msg, 'Logo Diunggah');
+      showAlert(msg);
+    } else {
+      throw new Error('Respon server tidak memuat URL file yang diunggah.');
     }
-    showAlert('Logo berhasil dipilih. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } catch (err) {
-    showAlert('Logo dipasang dari gambar. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
+    previewLogo.value = '';
+    const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
+    toast.error('Gagal mengunggah logo: ' + errText, 'Upload Gagal');
+    showAlert('Gagal mengunggah logo: ' + errText, 'error');
   } finally {
     uploadingLogo.value = false;
     event.target.value = '';
@@ -776,31 +789,35 @@ const handleLogoUpload = async (event) => {
 };
 
 const handleHeroUpload = async (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files?.[0];
   if (!file) return;
 
   if (file.size > 10 * 1024 * 1024) {
+    toast.error('Ukuran berkas hero banner terlalu besar (maksimal 10MB)', 'File Terlalu Besar');
     showAlert('Ukuran berkas hero banner terlalu besar (maksimal 10MB)', 'error');
+    event.target.value = '';
     return;
   }
 
-  // Tampilkan pratinjau instan seketika menggunakan Data URL
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    formVisual.value.hero_image = e.target.result;
-  };
-  reader.readAsDataURL(file);
-
+  // Tampilkan pratinjau instan seketika di peramban
+  previewHero.value = URL.createObjectURL(file);
   uploadingHero.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
     const uploadedUrl = res?.data?.url || res?.url;
     if (uploadedUrl) {
       formVisual.value.hero_image = uploadedUrl;
+      const msg = 'Foto latar hero banner berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
+      toast.success(msg, 'Hero Banner Diunggah');
+      showAlert(msg);
+    } else {
+      throw new Error('Respon server tidak memuat URL file yang diunggah.');
     }
-    showAlert('Foto latar hero banner berhasil dipilih. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } catch (err) {
-    showAlert('Hero banner dipasang dari gambar. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
+    previewHero.value = '';
+    const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
+    toast.error('Gagal mengunggah foto hero: ' + errText, 'Upload Gagal');
+    showAlert('Gagal mengunggah foto hero: ' + errText, 'error');
   } finally {
     uploadingHero.value = false;
     event.target.value = '';
@@ -809,17 +826,27 @@ const handleHeroUpload = async (event) => {
 
 const saveVisualSettings = async () => {
   if (savingVisual.value) return;
+  if (uploadingLogo.value || uploadingHero.value) {
+    toast.warning('Sedang mengunggah berkas gambar, mohon tunggu sebentar...', 'Mohon Tunggu');
+    return;
+  }
   savingVisual.value = true;
   try {
     const res = await AdminService.updateProfil({
       logo: formVisual.value.logo,
       hero_image: formVisual.value.hero_image
     });
-    showAlert('Pengaturan Logo dan Hero Banner berhasil disimpan!');
+    const msg = res?.message || 'Pengaturan Logo dan Hero Banner berhasil disimpan!';
+    toast.success(msg, 'Pengaturan Disimpan');
+    showAlert(msg, 'success');
+    previewLogo.value = '';
+    previewHero.value = '';
     // Kirim custom event agar navbar dan komponen lain langsung terupdate secara reaktif
     window.dispatchEvent(new CustomEvent('profil-updated', { detail: res?.data }));
   } catch (err) {
-    showAlert('Gagal menyimpan pengaturan visual: ' + (err.response?.data?.message || err.message), 'error');
+    const errText = err.response?.data?.message || err.message || 'Terjadi kesalahan sistem';
+    toast.error('Gagal menyimpan pengaturan visual: ' + errText, 'Simpan Gagal');
+    showAlert('Gagal menyimpan pengaturan visual: ' + errText, 'error');
   } finally {
     savingVisual.value = false;
   }
@@ -879,11 +906,13 @@ const closeModal = () => {
 };
 
 const handlePageImgUpload = async (event) => {
-  const file = event.target.files[0];
+  const file = event.target.files?.[0];
   if (!file) return;
 
   if (file.size > 10 * 1024 * 1024) {
+    toast.error('Ukuran berkas cover terlalu besar (maksimal 10MB)', 'File Terlalu Besar');
     showAlert('Ukuran berkas cover terlalu besar (maksimal 10MB)', 'error');
+    event.target.value = '';
     return;
   }
 
@@ -893,10 +922,13 @@ const handlePageImgUpload = async (event) => {
     const uploadedUrl = res?.data?.url || res?.url;
     if (uploadedUrl) {
       pageForm.value.gambar = uploadedUrl;
+      toast.success('Foto cover halaman berhasil diunggah.');
       showAlert('Foto cover halaman berhasil diunggah.');
     }
   } catch (err) {
-    showAlert('Gagal mengunggah foto cover: ' + (err.response?.data?.message || err.message), 'error');
+    const errText = err.response?.data?.message || err.message || 'Gagal mengunggah gambar';
+    toast.error('Gagal mengunggah foto cover: ' + errText, 'Upload Gagal');
+    showAlert('Gagal mengunggah foto cover: ' + errText, 'error');
   } finally {
     uploadingPageImg.value = false;
     event.target.value = '';
@@ -934,6 +966,7 @@ const syncCustomNavMenus = async (pages) => {
 const submitHalamanForm = async () => {
   if (savingPage.value) return;
   if (!pageForm.value.judul) {
+    toast.warning('Judul halaman wajib diisi.', 'Form Belum Lengkap');
     showAlert('Judul halaman wajib diisi.', 'error');
     return;
   }
@@ -942,9 +975,11 @@ const submitHalamanForm = async () => {
   try {
     if (modal.value.isEdit) {
       await AdminService.saveHalamanKustom(pageForm.value, modal.value.targetId);
+      toast.success('Halaman kustom berhasil diperbarui!');
       showAlert('Halaman kustom berhasil diperbarui!');
     } else {
       await AdminService.saveHalamanKustom(pageForm.value);
+      toast.success('Halaman kustom baru dan sub-menu berhasil dibuat!');
       showAlert('Halaman kustom baru dan sub-menu berhasil dibuat!');
     }
 
@@ -952,7 +987,9 @@ const submitHalamanForm = async () => {
     await loadHalamanList();
     await syncCustomNavMenus(halamanList.value);
   } catch (err) {
-    showAlert('Gagal menyimpan halaman: ' + (err.response?.data?.message || err.message), 'error');
+    const errText = err.response?.data?.message || err.message || 'Gagal menyimpan halaman';
+    toast.error('Gagal menyimpan halaman: ' + errText, 'Gagal Menyimpan');
+    showAlert('Gagal menyimpan halaman: ' + errText, 'error');
   } finally {
     savingPage.value = false;
   }
@@ -965,11 +1002,14 @@ const confirmDeleteHalaman = async (item) => {
 
   try {
     await AdminService.deleteHalamanKustom(item.id);
+    toast.success(`Halaman "${item.judul}" berhasil dihapus.`);
     showAlert(`Halaman "${item.judul}" berhasil dihapus.`);
     await loadHalamanList();
     await syncCustomNavMenus(halamanList.value);
   } catch (err) {
-    showAlert('Gagal menghapus halaman: ' + (err.response?.data?.message || err.message), 'error');
+    const errText = err.response?.data?.message || err.message || 'Gagal menghapus halaman';
+    toast.error('Gagal menghapus halaman: ' + errText, 'Gagal Menghapus');
+    showAlert('Gagal menghapus halaman: ' + errText, 'error');
   }
 };
 

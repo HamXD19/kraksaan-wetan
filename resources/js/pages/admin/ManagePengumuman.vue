@@ -528,8 +528,9 @@ const handlePdfUpload = async (e) => {
   uploadingFile.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'document');
-    if (res.data?.url) {
-      form.file = res.data.url;
+    const uploadedUrl = res?.data?.url || res?.url;
+    if (uploadedUrl) {
+      form.file = uploadedUrl;
       toast.success('Lampiran PDF berhasil diunggah!');
     }
   } catch (err) {
