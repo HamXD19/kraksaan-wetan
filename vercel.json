@@ -9,10 +9,15 @@
   },
   "routes": [
     {
-      "handle": "filesystem"
+      "src": "^/(assets|build|images|storage)/(.*)$",
+      "dest": "/$1/$2"
     },
     {
-      "src": "/(.*)",
+      "src": "^/(favicon[^/]*|android-chrome[^/]*|apple-touch-icon[^/]*|robots\\.txt)$",
+      "dest": "/$1"
+    },
+    {
+      "src": "^/(.*)$",
       "dest": "/api/index.php"
     }
   ],
