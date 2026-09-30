@@ -1,5 +1,12 @@
 <?php
 
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+if (! defined('LARAVEL_START')) {
+    define('LARAVEL_START', microtime(true));
+}
+
 // Konfigurasi lingkungan serverless Vercel
 putenv('APP_STORAGE=/tmp/storage');
 putenv('VERCEL=1');
