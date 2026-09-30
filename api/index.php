@@ -20,6 +20,9 @@ if (isset($_GET['__route__'])) {
     $_SERVER['PATH_INFO'] = $_SERVER['HTTP_X_MATCHED_PATH'];
 }
 
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+
 // Konfigurasi lingkungan serverless Vercel
 putenv('APP_STORAGE=/tmp/storage');
 putenv('VERCEL=1');

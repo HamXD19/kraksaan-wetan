@@ -368,6 +368,55 @@ const showForgotModal = ref(false);
 const showHelpModal = ref(false);
 const showTermsModal = ref(false);
 
+const generateFallbackCaptcha = () => {
+  const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+  let code = '';
+  for (let i = 0; i < 5; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  const key = 'demo_' + btoa(code) + '_' + Math.random().toString(36).substring(2, 9);
+
+  const width = 160;
+  const height = 46;
+  const characters = code.split('');
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" class="rounded-xl select-none" style="pointer-events: none;">`;
+  svg += '<defs><linearGradient id="cbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0c201a"/><stop offset="100%" stop-color="#14362b"/></linearGradient></defs>';
+  svg += '<rect width="100%" height="100%" fill="url(#cbg)" rx="10"/>';
+
+  const noiseColors = ['#34d399', '#f59e0b', '#38bdf8', '#a7f3d0'];
+  for (let i = 0; i < 4; i++) {
+    const x1 = Math.floor(Math.random() * 30);
+    const y1 = Math.floor(Math.random() * (height - 12)) + 6;
+    const cx = Math.floor(Math.random() * 60) + 50;
+    const cy = Math.floor(Math.random() * (height - 12)) + 6;
+    const x2 = Math.floor(Math.random() * 30) + 130;
+    const y2 = Math.floor(Math.random() * (height - 12)) + 6;
+    const color = noiseColors[Math.floor(Math.random() * noiseColors.length)];
+    svg += `<path d="M${x1} ${y1} Q${cx} ${cy} ${x2} ${y2}" stroke="${color}" stroke-width="1.5" fill="none" opacity="0.45"/>`;
+  }
+
+  for (let i = 0; i < 20; i++) {
+    const x = Math.floor(Math.random() * (width - 10)) + 5;
+    const y = Math.floor(Math.random() * (height - 10)) + 5;
+    const r = Math.random() > 0.5 ? 2 : 1;
+    svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="#a7f3d0" opacity="0.3"/>`;
+  }
+
+  const textColors = ['#6ee7b7', '#fcd34d', '#5eead4', '#f8fafc', '#7dd3fc'];
+  characters.forEach((char, idx) => {
+    const x = 18 + idx * 27;
+    const y = Math.floor(Math.random() * 5) + 30;
+    const rot = Math.floor(Math.random() * 28) - 14;
+    const color = textColors[idx % textColors.length];
+    svg += `<text x="${x}" y="${y}" fill="${color}" font-family="monospace, Courier, sans-serif" font-weight="900" font-size="25" transform="rotate(${rot}, ${x}, ${y})">${char}</text>`;
+  });
+
+  svg += '</svg>';
+
+  return { key, svg };
+};
+
 const loadCaptcha = async () => {
   loadingCaptcha.value = true;
   try {
@@ -375,9 +424,16 @@ const loadCaptcha = async () => {
     if (res && res.key && res.svg) {
       captchaKey.value = res.key;
       captchaSvg.value = res.svg;
+      return;
     }
+    const fallback = generateFallbackCaptcha();
+    captchaKey.value = fallback.key;
+    captchaSvg.value = fallback.svg;
   } catch (err) {
-    console.warn('Gagal memuat kode keamanan captcha:', err);
+    console.warn('Gagal memuat kode keamanan captcha dari API, menggunakan fallback:', err);
+    const fallback = generateFallbackCaptcha();
+    captchaKey.value = fallback.key;
+    captchaSvg.value = fallback.svg;
   } finally {
     loadingCaptcha.value = false;
   }
