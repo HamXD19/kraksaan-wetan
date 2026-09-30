@@ -503,6 +503,7 @@ const saveItem = async () => {
     return;
   }
 
+  if (saving.value) return;
   saving.value = true;
   try {
     const payload = { ...form };

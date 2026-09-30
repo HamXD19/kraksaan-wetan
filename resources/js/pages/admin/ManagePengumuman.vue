@@ -252,9 +252,12 @@
                   />
                 </div>
 
-                <!-- Banner Media -->
+                <!-- Banner Media (Lanskap 16:9) -->
                 <div class="space-y-1.5 pt-1">
-                  <label class="block font-bold text-slate-700 text-xs">Banner (Lanskap 16:9)</label>
+                  <div class="flex items-center justify-between">
+                    <label class="block font-bold text-slate-700 text-xs">Banner / Gambar Utama (16:9)</label>
+                    <span class="text-[10px] text-slate-400">Tampil lebar di atas kartu</span>
+                  </div>
                   <div class="flex items-center gap-2.5">
                     <div class="w-16 h-11 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
                       <img v-if="form.banner" :src="form.banner" alt="Banner" class="w-full h-full object-cover" />
@@ -264,20 +267,33 @@
                       <input 
                         type="text" 
                         v-model="form.banner" 
-                        placeholder="URL atau pilih file..." 
+                        placeholder="URL atau pilih file untuk crop..." 
                         class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs outline-none"
                       />
-                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs">
-                        <span>{{ uploadingBanner ? '...' : 'Unggah' }}</span>
-                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleBannerUpload" :disabled="uploadingBanner" />
+                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>{{ uploadingBanner ? 'Memproses...' : 'Pilih & Crop' }}</span>
+                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" @change="onSelectImage($event, 'banner')" :disabled="uploadingBanner" />
                       </label>
+                      <button 
+                        v-if="form.banner" 
+                        type="button" 
+                        @click="form.banner = ''" 
+                        class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold cursor-pointer transition"
+                        title="Hapus Banner"
+                      >
+                        Hapus
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                <!-- Thumbnail Media -->
+                <!-- Thumbnail Media (Kotak 1:1) -->
                 <div class="space-y-1.5 pt-1">
-                  <label class="block font-bold text-slate-700 text-xs">Thumbnail (Kotak 1:1)</label>
+                  <div class="flex items-center justify-between">
+                    <label class="block font-bold text-slate-700 text-xs">Thumbnail Pengumuman (1:1)</label>
+                    <span class="text-[10px] text-slate-400">Tampil di samping judul</span>
+                  </div>
                   <div class="flex items-center gap-2.5">
                     <div class="w-11 h-11 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 flex items-center justify-center shadow-2xs">
                       <img v-if="form.thumbnail" :src="form.thumbnail" alt="Thumbnail" class="w-full h-full object-cover" />
@@ -287,13 +303,23 @@
                       <input 
                         type="text" 
                         v-model="form.thumbnail" 
-                        placeholder="URL atau pilih file..." 
+                        placeholder="URL atau pilih file untuk crop..." 
                         class="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs outline-none"
                       />
-                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs">
-                        <span>{{ uploadingThumbnail ? '...' : 'Unggah' }}</span>
-                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleThumbnailUpload" :disabled="uploadingThumbnail" />
+                      <label class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-lg text-xs cursor-pointer whitespace-nowrap flex items-center gap-1 shadow-xs transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span>{{ uploadingThumbnail ? 'Memproses...' : 'Pilih & Crop' }}</span>
+                        <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" @change="onSelectImage($event, 'thumbnail')" :disabled="uploadingThumbnail" />
                       </label>
+                      <button 
+                        v-if="form.thumbnail" 
+                        type="button" 
+                        @click="form.thumbnail = ''" 
+                        class="px-2 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-lg text-xs font-semibold cursor-pointer transition"
+                        title="Hapus Thumbnail"
+                      >
+                        Hapus
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -325,6 +351,14 @@
         </form>
       </div>
     </div>
+
+    <!-- Image Cropper Modal for Banner & Thumbnail -->
+    <ImageCropperModal
+      v-model:show="showCropper"
+      :image-file="selectedImageFile"
+      :default-aspect-ratio="cropperAspectRatio"
+      @cropped="handleCroppedImage"
+    />
   </div>
 </template>
 
@@ -332,6 +366,7 @@
 import { ref, reactive, onMounted } from 'vue';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import RichTextEditor from '../../components/RichTextEditor.vue';
+import ImageCropperModal from '../../components/ImageCropperModal.vue';
 import { AdminService } from '../../services/api';
 import { useToast } from '../../composables/useToast';
 
@@ -347,6 +382,12 @@ const isCustomKategori = ref(false);
 const showModal = ref(false);
 const editId = ref(null);
 const successMsg = ref('');
+
+// Crop Modal State
+const showCropper = ref(false);
+const selectedImageFile = ref(null);
+const cropTarget = ref('banner'); // 'banner' | 'thumbnail'
+const cropperAspectRatio = ref(16 / 9);
 
 const form = reactive({
   judul: '',
@@ -411,63 +452,58 @@ const isValidImageFile = (file) => {
   return (allowedMimeTypes.includes(file.type) || file.type.startsWith('image/')) && allowedExts.includes(ext);
 };
 
-const handleBannerUpload = async (e) => {
+const onSelectImage = (e, target = 'banner') => {
   const file = e.target.files?.[0];
   if (!file) return;
 
+  const targetLabel = target === 'banner' ? 'banner' : 'thumbnail';
+
   if (!isValidImageFile(file)) {
-    toast.error('Format file banner tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
+    toast.error(`Format file ${targetLabel} tidak valid! Harap pilih file gambar (JPG, PNG, WebP).`);
     e.target.value = '';
     return;
   }
   if (file.size > 10 * 1024 * 1024) {
-    toast.error('Ukuran file banner terlalu besar! Maksimal 10MB.');
+    toast.error(`Ukuran file ${targetLabel} terlalu besar! Maksimal 10MB.`);
     e.target.value = '';
     return;
   }
 
-  uploadingBanner.value = true;
-  try {
-    const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      form.banner = res.data.url;
-      toast.success('Banner pengumuman berhasil diunggah!');
-    }
-  } catch (err) {
-    toast.error('Gagal mengunggah banner: ' + (err.response?.data?.message || err.message));
-  } finally {
-    uploadingBanner.value = false;
-    e.target.value = '';
-  }
+  cropTarget.value = target;
+  cropperAspectRatio.value = target === 'banner' ? (16 / 9) : (1 / 1);
+  selectedImageFile.value = file;
+  showCropper.value = true;
+  e.target.value = '';
 };
 
-const handleThumbnailUpload = async (e) => {
-  const file = e.target.files?.[0];
-  if (!file) return;
-
-  if (!isValidImageFile(file)) {
-    toast.error('Format file thumbnail tidak valid! Harap pilih file gambar (JPG, PNG, WebP, SVG).');
-    e.target.value = '';
-    return;
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    toast.error('Ukuran file thumbnail terlalu besar! Maksimal 10MB.');
-    e.target.value = '';
-    return;
+const handleCroppedImage = async (croppedFile) => {
+  const isBanner = cropTarget.value === 'banner';
+  if (isBanner) {
+    uploadingBanner.value = true;
+  } else {
+    uploadingThumbnail.value = true;
   }
 
-  uploadingThumbnail.value = true;
   try {
-    const res = await AdminService.uploadFile(file, 'image');
-    if (res.data?.url) {
-      form.thumbnail = res.data.url;
-      toast.success('Thumbnail pengumuman berhasil diunggah!');
+    const res = await AdminService.uploadFile(croppedFile, 'image');
+    const url = res.data?.url || res.url;
+    if (url) {
+      if (isBanner) {
+        form.banner = url;
+        toast.success('Banner pengumuman berhasil disesuaikan dan diunggah!');
+      } else {
+        form.thumbnail = url;
+        toast.success('Thumbnail pengumuman berhasil disesuaikan dan diunggah!');
+      }
     }
   } catch (err) {
-    toast.error('Gagal mengunggah thumbnail: ' + (err.response?.data?.message || err.message));
+    toast.error('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
   } finally {
-    uploadingThumbnail.value = false;
-    e.target.value = '';
+    if (isBanner) {
+      uploadingBanner.value = false;
+    } else {
+      uploadingThumbnail.value = false;
+    }
   }
 };
 
@@ -505,6 +541,7 @@ const handlePdfUpload = async (e) => {
 };
 
 const saveItem = async () => {
+  if (saving.value) return;
   saving.value = true;
   try {
     const payload = { ...form };

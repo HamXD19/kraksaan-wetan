@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\TransparansiAnggaran;
+use App\Models\AnggaranRealisasi;
+use App\Services\FileStorageHelper;
 use Illuminate\Database\Seeder;
 
 class TransparansiAnggaranSeeder extends Seeder
@@ -12,164 +13,165 @@ class TransparansiAnggaranSeeder extends Seeder
      */
     public function run(): void
     {
-        $data = [
-            // Tahun Anggaran 2026 (Tahun Berjalan)
+        // 1 Contoh Anggaran Resmi APBD Kelurahan Kraksaan Wetan Tahun Anggaran 2026
+        $existing = AnggaranRealisasi::where('tahun', 2026)->first();
+        if ($existing) {
+            return;
+        }
+
+        // Pastikan berkas PDF lampiran resmi tersedia
+        $pdfPath = FileStorageHelper::ensureValidPdfFile(
+            'dokumen/APBD_Kraksaan_Wetan_TA_2026.pdf',
+            'Anggaran Pendapatan dan Belanja Kelurahan Kraksaan Wetan Tahun Anggaran 2026',
+            'Transparansi APBD',
+            'APBD-2026/KW',
+            'Ringkasan Laporan Realisasi Anggaran Pendapatan dan Belanja Kelurahan (APB-Kelurahan) Kraksaan Wetan Tahun Anggaran 2026. Dokumen resmi transparansi publik bagi warga masyarakat.'
+        );
+
+        $budget = AnggaranRealisasi::create([
+            'tahun' => 2026,
+            'judul' => 'Anggaran Pendapatan dan Belanja Kelurahan Kraksaan Wetan Tahun Anggaran 2026',
+            'slug' => 'anggaran-pendapatan-dan-belanja-kelurahan-kraksaan-wetan-tahun-anggaran-2026',
+            'tanggal_publikasi' => '2026-01-15',
+            'deskripsi' => 'Ringkasan Laporan Realisasi Anggaran Pendapatan dan Belanja Kelurahan (APB-Kelurahan) Kraksaan Wetan, Kecamatan Kraksaan, Kabupaten Probolinggo Tahun Anggaran 2026. Disajikan secara transparan dan akuntabel guna memberikan informasi keterbukaan pengelolaan keuangan publik kepada seluruh lapisan masyarakat.',
+            'gambar' => null,
+            'file_lampiran' => $pdfPath,
+            'status' => 'published',
+            'urutan' => 1,
+        ]);
+
+        $items = [
+            // --- 1. PENDAPATAN ---
+            // A. Pendapatan Asli
             [
-                'tahun' => 2026,
-                'program' => 'Program Peningkatan Sarana dan Prasarana Lingkungan Perkotaan',
-                'kegiatan' => 'Pembangunan & Normalisasi Saluran Drainase U-Ditch Anti-Banjir',
-                'kategori' => 'Infrastruktur & Sarpras',
-                'sumber_dana' => 'Alokasi Dana Kelurahan (ADK)',
-                'anggaran_rencana' => 175000000,
-                'anggaran_realisasi' => 148500000,
-                'penerima_manfaat_target' => '950 Jiwa (RW 02 Pasar Lama & RW 04 Patemon)',
-                'penerima_manfaat_realisasi' => '950 Jiwa (Terbebas dari genangan air)',
-                'progres_fisik' => 88,
-                'status' => 'Sedang Berjalan',
-                'lokasi' => 'Jl. Pattimura s.d. Gang Patemon RW 02 - RW 04',
-                'penanggung_jawab' => 'Kasi Perekonomian & Pembangunan (Ekbang)',
-                'deskripsi' => 'Pemasangan beton precast U-Ditch sepanjang 420 meter untuk memperlancar aliran drainase warga menuju Kali Rondokuning guna mencegah genangan saat musim penghujan.',
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Asli Daerah (PAD) / Kelurahan',
+                'uraian' => 'Hasil Pengelolaan Kekayaan & Pemanfaatan Aset Kelurahan',
+                'anggaran' => 45000000,
+                'realisasi' => 48500000,
                 'urutan' => 1,
-                'aktif' => true,
             ],
             [
-                'tahun' => 2026,
-                'program' => 'Program Peningkatan Sarana dan Prasarana Lingkungan Perkotaan',
-                'kegiatan' => 'Pavingisasi Jalan Pemukiman & Penerangan Jalan Lingkungan Hemat Energi',
-                'kategori' => 'Infrastruktur & Sarpras',
-                'sumber_dana' => 'APBD Kab. Probolinggo',
-                'anggaran_rencana' => 120000000,
-                'anggaran_realisasi' => 120000000,
-                'penerima_manfaat_target' => '420 KK di RW 03 Kauman & RW 05 Kebon Agung',
-                'penerima_manfaat_realisasi' => '420 KK (Akses jalan tertata rapi & terang)',
-                'progres_fisik' => 100,
-                'status' => 'Selesai',
-                'lokasi' => 'Kawasan Lingkungan RW 03 & RW 05',
-                'penanggung_jawab' => 'Kasi Perekonomian & Pembangunan (Ekbang)',
-                'deskripsi' => 'Peningkatan kualitas jalan paving block K-300 seluas 850 m² dan pemasangan 25 titik lampu PJU LED tenaga surya ramah lingkungan.',
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Asli Daerah (PAD) / Kelurahan',
+                'uraian' => 'Swadaya, Partisipasi, dan Gotong Royong Masyarakat',
+                'anggaran' => 25000000,
+                'realisasi' => 26200000,
                 'urutan' => 2,
-                'aktif' => true,
             ],
+            // B. Pendapatan Transfer
             [
-                'tahun' => 2026,
-                'program' => 'Program Pemberdayaan Ekonomi Masyarakat & Penguatan UMKM',
-                'kegiatan' => 'Pelatihan Digital Marketing, Desain Kemasan & Bantuan Sarana Usaha UMKM',
-                'kategori' => 'Pemberdayaan Masyarakat',
-                'sumber_dana' => 'Alokasi Dana Kelurahan (ADK)',
-                'anggaran_rencana' => 65000000,
-                'anggaran_realisasi' => 52000000,
-                'penerima_manfaat_target' => '45 Pelaku Usaha Mikro & Industri Rumahan',
-                'penerima_manfaat_realisasi' => '40 UMKM (Telah tersertifikasi halal & NIB)',
-                'progres_fisik' => 85,
-                'status' => 'Sedang Berjalan',
-                'lokasi' => 'Balai Kelurahan Kraksaan Wetan',
-                'penanggung_jawab' => 'Kasi Perekonomian & Pembangunan bersama LPMK',
-                'deskripsi' => 'Pendampingan pembuatan izin NIB OSS, sertifikasi halal, foto produk katalog, dan bantuan kemasan kedap udara bagi produk olahan ikan dan boga khas Kraksaan.',
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Transfer',
+                'uraian' => 'Alokasi Dana Kelurahan (ADK) APBD Kabupaten Probolinggo',
+                'anggaran' => 750000000,
+                'realisasi' => 750000000,
                 'urutan' => 3,
-                'aktif' => true,
             ],
             [
-                'tahun' => 2026,
-                'program' => 'Program Jaring Pengaman Sosial & Peningkatan Derajat Kesehatan',
-                'kegiatan' => 'Gerakan Terpadu Pencegahan Stunting & Pemberian Makanan Tambahan (PMT)',
-                'kategori' => 'Bantuan Sosial & Kesehatan',
-                'sumber_dana' => 'Alokasi Dana Kelurahan (ADK)',
-                'anggaran_rencana' => 85000000,
-                'anggaran_realisasi' => 68500000,
-                'penerima_manfaat_target' => '120 Balita Resiko Stunting & 60 Ibu Hamil KEK',
-                'penerima_manfaat_realisasi' => '115 Balita & 58 Ibu Hamil (BB meningkat)',
-                'progres_fisik' => 80,
-                'status' => 'Sedang Berjalan',
-                'lokasi' => 'Posyandu Bougenville RW 01 s.d. RW 07',
-                'penanggung_jawab' => 'Kasi Kesejahteraan Rakyat (Kesra) & TP-PKK',
-                'deskripsi' => 'Penyaluran makanan bergizi berbahan dasar pangan lokal tinggi protein hewani selama 90 hari, suplemen vitamin, serta pendampingan intensif kader posyandu.',
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Transfer',
+                'uraian' => 'Bagi Hasil Pajak Daerah dan Retribusi Daerah (BHPRD)',
+                'anggaran' => 120000000,
+                'realisasi' => 118500000,
                 'urutan' => 4,
-                'aktif' => true,
             ],
+            // C. Pendapatan Lain-lain
             [
-                'tahun' => 2026,
-                'program' => 'Program Jaring Pengaman Sosial & Peningkatan Derajat Kesehatan',
-                'kegiatan' => 'Validasi Faktual Data Terpadu Kesejahteraan Sosial (DTKS) & Penyaluran Bansos',
-                'kategori' => 'Bantuan Sosial & Kesehatan',
-                'sumber_dana' => 'Bagi Hasil Pajak & Retribusi',
-                'anggaran_rencana' => 45000000,
-                'anggaran_realisasi' => 38000000,
-                'penerima_manfaat_target' => '385 KPM (Keluarga Penerima Manfaat) Prasejahtera',
-                'penerima_manfaat_realisasi' => '385 KPM (Tepat sasaran)',
-                'progres_fisik' => 90,
-                'status' => 'Sedang Berjalan',
-                'lokasi' => 'Pendopo Kelurahan Kraksaan Wetan',
-                'penanggung_jawab' => 'Kasi Kesejahteraan Rakyat (Kesra)',
-                'deskripsi' => 'Verifikasi dan validasi lapangan data kemiskinan ekstrem bekerjasama dengan pengurus RT/RW untuk memastikan bantuan beras cadangan pangan, PKH, dan BPNT tepat sasaran.',
+                'tipe' => 'pendapatan',
+                'kategori' => 'Lain-lain Pendapatan yang Sah',
+                'uraian' => 'Penerimaan Bantuan Keuangan Khusus & Hibah Daerah',
+                'anggaran' => 50000000,
+                'realisasi' => 50000000,
                 'urutan' => 5,
-                'aktif' => true,
-            ],
-            [
-                'tahun' => 2026,
-                'program' => 'Program Transformasi Digital & Tata Kelola Pelayanan Publik',
-                'kegiatan' => 'Pengembangan Sistem Pelayanan Surat Online Mandiri & Kiosk Layanan Publik',
-                'kategori' => 'Pemerintahan & Pelayanan Digital',
-                'sumber_dana' => 'Bagi Hasil Pajak & Retribusi',
-                'anggaran_rencana' => 55000000,
-                'anggaran_realisasi' => 49500000,
-                'penerima_manfaat_target' => 'Seluruh Warga Kelurahan Kraksaan Wetan (6.842 Jiwa)',
-                'penerima_manfaat_realisasi' => 'Aktif digunakan warga untuk pengajuan online',
-                'progres_fisik' => 95,
-                'status' => 'Sedang Berjalan',
-                'lokasi' => 'Kantor Kelurahan Kraksaan Wetan & Portal Web',
-                'penanggung_jawab' => 'Sekretaris Kelurahan & Pengadministrasi Umum',
-                'deskripsi' => 'Digitalisasi pengajuan dokumen kependudukan (KTP, Domisili, SKU, SKTM, SKCK) terintegrasi sistem tracking status berbasis web dan notifikasi WhatsApp.',
-                'urutan' => 6,
-                'aktif' => true,
             ],
 
-            // Tahun Anggaran 2025 (Tahun Sebelumnya)
+            // --- 2. BELANJA ---
+            // A. Belanja Operasi
             [
-                'tahun' => 2025,
-                'program' => 'Program Peningkatan Sarana dan Prasarana Lingkungan Perkotaan',
-                'kegiatan' => 'Pembangunan Talud Penahan Tanah & Penghijauan Bantaran Kali Rondokuning',
-                'kategori' => 'Infrastruktur & Sarpras',
-                'sumber_dana' => 'Alokasi Dana Kelurahan (ADK)',
-                'anggaran_rencana' => 150000000,
-                'anggaran_realisasi' => 149200000,
-                'penerima_manfaat_target' => 'Warga Sempadan Sungai RW 01 & RW 06',
-                'penerima_manfaat_realisasi' => 'Tanggul kokoh, 500 pohon ditanam',
-                'progres_fisik' => 100,
-                'status' => 'Selesai',
-                'lokasi' => 'Sisi Timur Kali Rondokuning',
-                'penanggung_jawab' => 'Kasi Ekbang',
-                'deskripsi' => 'Penguatan talud pasangan batu kali sepanjang 300 meter untuk mencegah erosi bibir sungai dan penanaman pohon peneduh.',
-                'urutan' => 7,
-                'aktif' => true,
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Operasi',
+                'uraian' => 'Belanja Pegawai (Honorarium Kelembagaan RT/RW, LPM, Linmas)',
+                'anggaran' => 210000000,
+                'realisasi' => 205000000,
+                'urutan' => 6,
             ],
             [
-                'tahun' => 2025,
-                'program' => 'Program Pemberdayaan Ekonomi Masyarakat & Penguatan UMKM',
-                'kegiatan' => 'Penyelenggaraan Festival Kuliner Rakyat & Pameran Produk UMKM Kraksaan',
-                'kategori' => 'Pemberdayaan Masyarakat',
-                'sumber_dana' => 'APBD Kab. Probolinggo',
-                'anggaran_rencana' => 45000000,
-                'anggaran_realisasi' => 44800000,
-                'penerima_manfaat_target' => '60 Pedagang Kuliner & Ribuan Pengunjung',
-                'penerima_manfaat_realisasi' => 'Perputaran transaksi UMKM mencapai Rp 120 Juta',
-                'progres_fisik' => 100,
-                'status' => 'Selesai',
-                'lokasi' => 'Kawasan Sentra Kuliner Kraksaan Wetan',
-                'penanggung_jawab' => 'Kasi Ekbang bersama Karang Taruna',
-                'deskripsi' => 'Pameran ekonomi kreatif dan bazar rakyat guna meningkatkan pendapatan warga pasca panen raya.',
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Operasi',
+                'uraian' => 'Belanja Barang dan Jasa (Operasional Kantor, ATK, Listrik, Internet)',
+                'anggaran' => 160000000,
+                'realisasi' => 152400000,
+                'urutan' => 7,
+            ],
+            [
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Operasi',
+                'uraian' => 'Belanja Pemeliharaan Sarana Gedung Kantor & Fasilitas Umum',
+                'anggaran' => 60000000,
+                'realisasi' => 58600000,
                 'urutan' => 8,
-                'aktif' => true,
+            ],
+            // B. Belanja Modal
+            [
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Modal',
+                'uraian' => 'Belanja Modal Pembangunan & Normalisasi Saluran Drainase U-Ditch',
+                'anggaran' => 240000000,
+                'realisasi' => 238500000,
+                'urutan' => 9,
+            ],
+            [
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Modal',
+                'uraian' => 'Belanja Modal Pavingisasi Jalan Pemukiman & Penerangan Lingkungan',
+                'anggaran' => 180000000,
+                'realisasi' => 179000000,
+                'urutan' => 10,
+            ],
+            [
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Modal',
+                'uraian' => 'Belanja Modal Pengadaan Kiosk Pelayanan Surat Digital & Perangkat IT',
+                'anggaran' => 90000000,
+                'realisasi' => 88500000,
+                'urutan' => 11,
+            ],
+            // C. Belanja Tidak Terduga
+            [
+                'tipe' => 'belanja',
+                'kategori' => 'Belanja Tidak Terduga',
+                'uraian' => 'Belanja Penanggulangan Bencana & Keadaan Mendesak Lingkungan',
+                'anggaran' => 40000000,
+                'realisasi' => 25000000,
+                'urutan' => 12,
+            ],
+
+            // --- 3. PEMBIAYAAN ---
+            // A. Penerimaan Pembiayaan
+            [
+                'tipe' => 'pembiayaan',
+                'kategori' => 'Penerimaan Pembiayaan',
+                'uraian' => 'Sisa Lebih Perhitungan Anggaran (SiLPA) Tahun Anggaran Sebelumnya',
+                'anggaran' => 15000000,
+                'realisasi' => 15000000,
+                'urutan' => 13,
+            ],
+            // B. Pengeluaran Pembiayaan
+            [
+                'tipe' => 'pembiayaan',
+                'kategori' => 'Pengeluaran Pembiayaan',
+                'uraian' => 'Pembentukan Dana Cadangan Kelurahan Kraksaan Wetan',
+                'anggaran' => 10000000,
+                'realisasi' => 10000000,
+                'urutan' => 14,
             ],
         ];
 
-        foreach ($data as $item) {
-            TransparansiAnggaran::updateOrCreate(
-                [
-                    'tahun' => $item['tahun'],
-                    'kegiatan' => $item['kegiatan'],
-                ],
-                $item
-            );
+        foreach ($items as $itemData) {
+            $budget->items()->create($itemData);
         }
+
+        $budget->recalculateTotals();
     }
 }

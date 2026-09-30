@@ -73,12 +73,13 @@
         </router-link>
 
         <!-- Modul Konten & Humas -->
-        <template v-if="canAccess('staff_konten')">
+        <template v-if="hasAnyMenuAccess(['berita', 'pengumuman', 'agenda', 'galeri', 'dokumen'])">
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/70">
             Konten & Informasi
           </div>
 
           <router-link 
+            v-if="hasMenuAccess('berita')"
             to="/admin/berita" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -88,6 +89,7 @@
           </router-link>
 
           <router-link 
+            v-if="hasMenuAccess('pengumuman')"
             to="/admin/pengumuman" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -97,6 +99,7 @@
           </router-link>
 
           <router-link 
+            v-if="hasMenuAccess('agenda')"
             to="/admin/agenda" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -106,6 +109,7 @@
           </router-link>
 
           <router-link 
+            v-if="hasMenuAccess('galeri')"
             to="/admin/galeri" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -114,18 +118,90 @@
             <span>Kelola Galeri Foto</span>
           </router-link>
 
-          <router-link 
-            to="/admin/dokumen" 
-            active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
-            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
-          >
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            <span>Dokumen Kelurahan (PDF)</span>
-          </router-link>
+          <!-- Dokumen Kelurahan (PDF) Accordion Submenu -->
+          <div v-if="hasMenuAccess('dokumen')" class="space-y-1">
+            <button
+              type="button"
+              @click="dokumenMenuOpen = !dokumenMenuOpen"
+              class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 transition cursor-pointer text-left"
+              :class="route.path.startsWith('/admin/dokumen') ? 'bg-emerald-800 text-amber-300 font-bold shadow-xs' : 'text-emerald-100'"
+            >
+              <div class="flex items-center gap-3 min-w-0">
+                <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="truncate">Dokumen Kelurahan (PDF)</span>
+              </div>
+              <svg 
+                class="w-3.5 h-3.5 text-emerald-300 transition-transform duration-200 shrink-0 ml-1"
+                :class="dokumenMenuOpen ? 'rotate-180' : ''"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+
+            <!-- Submenu Pembagian Kategori Dokumen PDF -->
+            <div v-show="dokumenMenuOpen" class="pl-5 pr-1 space-y-0.5 py-1">
+              <router-link
+                to="/admin/dokumen"
+                :class="route.path === '/admin/dokumen' && (!route.query.kategori || route.query.kategori === 'Semua') ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">📁</span>
+                <span>Semua Dokumen</span>
+              </router-link>
+
+              <router-link
+                :to="{ path: '/admin/dokumen', query: { kategori: 'Musrenbang' } }"
+                :class="route.path === '/admin/dokumen' && route.query.kategori === 'Musrenbang' ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">🏛️</span>
+                <span>Musrenbang</span>
+              </router-link>
+
+              <router-link
+                :to="{ path: '/admin/dokumen', query: { kategori: 'UMKM' } }"
+                :class="route.path === '/admin/dokumen' && route.query.kategori === 'UMKM' ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">🏪</span>
+                <span>UMKM</span>
+              </router-link>
+
+              <router-link
+                :to="{ path: '/admin/dokumen', query: { kategori: 'Renstra & Renja' } }"
+                :class="route.path === '/admin/dokumen' && route.query.kategori === 'Renstra & Renja' ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">📊</span>
+                <span>Renstra & Renja</span>
+              </router-link>
+
+              <router-link
+                :to="{ path: '/admin/dokumen', query: { kategori: 'SK Kelembagaan' } }"
+                :class="route.path === '/admin/dokumen' && route.query.kategori === 'SK Kelembagaan' ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">📜</span>
+                <span>SK Kelembagaan</span>
+              </router-link>
+
+              <router-link
+                :to="{ path: '/admin/dokumen', query: { kategori: 'Regulasi & Kebijakan' } }"
+                :class="route.path === '/admin/dokumen' && route.query.kategori === 'Regulasi & Kebijakan' ? 'bg-emerald-700/80 text-amber-300 font-bold shadow-xs' : 'text-emerald-200/90 hover:text-white hover:bg-emerald-900/60'"
+                class="flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[11px] transition"
+              >
+                <span class="text-xs">⚖️</span>
+                <span>Regulasi & Kebijakan</span>
+              </router-link>
+            </div>
+          </div>
         </template>
 
         <!-- Modul Pelayanan Masyarakat -->
-        <template v-if="canAccess('staff_pelayanan')">
+        <template v-if="hasMenuAccess('layanan')">
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/70">
             Pelayanan Warga
           </div>
@@ -141,12 +217,13 @@
         </template>
 
         <!-- Modul Administrasi Wilayah & LKK -->
-        <template v-if="canAccess('staff_administrasi')">
+        <template v-if="hasAnyMenuAccess(['lembaga', 'statistik', 'transparansi'])">
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/70">
             Administrasi Wilayah
           </div>
 
           <router-link 
+            v-if="hasMenuAccess('lembaga')"
             to="/admin/lembaga" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -156,6 +233,7 @@
           </router-link>
 
           <router-link 
+            v-if="hasMenuAccess('statistik')"
             to="/admin/statistik" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -165,6 +243,7 @@
           </router-link>
 
           <router-link 
+            v-if="hasMenuAccess('transparansi')"
             to="/admin/transparansi" 
             active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
             class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
@@ -175,21 +254,23 @@
         </template>
 
         <!-- Master Kategori (Semua Divisi) -->
-        <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/70">
-          Master Data
-        </div>
+        <template v-if="hasMenuAccess('kategori')">
+          <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-emerald-400/70">
+            Master Data
+          </div>
 
-        <router-link 
-          to="/admin/kategori" 
-          active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
-          class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
-        >
-          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-          <span>Master Kategori</span>
-        </router-link>
+          <router-link 
+            to="/admin/kategori" 
+            active-class="bg-emerald-800 text-amber-300 font-bold shadow-xs"
+            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-emerald-100 transition"
+          >
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+            <span>Master Kategori</span>
+          </router-link>
+        </template>
 
-        <!-- Modul Kebijakan & Profil (Super Admin Only) -->
-        <template v-if="isSuperAdmin()">
+        <!-- Modul Kebijakan & Profil (Super Admin / Akses Menu Profil) -->
+        <template v-if="isSuperAdmin() || hasMenuAccess('profil')">
           <div class="pt-2 pb-1 px-3 text-[10px] font-bold uppercase tracking-wider text-purple-300/70">
             Pemerintahan & Profil
           </div>
@@ -201,6 +282,16 @@
           >
             <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
             <span>Profil & Aparatur</span>
+          </router-link>
+
+          <router-link 
+            v-if="isSuperAdmin()"
+            to="/admin/system-settings" 
+            active-class="bg-purple-900 text-purple-200 font-bold shadow-xs border border-purple-700/50"
+            class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-emerald-900 text-purple-200 transition"
+          >
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Setting System</span>
           </router-link>
         </template>
       </nav>
@@ -278,11 +369,28 @@ import { AdminService, KelurahanService } from '../services/api';
 const router = useRouter();
 const route = useRoute();
 const sidebarOpen = ref(false);
+const dokumenMenuOpen = ref(true);
 const user = ref(null);
 const profil = ref(null);
 
 const isSuperAdmin = () => {
   return user.value?.role === 'super_admin';
+};
+
+const hasMenuAccess = (menuKey) => {
+  if (!user.value) return false;
+  if (user.value.role === 'super_admin') return true;
+  const list = user.value.effective_menus || user.value.accessible_menus;
+  if (Array.isArray(list)) {
+    return list.includes(menuKey);
+  }
+  return false;
+};
+
+const hasAnyMenuAccess = (menus) => {
+  if (!user.value) return false;
+  if (user.value.role === 'super_admin') return true;
+  return menus.some(m => hasMenuAccess(m));
 };
 
 const canAccess = (roles) => {

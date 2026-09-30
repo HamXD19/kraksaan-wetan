@@ -55,47 +55,43 @@
             </div>
           </div>
 
-          <!-- Batas Wilayah -->
-          <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 reveal delay-150">
+          <!-- Batas Wilayah (Dinamis DB) -->
+          <div v-if="profil.batas_wilayah" class="bg-slate-50 p-5 rounded-xl border border-slate-200 reveal delay-150">
             <h3 class="font-bold text-slate-800 text-sm mb-3 uppercase tracking-wider">Batas-Batas Wilayah Administratif</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-600">
               <div class="p-3 bg-white rounded-lg border border-slate-200/80">
                 <span class="font-bold text-emerald-800 block mb-0.5">Utara</span>
-                Desa Kalibuntu & Selat Madura
+                {{ profil.batas_wilayah.utara || 'Desa Kalibuntu & Selat Madura' }}
               </div>
               <div class="p-3 bg-white rounded-lg border border-slate-200/80">
                 <span class="font-bold text-emerald-800 block mb-0.5">Selatan</span>
-                Desa Sumberlele & Kecamatan Besuk
+                {{ profil.batas_wilayah.selatan || 'Desa Sumberlele & Kecamatan Besuk' }}
               </div>
               <div class="p-3 bg-white rounded-lg border border-slate-200/80">
                 <span class="font-bold text-emerald-800 block mb-0.5">Timur</span>
-                Desa Bulu & Desa Rondokuning
+                {{ profil.batas_wilayah.timur || 'Desa Bulu & Desa Rondokuning' }}
               </div>
               <div class="p-3 bg-white rounded-lg border border-slate-200/80">
                 <span class="font-bold text-emerald-800 block mb-0.5">Barat</span>
-                Sungai Kraksaan & Kelurahan Patokan
+                {{ profil.batas_wilayah.barat || 'Sungai Kraksaan & Kelurahan Patokan' }}
               </div>
             </div>
           </div>
 
-          <!-- Potensi Unggulan -->
-          <div class="reveal delay-200">
+          <!-- Potensi Unggulan (Dinamis DB) -->
+          <div v-if="profil.potensi_unggulan && profil.potensi_unggulan.length" class="reveal delay-200">
             <h2 class="text-xl font-bold text-slate-900 mb-3 flex items-center gap-2">
               <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
               Potensi Unggulan Kelurahan
             </h2>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              <div class="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
-                <h4 class="font-bold text-emerald-900 mb-1 text-sm">UMKM Kuliner & Niaga</h4>
-                <p class="text-slate-600">Pusat jajanan tradisional, olahan hasil laut Kraksaan, dan sentra pedagang pasar lokal.</p>
-              </div>
-              <div class="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
-                <h4 class="font-bold text-emerald-900 mb-1 text-sm">Kawasan Pemukiman</h4>
-                <p class="text-slate-600">Lingkungan RT/RW tertib dengan semangat gotong royong dan posyandu integrasi aktif.</p>
-              </div>
-              <div class="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50">
-                <h4 class="font-bold text-emerald-900 mb-1 text-sm">Pelayanan Digital</h4>
-                <p class="text-slate-600">Pemanfaatan sistem digital kependudukan dan transparansi informasi warga berbasis website.</p>
+              <div 
+                v-for="(pot, pIdx) in profil.potensi_unggulan" 
+                :key="pIdx"
+                class="p-4 rounded-xl border border-emerald-100 bg-emerald-50/50"
+              >
+                <h4 class="font-bold text-emerald-900 mb-1 text-sm">{{ pot.judul }}</h4>
+                <p class="text-slate-600">{{ pot.deskripsi }}</p>
               </div>
             </div>
           </div>

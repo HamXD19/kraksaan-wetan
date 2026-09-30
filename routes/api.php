@@ -26,17 +26,30 @@ Route::prefix('v1')->group(function () {
     Route::get('/pengumuman/{id}/unduh', [KelurahanController::class, 'unduhPengumuman']);
     Route::get('/dokumen', [KelurahanController::class, 'getDokumen']);
     Route::get('/dokumen/{id}/unduh', [KelurahanController::class, 'unduhDokumen']);
+    Route::get('/dokumen/{id}/pratinjau', [KelurahanController::class, 'pratinjauDokumen']);
     Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
     Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
     Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
     Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
+    Route::get('/transparansi/{slug}', [KelurahanController::class, 'getTransparansiDetail']);
+    Route::get('/transparansi/{slug}/unduh', [KelurahanController::class, 'unduhDokumenTransparansi']);
+    Route::get('/apbd', [KelurahanController::class, 'getTransparansi']);
+    Route::get('/apbd/{slug}', [KelurahanController::class, 'getTransparansiDetail']);
+    Route::get('/apbd/{slug}/unduh', [KelurahanController::class, 'unduhDokumenTransparansi']);
     Route::get('/agenda', [KelurahanController::class, 'getAgenda']);
     Route::get('/agenda/{slug}', [KelurahanController::class, 'getAgendaBySlug']);
+    Route::get('/halaman/{slug}', [KelurahanController::class, 'getHalamanBySlug']);
+    Route::get('/maklumat-pelayanan', [KelurahanController::class, 'getMaklumatPelayanan']);
+    Route::get('/survei-skm', [KelurahanController::class, 'getSurveiSkm']);
+    Route::get('/survei-skm/{id}', [KelurahanController::class, 'getSurveiSkmDetail']);
+    Route::get('/survei-skm/{id}/unduh', [KelurahanController::class, 'unduhLaporanSkm']);
+    Route::get('/running-text', [KelurahanController::class, 'getRunningText']);
     Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 });
 
 Route::get('/profil', [KelurahanController::class, 'getProfil']);
 Route::get('/statistik', [KelurahanController::class, 'getStatistik']);
+Route::get('/running-text', [KelurahanController::class, 'getRunningText']);
 Route::get('/layanan', [PelayananController::class, 'getLayanan']);
 Route::get('/layanan/{slug}', [PelayananController::class, 'getLayananBySlug']);
 Route::get('/pelayanan', [PelayananController::class, 'getLayanan']);
@@ -48,12 +61,23 @@ Route::get('/pengumuman', [KelurahanController::class, 'getPengumuman']);
 Route::get('/pengumuman/{id}/unduh', [KelurahanController::class, 'unduhPengumuman']);
 Route::get('/dokumen', [KelurahanController::class, 'getDokumen']);
 Route::get('/dokumen/{id}/unduh', [KelurahanController::class, 'unduhDokumen']);
+Route::get('/dokumen/{id}/pratinjau', [KelurahanController::class, 'pratinjauDokumen']);
 Route::get('/galeri', [KelurahanController::class, 'getGaleri']);
 Route::get('/galeri/{id}', [KelurahanController::class, 'getGaleriById']);
 Route::get('/lembaga', [KelurahanController::class, 'getLembaga']);
 Route::get('/transparansi', [KelurahanController::class, 'getTransparansi']);
+Route::get('/transparansi/{slug}', [KelurahanController::class, 'getTransparansiDetail']);
+Route::get('/transparansi/{slug}/unduh', [KelurahanController::class, 'unduhDokumenTransparansi']);
+Route::get('/apbd', [KelurahanController::class, 'getTransparansi']);
+Route::get('/apbd/{slug}', [KelurahanController::class, 'getTransparansiDetail']);
+Route::get('/apbd/{slug}/unduh', [KelurahanController::class, 'unduhDokumenTransparansi']);
 Route::get('/agenda', [KelurahanController::class, 'getAgenda']);
 Route::get('/agenda/{slug}', [KelurahanController::class, 'getAgendaBySlug']);
+Route::get('/halaman/{slug}', [KelurahanController::class, 'getHalamanBySlug']);
+Route::get('/maklumat-pelayanan', [KelurahanController::class, 'getMaklumatPelayanan']);
+Route::get('/survei-skm', [KelurahanController::class, 'getSurveiSkm']);
+Route::get('/survei-skm/{id}', [KelurahanController::class, 'getSurveiSkmDetail']);
+Route::get('/survei-skm/{id}/unduh', [KelurahanController::class, 'unduhLaporanSkm']);
 Route::get('/tts', [KelurahanController::class, 'getTtsAudio']);
 Route::post('/kontak', [KelurahanController::class, 'kirimKontak']);
 
@@ -85,6 +109,16 @@ Route::prefix('admin')->group(function () {
             Route::put('/perangkat/{id}', [AdminController::class, 'updatePerangkat']);
             Route::delete('/perangkat/{id}', [AdminController::class, 'deletePerangkat']);
 
+            // Setting System & Halaman Kustom (Super Admin Only)
+            Route::get('/halaman-kustom', [AdminController::class, 'getHalamanKustom']);
+            Route::post('/halaman-kustom', [AdminController::class, 'storeHalamanKustom']);
+            Route::put('/halaman-kustom/{id}', [AdminController::class, 'updateHalamanKustom']);
+            Route::delete('/halaman-kustom/{id}', [AdminController::class, 'deleteHalamanKustom']);
+
+            // Manajemen Penyimpanan & Berkas Orphan (Super Admin Only)
+            Route::get('/storage/stats', [AdminController::class, 'getStorageStats']);
+            Route::post('/storage/clean-orphans', [AdminController::class, 'cleanOrphanedStorage']);
+
             // Pemantauan Log Aktifitas Setiap Akun (Super Admin Only)
             Route::get('/activity-logs', [AdminController::class, 'getActivityLogs']);
             Route::get('/activity-logs/users', [AdminController::class, 'getActivityLogUsers']);
@@ -102,6 +136,8 @@ Route::prefix('admin')->group(function () {
             Route::get('/berita', [AdminController::class, 'getBerita']);
             Route::post('/berita', [AdminController::class, 'storeBerita']);
             Route::put('/berita/{id}', [AdminController::class, 'updateBerita']);
+            Route::put('/berita/{id}/toggle-status', [AdminController::class, 'toggleStatusBerita']);
+            Route::put('/berita/{id}/toggle-running-text', [AdminController::class, 'toggleRunningTextBerita']);
             Route::delete('/berita/{id}', [AdminController::class, 'deleteBerita']);
 
             // Pengumuman CRUD
@@ -141,6 +177,19 @@ Route::prefix('admin')->group(function () {
             Route::put('/layanan/{id}', [AdminController::class, 'updateLayanan']);
             Route::put('/layanan/{id}/toggle-aktif', [AdminPelayananController::class, 'toggleAktifLayanan']);
             Route::delete('/layanan/{id}', [AdminController::class, 'deleteLayanan']);
+
+            // Maklumat Pelayanan
+            Route::get('/maklumat-pelayanan', [AdminPelayananController::class, 'getMaklumat']);
+            Route::post('/maklumat-pelayanan', [AdminPelayananController::class, 'saveMaklumat']);
+            Route::put('/maklumat-pelayanan/{id}/toggle-aktif', [AdminPelayananController::class, 'toggleAktifMaklumat']);
+            Route::delete('/maklumat-pelayanan/{id}', [AdminPelayananController::class, 'deleteMaklumat']);
+
+            // Survei Kepuasan Masyarakat (SKM) CRUD
+            Route::get('/survei-skm', [AdminPelayananController::class, 'getSurveiSkm']);
+            Route::post('/survei-skm', [AdminPelayananController::class, 'storeSurveiSkm']);
+            Route::put('/survei-skm/{id}', [AdminPelayananController::class, 'updateSurveiSkm']);
+            Route::put('/survei-skm/{id}/toggle-aktif', [AdminPelayananController::class, 'toggleAktifSurveiSkm']);
+            Route::delete('/survei-skm/{id}', [AdminPelayananController::class, 'deleteSurveiSkm']);
         });
 
         // 4. STAFF ADMINISTRASI (Lembaga Kemasyarakatan & Statistik Kependudukan)
@@ -160,8 +209,10 @@ Route::prefix('admin')->group(function () {
 
             // Transparansi Anggaran & Akuntabilitas (Staff Administrasi & Super Admin)
             Route::get('/transparansi', [AdminController::class, 'getTransparansi']);
+            Route::get('/transparansi/{id}', [AdminController::class, 'showTransparansi']);
             Route::post('/transparansi', [AdminController::class, 'storeTransparansi']);
             Route::put('/transparansi/{id}', [AdminController::class, 'updateTransparansi']);
+            Route::put('/transparansi/{id}/toggle-status', [AdminController::class, 'toggleStatusTransparansi']);
             Route::put('/transparansi/{id}/toggle-aktif', [AdminController::class, 'toggleAktifTransparansi']);
             Route::delete('/transparansi/{id}', [AdminController::class, 'deleteTransparansi']);
         });

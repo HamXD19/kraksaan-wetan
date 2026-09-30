@@ -49,25 +49,17 @@
             </div>
           </div>
 
-          <!-- Nilai-Nilai Budaya Kerja -->
-          <div class="bg-gradient-to-r from-emerald-950 to-emerald-900 text-white p-8 rounded-3xl shadow-sm reveal delay-150">
+          <!-- Nilai-Nilai Budaya Kerja (Dinamis DB) -->
+          <div v-if="profil.tata_nilai && profil.tata_nilai.length" class="bg-gradient-to-r from-emerald-950 to-emerald-900 text-white p-8 rounded-3xl shadow-sm reveal delay-150">
             <h3 class="text-lg font-bold text-amber-400 mb-4">Tata Nilai Pelayanan "BERAKHLAK & GUYUB"</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60">
-                <strong class="text-emerald-200 block mb-1">Berorientasi Pelayanan</strong>
-                Memahami dan memenuhi kebutuhan masyarakat secara ramah, cekatan, dan solutif.
-              </div>
-              <div class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60">
-                <strong class="text-emerald-200 block mb-1">Akuntabel & Transparan</strong>
-                Melaksanakan tugas dengan jujur, bertanggung jawab, cermat, disiplin, dan bebas pungli.
-              </div>
-              <div class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60">
-                <strong class="text-emerald-200 block mb-1">Harmonis & Gotong Royong</strong>
-                Saling peduli, menghargai keberagaman warga, dan menjaga kerukunan antarkomunitas.
-              </div>
-              <div class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60">
-                <strong class="text-emerald-200 block mb-1">Adaptif & Kolaboratif</strong>
-                Terus berinovasi dan memanfaatkan teknologi digital untuk percepatan layanan publik.
+              <div 
+                v-for="(val, vIdx) in profil.tata_nilai" 
+                :key="vIdx" 
+                class="p-3.5 rounded-xl bg-emerald-900/60 border border-emerald-700/60"
+              >
+                <strong class="text-emerald-200 block mb-1">{{ val.judul }}</strong>
+                {{ val.deskripsi }}
               </div>
             </div>
           </div>

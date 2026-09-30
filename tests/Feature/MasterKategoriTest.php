@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Berita;
+use App\Models\MasterKategori;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -122,5 +124,52 @@ class MasterKategoriTest extends TestCase
                     'halo_sae_link',
                 ],
             ]);
+    }
+
+    public function test_cannot_delete_category_if_in_use_by_other_tables(): void
+    {
+        $uniqueName = 'Kategori Unik '.Str::random(8);
+        // 1. Buat master kategori baru
+        $kategori = MasterKategori::create([
+            'modul' => 'berita',
+            'nama' => $uniqueName,
+            'warna' => 'emerald',
+            'urutan' => 99,
+            'is_aktif' => true,
+        ]);
+
+        // 2. Buat berita yang memakai kategori tersebut
+        $berita = Berita::create([
+            'slug' => 'berita-uji-kategori-'.Str::random(10),
+            'judul' => 'Judul Berita Uji Kategori',
+            'kategori' => $uniqueName,
+            'tanggal' => '28 September 2026',
+            'penulis' => 'Tim Humas',
+            'ringkasan' => 'Ringkasan uji coba',
+            'konten' => 'Konten lengkap uji coba',
+            'status' => 'published',
+        ]);
+
+        // 3. Coba hapus kategori -> harus ditolak dengan kode status 422
+        $deleteRes = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
+            ->deleteJson('/api/admin/kategori/'.$kategori->id);
+
+        $deleteRes->assertStatus(422)
+            ->assertJsonPath('status', 'error');
+
+        $this->assertStringContainsString('masih digunakan pada data: Berita', $deleteRes->json('message'));
+        $this->assertDatabaseHas('master_kategoris', ['id' => $kategori->id]);
+
+        // 4. Hapus berita yang mengikat kategori
+        $berita->delete();
+
+        // 5. Coba hapus lagi -> sekarang harus berhasil
+        $deleteResSuccess = $this->withHeader('Authorization', 'Bearer '.$this->superAdminToken)
+            ->deleteJson('/api/admin/kategori/'.$kategori->id);
+
+        $deleteResSuccess->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        $this->assertDatabaseMissing('master_kategoris', ['id' => $kategori->id]);
     }
 }

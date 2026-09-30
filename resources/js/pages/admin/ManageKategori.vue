@@ -380,6 +380,7 @@ function openModal(item = null) {
 }
 
 async function saveItem() {
+  if (saving.value) return;
   saving.value = true;
   try {
     let res;

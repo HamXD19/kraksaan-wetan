@@ -40,6 +40,191 @@
       </div>
     </section>
 
+    <!-- 2.5 Maklumat Pelayanan & Indeks Kepuasan Masyarakat (IKM) -->
+    <!-- 2.5 Maklumat Pelayanan & Indeks Kepuasan Masyarakat (IKM) -->
+    <section v-if="maklumat" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#022c22] via-[#064e3b] to-[#022c22] text-white p-6 sm:p-10 lg:p-12 shadow-2xl border-2 border-emerald-600/40 ring-1 ring-amber-400/20 reveal">
+        <!-- Ambient Glow & Watermark -->
+        <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -top-20 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <!-- Subtle Seal Watermark Background -->
+        <div class="absolute right-6 top-6 opacity-5 pointer-events-none hidden md:block">
+          <svg class="w-64 h-64 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center relative z-10">
+          <!-- Text Content -->
+          <div class="lg:col-span-8 space-y-5">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-900/90 border border-amber-400/50 text-amber-300 text-xs font-bold uppercase tracking-wider shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                Maklumat Pelayanan Publik
+              </span>
+              <span v-if="maklumat.nomor_sk" class="px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-xs text-emerald-200 text-[11px] sm:text-xs font-semibold border border-white/10 flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>SK: {{ maklumat.nomor_sk }}</span>
+              </span>
+            </div>
+
+            <div>
+              <h3 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight leading-tight drop-shadow-sm">
+                {{ maklumat.judul || 'Maklumat Pelayanan Kelurahan Kraksaan Wetan' }}
+              </h3>
+            </div>
+
+            <!-- Motto Pelayanan -->
+            <div v-if="maklumat.motto" class="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-amber-400/15 border border-amber-400/30 text-amber-200 text-xs sm:text-sm font-semibold shadow-inner">
+              <svg class="w-4 h-4 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <span>Motto: "{{ maklumat.motto }}"</span>
+            </div>
+
+            <!-- Pernyataan Ikrar Komitmen Pelayanan -->
+            <div class="relative bg-slate-950/40 border border-emerald-600/40 rounded-2xl p-5 sm:p-6 backdrop-blur-xs shadow-inner space-y-3">
+              <div class="flex items-start gap-3">
+                <span class="text-3xl sm:text-4xl text-amber-400/50 font-serif leading-none select-none">“</span>
+                <p class="text-xs sm:text-sm text-emerald-50 leading-relaxed font-normal whitespace-pre-line break-words flex-1">
+                  {{ maklumat.konten }}
+                </p>
+              </div>
+
+              <!-- 4 Pilar Nilai Pelayanan -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-4 border-t border-emerald-800/60 text-[11px]">
+                <div class="flex items-center gap-1.5 text-emerald-200 font-medium">
+                  <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                  <span>Bebas Pungli (Gratis)</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-emerald-200 font-medium">
+                  <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                  <span>Transparan & Jelas</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-emerald-200 font-medium">
+                  <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                  <span>Tepat & Pasti</span>
+                </div>
+                <div class="flex items-center gap-1.5 text-emerald-200 font-medium">
+                  <svg class="w-3.5 h-3.5 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                  <span>Sopan & Ramah</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons & SKM badge -->
+            <div class="pt-2 flex flex-wrap items-center gap-3">
+              <router-link
+                to="/pelayanan"
+                class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg hover:shadow-amber-400/20 active:scale-95"
+              >
+                <span>Lihat Standar SOP Pelayanan</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </router-link>
+
+              <router-link
+                to="/survei-skm"
+                class="px-5 py-2.5 rounded-xl bg-emerald-800/90 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 border border-emerald-500/60 shadow-xs active:scale-95"
+              >
+                <span v-if="skmLatest">IKM {{ skmLatest.skor_ikm }} ({{ skmLatest.predikat }})</span>
+                <span v-else>Survei Kepuasan (SKM)</span>
+                <svg class="w-4 h-4 text-amber-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </router-link>
+
+              <button
+                v-if="maklumat.gambar"
+                type="button"
+                @click="showMaklumatModal = true"
+                class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center gap-2 border border-white/15 cursor-pointer shadow-xs active:scale-95"
+              >
+                <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                <span>Buka Piagam HD</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Framed Certificate / Poster Column -->
+          <div class="lg:col-span-4 flex flex-col items-center justify-center">
+            <!-- Framed Poster with Full Unclipped Presentation -->
+            <div 
+              v-if="maklumat.gambar"
+              @click="showMaklumatModal = true"
+              class="group relative w-full max-w-[280px] sm:max-w-xs bg-slate-950/80 rounded-2xl p-2.5 border-2 border-amber-400/50 shadow-2xl hover:border-amber-300 transition-all duration-300 cursor-pointer transform hover:-translate-y-1.5"
+              title="Klik untuk memperbesar piagam maklumat"
+            >
+              <div class="w-full aspect-[3/4] sm:aspect-[4/5] bg-black/40 rounded-xl overflow-hidden flex items-center justify-center relative">
+                <img 
+                  :src="maklumat.gambar" 
+                  :alt="maklumat.judul" 
+                  class="w-full h-full object-contain rounded-lg group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <!-- Hover Overlay -->
+                <div class="absolute inset-0 bg-slate-950/65 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 text-white text-xs font-bold p-3 text-center backdrop-blur-2xs">
+                  <div class="w-10 h-10 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                  </div>
+                  <span>Perbesar Piagam HD</span>
+                </div>
+              </div>
+              <p class="text-[10px] text-center text-amber-200/80 mt-2 font-medium flex items-center justify-center gap-1">
+                <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <span>Klik untuk melihat piagam penuh</span>
+              </p>
+            </div>
+
+            <!-- Fallback Plakat Lambang jika belum unggah poster gambar -->
+            <div v-else class="w-full max-w-[280px] p-6 rounded-2xl border-2 border-amber-400/40 bg-gradient-to-b from-emerald-900/60 to-slate-950/80 text-center space-y-3.5 shadow-xl">
+              <div class="w-16 h-16 mx-auto rounded-full bg-amber-400/10 border-2 border-amber-400/60 flex items-center justify-center shadow-inner">
+                <svg class="w-8 h-8 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-amber-300 uppercase tracking-widest">Piagam Integritas</p>
+                <p class="text-[11px] text-emerald-200/90 mt-1 leading-relaxed">Komitmen resmi aparatur Kelurahan Kraksaan Wetan memberikan pelayanan prima, transparan, dan tanpa diskriminasi.</p>
+              </div>
+              <div class="pt-2 border-t border-white/10 text-[10px] text-amber-200/80">
+                Pemerintah Kelurahan Kraksaan Wetan
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal Preview Poster Maklumat HD -->
+    <div 
+      v-if="showMaklumatModal && maklumat?.gambar" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-sm animate-fade-in"
+      @click.self="showMaklumatModal = false"
+    >
+      <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col">
+        <div class="p-4 px-6 border-b border-slate-100 flex items-center justify-between bg-white z-10">
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-slate-900">{{ maklumat.judul }}</h3>
+            <p v-if="maklumat.nomor_sk" class="text-xs text-emerald-700 font-semibold">{{ maklumat.nomor_sk }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <a 
+              :href="maklumat.gambar" 
+              target="_blank" 
+              class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1"
+              title="Buka Gambar Asli"
+            >
+              <span>Ukuran Penuh</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            </a>
+            <button 
+              @click="showMaklumatModal = false" 
+              class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition cursor-pointer font-bold"
+              title="Tutup"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+        <div class="p-4 sm:p-6 overflow-y-auto flex items-center justify-center bg-slate-900/90 min-h-[50vh]">
+          <img :src="maklumat.gambar" :alt="maklumat.judul" class="max-w-full max-h-[78vh] object-contain rounded-xl shadow-2xl border border-white/10" />
+        </div>
+      </div>
+    </div>
+
     <!-- 3. Profil Singkat Kelurahan -->
     <section id="profil-kelurahan" class="bg-gradient-to-b from-white to-slate-100 py-16 border-y border-slate-200 scroll-mt-24">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -315,16 +500,21 @@ const quickServices = ref([]);
 const beritaList = ref([]);
 const pengumumanList = ref([]);
 const galeriList = ref([]);
+const maklumat = ref(null);
+const skmLatest = ref(null);
+const showMaklumatModal = ref(false);
 
 onMounted(async () => {
   try {
-    const [p, s, l, b, pg, g] = await Promise.all([
+    const [p, s, l, b, pg, g, mData, sData] = await Promise.all([
       KelurahanService.getProfil(),
       KelurahanService.getStatistik(),
       KelurahanService.getLayanan(),
       KelurahanService.getBerita(),
       KelurahanService.getPengumuman(),
-      KelurahanService.getGaleri()
+      KelurahanService.getGaleri(),
+      KelurahanService.getMaklumatPelayanan().catch(() => null),
+      KelurahanService.getSurveiSkm().catch(() => null)
     ]);
 
     profil.value = p;
@@ -333,6 +523,10 @@ onMounted(async () => {
     beritaList.value = b;
     pengumumanList.value = pg;
     galeriList.value = g;
+    maklumat.value = mData;
+    if (sData) {
+      skmLatest.value = sData.skm_terbaru || (sData.arsip && sData.arsip[0]) || null;
+    }
   } catch (err) {
     console.error('Gagal mengambil data beranda:', err);
   } finally {

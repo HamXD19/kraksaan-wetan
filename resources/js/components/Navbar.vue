@@ -152,6 +152,31 @@
                 <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Struktur Organisasi</router-link>
                 <router-link to="/pemerintahan" data-speech="Profil Lurah dan Perangkat" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Profil Lurah & Perangkat</router-link>
                 <router-link to="/informasi-publik" data-speech="Data Wilayah" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data Wilayah</router-link>
+
+                <!-- Sub-menu Tambahan dari Admin (Profil) -->
+                <template v-if="customMenus.profil && customMenus.profil.length">
+                  <template v-for="(sub, sIdx) in customMenus.profil" :key="'prof-sub-' + sIdx">
+                    <a 
+                      v-if="isExternalUrl(sub.url)" 
+                      :href="sub.url" 
+                      :target="sub.target || '_self'" 
+                      :rel="sub.target === '_blank' ? 'noopener noreferrer' : undefined"
+                      :data-speech="sub.label"
+                      class="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      <span>{{ sub.label }}</span>
+                      <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <router-link 
+                      v-else 
+                      :to="sub.url" 
+                      :data-speech="sub.label" 
+                      class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      {{ sub.label }}
+                    </router-link>
+                  </template>
+                </template>
               </div>
             </div>
           </li>
@@ -176,6 +201,31 @@
                 <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Perangkat Kelurahan</router-link>
                 <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Rukun Tetangga & RW (RT/RW)</router-link>
                 <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Lembaga Kemasyarakatan (LKK)</router-link>
+
+                <!-- Sub-menu Tambahan dari Admin (Pemerintahan) -->
+                <template v-if="customMenus.pemerintahan && customMenus.pemerintahan.length">
+                  <template v-for="(sub, sIdx) in customMenus.pemerintahan" :key="'pem-sub-' + sIdx">
+                    <a 
+                      v-if="isExternalUrl(sub.url)" 
+                      :href="sub.url" 
+                      :target="sub.target || '_self'" 
+                      :rel="sub.target === '_blank' ? 'noopener noreferrer' : undefined"
+                      :data-speech="sub.label"
+                      class="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      <span>{{ sub.label }}</span>
+                      <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <router-link 
+                      v-else 
+                      :to="sub.url" 
+                      :data-speech="sub.label" 
+                      class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      {{ sub.label }}
+                    </router-link>
+                  </template>
+                </template>
               </div>
             </div>
           </li>
@@ -185,7 +235,7 @@
             <button 
               data-speech="Informasi Publik"
               class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60 cursor-pointer"
-              :class="$route.path.startsWith('/informasi-publik') || $route.path.startsWith('/transparansi') || $route.path.startsWith('/pelayanan') || $route.path.startsWith('/agenda') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
+              :class="$route.path.startsWith('/informasi-publik') || $route.path.startsWith('/transparansi') || $route.path.startsWith('/pelayanan') || $route.path.startsWith('/survei-skm') || $route.path.startsWith('/agenda') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
               INFORMASI PUBLIK
               <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -198,8 +248,34 @@
                 <router-link to="/informasi-publik" data-speech="Data dan Statistik Kelurahan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Data & Statistik Kelurahan</router-link>
                 <router-link to="/agenda" data-speech="Agenda Kegiatan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Agenda Kegiatan</router-link>
                 <router-link to="/pelayanan" data-speech="Informasi Pelayanan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Informasi Pelayanan</router-link>
+                <router-link to="/survei-skm" data-speech="Survei Kepuasan Masyarakat" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Survei Kepuasan Masyarakat (SKM)</router-link>
                 <router-link to="/dokumen" data-speech="Dokumen" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Dokumen</router-link>
                 <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Transparansi & Akuntabilitas</router-link>
+
+                <!-- Sub-menu Tambahan dari Admin (Informasi Publik) -->
+                <template v-if="customMenus.informasi && customMenus.informasi.length">
+                  <template v-for="(sub, sIdx) in customMenus.informasi" :key="'info-sub-' + sIdx">
+                    <a 
+                      v-if="isExternalUrl(sub.url)" 
+                      :href="sub.url" 
+                      :target="sub.target || '_self'" 
+                      :rel="sub.target === '_blank' ? 'noopener noreferrer' : undefined"
+                      :data-speech="sub.label"
+                      class="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      <span>{{ sub.label }}</span>
+                      <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <router-link 
+                      v-else 
+                      :to="sub.url" 
+                      :data-speech="sub.label" 
+                      class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      {{ sub.label }}
+                    </router-link>
+                  </template>
+                </template>
               </div>
             </div>
           </li>
@@ -230,16 +306,54 @@
             </router-link>
           </li>
 
-          <!-- DOKUMEN -->
-          <li>
-            <router-link 
-              to="/dokumen" 
+          <!-- DOKUMEN (Dropdown) -->
+          <li class="relative group" @mouseenter="activeDropdown = 'dokumen'" @mouseleave="activeDropdown = null">
+            <button 
               data-speech="Dokumen"
-              class="px-3.5 py-3 inline-block transition-colors border-b-2 hover:bg-emerald-700/60"
+              class="px-3.5 py-3 inline-flex items-center gap-1.5 transition-colors border-b-2 group-hover:bg-emerald-700/60 cursor-pointer"
               :class="$route.path.startsWith('/dokumen') ? 'border-amber-400 text-amber-300 font-semibold bg-emerald-700/50' : 'border-transparent text-white/95 hover:text-white'"
             >
               DOKUMEN
-            </router-link>
+              <svg class="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div 
+              v-show="activeDropdown === 'dokumen'"
+              class="absolute left-0 top-full pt-1 w-64 transition-all z-50"
+            >
+              <div class="bg-white text-slate-800 shadow-2xl rounded-2xl border border-slate-200/80 p-1.5 space-y-0.5">
+                <router-link to="/dokumen" data-speech="Semua Dokumen" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Semua Dokumen</router-link>
+                <router-link to="/dokumen?kategori=Musrenbang" data-speech="Musrenbang" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Musrenbang</router-link>
+                <router-link to="/dokumen?kategori=UMKM" data-speech="UMKM" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">UMKM</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Renstra & Renja' } }" data-speech="Renstra dan Renja" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Renstra & Renja</router-link>
+                <router-link to="/dokumen?kategori=SK+Kelembagaan" data-speech="SK Kelembagaan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">SK Kelembagaan</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Regulasi & Kebijakan' } }" data-speech="Regulasi dan Kebijakan" class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors">Regulasi & Kebijakan</router-link>
+
+                <!-- Sub-menu Tambahan dari Admin (Dokumen) jika ada -->
+                <template v-if="customMenus.dokumen && customMenus.dokumen.length">
+                  <template v-for="(sub, sIdx) in customMenus.dokumen" :key="'dok-sub-' + sIdx">
+                    <a 
+                      v-if="isExternalUrl(sub.url)" 
+                      :href="sub.url" 
+                      :target="sub.target || '_self'" 
+                      :rel="sub.target === '_blank' ? 'noopener noreferrer' : undefined"
+                      :data-speech="sub.label"
+                      class="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      <span>{{ sub.label }}</span>
+                      <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                    <router-link 
+                      v-else 
+                      :to="sub.url" 
+                      :data-speech="sub.label" 
+                      class="block px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      {{ sub.label }}
+                    </router-link>
+                  </template>
+                </template>
+              </div>
+            </div>
           </li>
 
           <!-- KONTAK -->
@@ -348,6 +462,27 @@
                 <router-link to="/profil/sejarah" data-speech="Sejarah Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Sejarah Kelurahan</router-link>
                 <router-link to="/profil/visi-misi" data-speech="Visi dan Misi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Visi dan Misi</router-link>
                 <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Struktur Organisasi</router-link>
+                <!-- Custom Submenus Profil -->
+                <template v-for="(sub, sIdx) in customMenus.profil" :key="'mob-prof-' + sIdx">
+                  <a 
+                    v-if="isExternalUrl(sub.url)" 
+                    :href="sub.url" 
+                    :target="sub.target || '_self'" 
+                    @click="isMobileMenuOpen = false" 
+                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                  >
+                    <span>{{ sub.label }}</span>
+                    <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                  <router-link 
+                    v-else 
+                    :to="sub.url" 
+                    @click="isMobileMenuOpen = false" 
+                    class="block py-2 px-2 hover:text-emerald-700"
+                  >
+                    {{ sub.label }}
+                  </router-link>
+                </template>
               </div>
             </div>
 
@@ -366,6 +501,27 @@
                 <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Perangkat Kelurahan</router-link>
                 <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">RT / RW</router-link>
                 <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Lembaga Kemasyarakatan</router-link>
+                <!-- Custom Submenus Pemerintahan -->
+                <template v-for="(sub, sIdx) in customMenus.pemerintahan" :key="'mob-pem-' + sIdx">
+                  <a 
+                    v-if="isExternalUrl(sub.url)" 
+                    :href="sub.url" 
+                    :target="sub.target || '_self'" 
+                    @click="isMobileMenuOpen = false" 
+                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                  >
+                    <span>{{ sub.label }}</span>
+                    <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                  <router-link 
+                    v-else 
+                    :to="sub.url" 
+                    @click="isMobileMenuOpen = false" 
+                    class="block py-2 px-2 hover:text-emerald-700"
+                  >
+                    {{ sub.label }}
+                  </router-link>
+                </template>
               </div>
             </div>
 
@@ -383,8 +539,30 @@
                 <router-link to="/informasi-publik" data-speech="Data dan Statistik Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data & Statistik Kelurahan</router-link>
                 <router-link to="/agenda" data-speech="Agenda Kegiatan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Agenda Kegiatan</router-link>
                 <router-link to="/pelayanan" data-speech="Informasi Pelayanan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Informasi Pelayanan</router-link>
+                <router-link to="/survei-skm" data-speech="Survei Kepuasan Masyarakat" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Survei Kepuasan Masyarakat (SKM)</router-link>
                 <router-link to="/dokumen" data-speech="Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Dokumen</router-link>
                 <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Transparansi & Akuntabilitas</router-link>
+                <!-- Custom Submenus Informasi Publik -->
+                <template v-for="(sub, sIdx) in customMenus.informasi" :key="'mob-info-' + sIdx">
+                  <a 
+                    v-if="isExternalUrl(sub.url)" 
+                    :href="sub.url" 
+                    :target="sub.target || '_self'" 
+                    @click="isMobileMenuOpen = false" 
+                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                  >
+                    <span>{{ sub.label }}</span>
+                    <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                  <router-link 
+                    v-else 
+                    :to="sub.url" 
+                    @click="isMobileMenuOpen = false" 
+                    class="block py-2 px-2 hover:text-emerald-700"
+                  >
+                    {{ sub.label }}
+                  </router-link>
+                </template>
               </div>
             </div>
 
@@ -406,15 +584,48 @@
               Galeri Kegiatan
             </router-link>
 
-            <router-link 
-              to="/dokumen" 
-              data-speech="Dokumen"
-              @click="isMobileMenuOpen = false"
-              class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
-              :class="$route.path.startsWith('/dokumen') ? 'bg-emerald-50 text-emerald-800 font-bold' : ''"
-            >
-              Dokumen
-            </router-link>
+            <!-- Accordion: Dokumen -->
+            <div>
+              <button 
+                @click="toggleMobileSubmenu('dokumen')" 
+                data-speech="Menu Dokumen"
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
+                :class="$route.path.startsWith('/dokumen') ? 'text-emerald-800 font-bold bg-emerald-50/50' : ''"
+              >
+                <span>Dokumen</span>
+                <svg :class="{ 'rotate-180': mobileSubmenus.dokumen }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <div v-show="mobileSubmenus.dokumen" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
+                <router-link to="/dokumen" data-speech="Semua Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Semua Dokumen</router-link>
+                <router-link to="/dokumen?kategori=Musrenbang" data-speech="Musrenbang" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Musrenbang</router-link>
+                <router-link to="/dokumen?kategori=UMKM" data-speech="UMKM" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">UMKM</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Renstra & Renja' } }" data-speech="Renstra dan Renja" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Renstra & Renja</router-link>
+                <router-link to="/dokumen?kategori=SK+Kelembagaan" data-speech="SK Kelembagaan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">SK Kelembagaan</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Regulasi & Kebijakan' } }" data-speech="Regulasi dan Kebijakan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Regulasi & Kebijakan</router-link>
+
+                <!-- Custom Submenus Dokumen -->
+                <template v-for="(sub, sIdx) in (customMenus.dokumen || [])" :key="'mob-dok-' + sIdx">
+                  <a 
+                    v-if="isExternalUrl(sub.url)" 
+                    :href="sub.url" 
+                    :target="sub.target || '_self'" 
+                    @click="isMobileMenuOpen = false" 
+                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                  >
+                    <span>{{ sub.label }}</span>
+                    <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  </a>
+                  <router-link 
+                    v-else 
+                    :to="sub.url" 
+                    @click="isMobileMenuOpen = false" 
+                    class="block py-2 px-2 hover:text-emerald-700"
+                  >
+                    {{ sub.label }}
+                  </router-link>
+                </template>
+              </div>
+            </div>
 
             <router-link 
               to="/kontak" 
@@ -468,7 +679,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { AdminService, KelurahanService } from '../services/api';
 import { isSoundEnabled, toggleSound } from '../utils/sound';
@@ -483,8 +694,23 @@ const mobileSubmenus = ref({
   profil: false,
   pemerintahan: false,
   informasi: false,
+  dokumen: false,
   galeri: false
 });
+
+const customMenus = computed(() => {
+  return profil.value?.custom_nav_menus || {
+    profil: [],
+    pemerintahan: [],
+    informasi: [],
+    dokumen: []
+  };
+});
+
+const isExternalUrl = (url) => {
+  if (!url) return false;
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//');
+};
 
 const checkAuth = () => {
   isLoggedIn.value = AdminService.isAuthenticated();

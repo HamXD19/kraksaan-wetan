@@ -25,3 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
     })->create();
+
+if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('VERCEL') || env('APP_STORAGE')) {
+    $storage = env('APP_STORAGE', '/tmp/storage');
+    $app->useStoragePath($storage);
+}
+
+return $app;

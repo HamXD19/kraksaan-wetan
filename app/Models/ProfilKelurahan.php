@@ -15,5 +15,10 @@ class ProfilKelurahan extends Model
 
     protected $casts = [
         'misi' => 'array',
+        'batas_wilayah' => 'array',
+        'potensi_unggulan' => 'array',
+        'tata_nilai' => 'array',
+        'sejarah_timeline' => 'array',
+        'custom_nav_menus' => 'array',
     ];
 }

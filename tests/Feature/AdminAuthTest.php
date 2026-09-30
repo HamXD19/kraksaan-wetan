@@ -420,4 +420,61 @@ class AdminAuthTest extends TestCase
         $delete->assertStatus(200)
             ->assertJsonPath('status', 'success');
     }
+
+    public function test_admin_can_update_profil_with_dynamic_fields(): void
+    {
+        $this->getOrCreateAdmin();
+
+        $login = $this->postJson('/api/admin/login', [
+            'email' => 'admin@kraksaanwetan.go.id',
+            'password' => 'password123',
+        ]);
+        $token = $login->json('data.token');
+
+        $updatePayload = [
+            'nama' => 'Kelurahan Kraksaan Wetan',
+            'alamat' => 'Jl. Dr. Soetomo No. 12',
+            'deskripsi' => 'Kelurahan maju dan sejahtera',
+            'visi' => 'Visi Baru Kraksaan Wetan',
+            'batas_wilayah' => [
+                'utara' => 'Batas Utara Baru',
+                'selatan' => 'Batas Selatan Baru',
+                'timur' => 'Batas Timur Baru',
+                'barat' => 'Batas Barat Baru',
+            ],
+            'potensi_unggulan' => [
+                ['judul' => 'Sentra Ikan Asap', 'deskripsi' => 'Pengolahan ikan asap khas Kraksaan'],
+            ],
+            'tata_nilai' => [
+                ['judul' => 'Amanah', 'deskripsi' => 'Melayani dengan penuh amanah'],
+            ],
+            'sejarah_timeline' => [
+                ['tahun' => '2026', 'judul' => 'Era Digitalisasi', 'deskripsi' => 'Penerapan portal terintegrasi'],
+            ],
+            'custom_nav_menus' => [
+                'profil' => [
+                    ['label' => 'Prestasi Warga', 'url' => '/profil/prestasi', 'target' => '_self'],
+                ],
+                'pemerintahan' => [
+                    ['label' => 'Perda & Kebijakan', 'url' => 'https://jdih.probolinggokab.go.id', 'target' => '_blank'],
+                ],
+                'informasi' => [
+                    ['label' => 'Peta Digital', 'url' => '/informasi-publik/peta', 'target' => '_self'],
+                ],
+            ],
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->putJson('/api/admin/profil', $updatePayload);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.batas_wilayah.utara', 'Batas Utara Baru')
+            ->assertJsonPath('data.potensi_unggulan.0.judul', 'Sentra Ikan Asap')
+            ->assertJsonPath('data.tata_nilai.0.judul', 'Amanah')
+            ->assertJsonPath('data.sejarah_timeline.0.tahun', '2026')
+            ->assertJsonPath('data.custom_nav_menus.profil.0.label', 'Prestasi Warga')
+            ->assertJsonPath('data.custom_nav_menus.pemerintahan.0.label', 'Perda & Kebijakan')
+            ->assertJsonPath('data.custom_nav_menus.informasi.0.label', 'Peta Digital');
+    }
 }

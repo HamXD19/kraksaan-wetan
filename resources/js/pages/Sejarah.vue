@@ -41,22 +41,28 @@
               </p>
             </div>
 
-            <h3 class="text-lg font-bold text-slate-900 pt-4">Tonggak Perkembangan Waktu</h3>
-            <div class="space-y-4 pl-4 border-l-2 border-emerald-600 reveal delay-150">
-              <div class="relative pl-4">
-                <span class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-600 border-2 border-white"></span>
-                <span class="text-xs font-bold text-emerald-700">Era Hindia Belanda & Pra-Kemerdekaan</span>
-                <p class="text-xs text-slate-600 mt-1">Berkembang sebagai sentra niaga masyarakat agraris dan pesisir di sekitar stasiun dan jalur pos Daendels.</p>
-              </div>
-              <div class="relative pl-4">
-                <span class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-emerald-600 border-2 border-white"></span>
-                <span class="text-xs font-bold text-emerald-700">Peralihan Menjadi Kelurahan Definitif</span>
-                <p class="text-xs text-slate-600 mt-1">Status tata kelola pemerintahan bertransformasi menjadi kelurahan dengan penataan administrasi RT/RW modern.</p>
-              </div>
-              <div class="relative pl-4">
-                <span class="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-amber-500 border-2 border-white"></span>
-                <span class="text-xs font-bold text-amber-700">Tahun 2010 - Sekarang: Ibu Kota Kabupaten</span>
-                <p class="text-xs text-slate-600 mt-1">Pusat pemekaran infrastruktur perkotaan, digitalisasi pelayanan, dan penguatan UMKM warga.</p>
+            <!-- Tonggak Perkembangan Waktu (Dinamis DB) -->
+            <div v-if="profil.sejarah_timeline && profil.sejarah_timeline.length">
+              <h3 class="text-lg font-bold text-slate-900 pt-4 mb-4">Tonggak Perkembangan Waktu</h3>
+              <div class="space-y-4 pl-4 border-l-2 border-emerald-600 reveal delay-150">
+                <div 
+                  v-for="(tl, tIdx) in profil.sejarah_timeline" 
+                  :key="tIdx" 
+                  class="relative pl-4"
+                >
+                  <span 
+                    class="absolute -left-[21px] top-1 w-3 h-3 rounded-full border-2 border-white"
+                    :class="tIdx === profil.sejarah_timeline.length - 1 ? 'bg-amber-500' : 'bg-emerald-600'"
+                  ></span>
+                  <span 
+                    class="text-xs font-bold block"
+                    :class="tIdx === profil.sejarah_timeline.length - 1 ? 'text-amber-700' : 'text-emerald-700'"
+                  >
+                    {{ tl.tahun }}
+                  </span>
+                  <p v-if="tl.judul" class="text-xs font-semibold text-slate-800 mt-0.5">{{ tl.judul }}</p>
+                  <p class="text-xs text-slate-600 mt-1">{{ tl.deskripsi }}</p>
+                </div>
               </div>
             </div>
           </div>

@@ -21,127 +21,6 @@
         </h3>
 
         <form @submit.prevent="saveProfil" class="space-y-5 text-xs sm:text-sm">
-          <!-- Logo Daerah / Kelurahan -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-              <div>
-                <label class="block font-bold text-slate-900 text-sm">Logo Daerah / Kelurahan</label>
-                <p class="text-[11px] text-slate-500">Logo ini ditampilkan di seluruh portal (Navbar utama, Footer, dan Panel Admin).</p>
-              </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-md bg-slate-200/70 font-semibold text-slate-700 self-start sm:self-auto">
-                {{ profilForm.logo ? 'Kustom Terpasang' : 'Logo Bawaan Aktif' }}
-              </span>
-            </div>
-
-            <div class="flex flex-col sm:flex-row items-center gap-4">
-              <!-- Logo Preview Box -->
-              <div class="w-20 h-24 sm:w-24 sm:h-28 rounded-xl border border-slate-200 bg-white p-2 flex items-center justify-center flex-shrink-0 shadow-xs">
-                <img v-if="profilForm.logo" :src="profilForm.logo" alt="Logo Kelurahan" class="w-full h-full object-contain" />
-                <div v-else class="w-full h-full flex flex-col items-center justify-center text-center">
-                  <svg viewBox="0 0 80 96" class="w-12 h-14" fill="none">
-                    <path d="M40 2L76 18V50C76 72 40 94 40 94C40 94 4 72 4 50V18L40 2Z" fill="#047857" stroke="#f59e0b" stroke-width="3"/>
-                    <path d="M22 56L40 32L58 56H22Z" fill="#f8fafc"/>
-                    <circle cx="40" cy="26" r="5" fill="#f59e0b"/>
-                  </svg>
-                  <span class="text-[9px] font-semibold text-slate-400 mt-1">Default</span>
-                </div>
-              </div>
-
-              <!-- Upload Controls -->
-              <div class="flex-1 w-full space-y-2">
-                <div class="flex flex-col sm:flex-row gap-2">
-                  <input 
-                    type="text" 
-                    v-model="profilForm.logo" 
-                    placeholder="Masukkan URL Logo atau pilih Unggah File..." 
-                    class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
-                  />
-                  <label class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl cursor-pointer text-center text-xs flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap">
-                    <span v-if="uploadingLogo">Mengunggah...</span>
-                    <span v-else class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                      Pilih & Unggah Logo
-                    </span>
-                    <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleLogoUpload" :disabled="uploadingLogo" />
-                  </label>
-                  <button 
-                    v-if="profilForm.logo" 
-                    type="button" 
-                    @click="profilForm.logo = ''" 
-                    class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-xl text-xs transition whitespace-nowrap"
-                  >
-                    Reset Bawaan
-                  </button>
-                </div>
-                <p class="text-[11px] text-slate-500">Format yang didukung: PNG transparan, SVG, atau JPG/WebP (Maks. 10MB).</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pengaturan Foto Latar Hero Banner Beranda -->
-          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-                  <span>Foto Latar Hero Banner Beranda</span>
-                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Dinamis</span>
-                </h4>
-                <p class="text-xs text-slate-500 mt-0.5">Unggah foto latar khusus atau masukkan URL gambar untuk tampilan hero banner di halaman utama website.</p>
-              </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-md bg-slate-200/70 font-semibold text-slate-700 self-start sm:self-auto">
-                {{ profilForm.hero_image ? 'Foto Kustom Terpasang' : 'Foto Bawaan (Gunung Bromo)' }}
-              </span>
-            </div>
-
-            <!-- Banner Preview Box -->
-            <div class="relative w-full h-36 sm:h-48 rounded-2xl overflow-hidden border border-slate-200 bg-emerald-950 shadow-inner group">
-              <img 
-                :src="profilForm.hero_image || '/images/hero-bromo-vector.jpg'" 
-                alt="Pratinjau Hero Banner" 
-                class="w-full h-full object-cover object-[center_35%] transition-transform duration-300 group-hover:scale-105"
-              />
-              <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-transparent to-black/20"></div>
-              <div class="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white text-xs">
-                <span class="font-bold drop-shadow-sm flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  Pratinjau Tampilan Hero Banner
-                </span>
-                <span class="text-[10px] text-emerald-200 bg-emerald-900/80 px-2 py-0.5 rounded-md backdrop-blur-xs">
-                  {{ profilForm.hero_image ? 'Kustom' : 'Default' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Input Controls & Upload -->
-            <div class="space-y-2">
-              <div class="flex flex-col sm:flex-row gap-2">
-                <input 
-                  type="text" 
-                  v-model="profilForm.hero_image" 
-                  placeholder="Masukkan URL Foto Banner atau pilih Unggah Foto..." 
-                  class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none bg-white text-xs"
-                />
-                <label class="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl cursor-pointer text-center text-xs flex items-center justify-center gap-1.5 shadow-xs transition whitespace-nowrap">
-                  <span v-if="uploadingHero">Mengunggah...</span>
-                  <span v-else class="flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                    Pilih & Unggah Foto Hero
-                  </span>
-                  <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp, image/svg+xml" class="hidden" @change="handleHeroUpload" :disabled="uploadingHero" />
-                </label>
-                <button 
-                  v-if="profilForm.hero_image" 
-                  type="button" 
-                  @click="profilForm.hero_image = ''" 
-                  class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-xl text-xs transition whitespace-nowrap"
-                >
-                  Reset Bawaan
-                </button>
-              </div>
-              <p class="text-[11px] text-slate-500">Format yang didukung: JPG, PNG, WebP, SVG (Disarankan rasio lanskap 16:9 resolusi tinggi, Maks. 10MB).</p>
-            </div>
-          </div>
-
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
             <div>
@@ -214,9 +93,197 @@
             <textarea rows="2" v-model="profilForm.visi" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"></textarea>
           </div>
 
-          <div>
-            <label class="block font-bold text-slate-700 mb-1">Misi Pembangunan (1 baris per poin misi)</label>
-            <textarea rows="4" v-model="misiText" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none"></textarea>
+          <!-- Batas Wilayah Administratif -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <span>Batas-Batas Wilayah Administratif</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Dinamis</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Tentukan batas geografis kelurahan di empat penjuru mata angin.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Batas Utara</label>
+                <input type="text" v-model="profilForm.batas_wilayah.utara" placeholder="Contoh: Desa Kalibuntu & Selat Madura" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Batas Selatan</label>
+                <input type="text" v-model="profilForm.batas_wilayah.selatan" placeholder="Contoh: Desa Sumberlele & Kecamatan Besuk" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Batas Timur</label>
+                <input type="text" v-model="profilForm.batas_wilayah.timur" placeholder="Contoh: Desa Bulu & Desa Rondokuning" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1">Batas Barat</label>
+                <input type="text" v-model="profilForm.batas_wilayah.barat" placeholder="Contoh: Sungai Kraksaan & Kelurahan Patokan" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-emerald-600 outline-none text-xs sm:text-sm" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Potensi Unggulan Kelurahan -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <span>Potensi Unggulan Kelurahan</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Dinamis</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola kartu sorotan potensi sektor unggulan kelurahan di halaman Tentang Kami.</p>
+              </div>
+              <button 
+                type="button" 
+                @click="addPotensi" 
+                class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs self-start sm:self-auto transition shadow-xs"
+              >
+                + Tambah Potensi
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              <div 
+                v-for="(pot, pIdx) in profilForm.potensi_unggulan" 
+                :key="pIdx" 
+                class="p-4 bg-white rounded-xl border border-slate-200 space-y-2 relative shadow-xs"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-emerald-800">Potensi #{{ pIdx + 1 }}</span>
+                  <button 
+                    type="button" 
+                    @click="removePotensi(pIdx)" 
+                    class="text-rose-600 hover:text-rose-800 text-xs font-semibold"
+                  >
+                    Hapus
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  v-model="pot.judul" 
+                  placeholder="Judul Potensi (Contoh: UMKM Kuliner & Niaga)" 
+                  class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs font-bold" 
+                />
+                <textarea 
+                  rows="2" 
+                  v-model="pot.deskripsi" 
+                  placeholder="Keterangan singkat potensi ini..." 
+                  class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tonggak Linimasa Sejarah (Timeline) -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <span>Tonggak Perkembangan Sejarah (Timeline)</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Dinamis</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola butir-butir linimasa sejarah perkembangan kelurahan di halaman Sejarah.</p>
+              </div>
+              <button 
+                type="button" 
+                @click="addTimeline" 
+                class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs self-start sm:self-auto transition shadow-xs"
+              >
+                + Tambah Linimasa
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              <div 
+                v-for="(tl, tIdx) in profilForm.sejarah_timeline" 
+                :key="tIdx" 
+                class="p-4 bg-white rounded-xl border border-slate-200 space-y-2 relative shadow-xs"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-emerald-800">Periode #{{ tIdx + 1 }}</span>
+                  <button 
+                    type="button" 
+                    @click="removeTimeline(tIdx)" 
+                    class="text-rose-600 hover:text-rose-800 text-xs font-semibold"
+                  >
+                    Hapus
+                  </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input 
+                    type="text" 
+                    v-model="tl.tahun" 
+                    placeholder="Era / Tahun (Contoh: Tahun 2010 - Sekarang)" 
+                    class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs font-bold" 
+                  />
+                  <input 
+                    type="text" 
+                    v-model="tl.judul" 
+                    placeholder="Sub-judul (Contoh: Ibu Kota Kabupaten)" 
+                    class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs" 
+                  />
+                </div>
+                <textarea 
+                  rows="2" 
+                  v-model="tl.deskripsi" 
+                  placeholder="Keterangan capaian atau peristiwa bersejarah..." 
+                  class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tata Nilai Pelayanan Budaya Kerja -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm flex items-center gap-2">
+                  <span>Tata Nilai Pelayanan (Budaya Kerja ASN)</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">Dinamis</span>
+                </h4>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola kartu nilai-nilai pelayanan di halaman Visi & Misi.</p>
+              </div>
+              <button 
+                type="button" 
+                @click="addTataNilai" 
+                class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs self-start sm:self-auto transition shadow-xs"
+              >
+                + Tambah Tata Nilai
+              </button>
+            </div>
+
+            <div class="space-y-3">
+              <div 
+                v-for="(val, vIdx) in profilForm.tata_nilai" 
+                :key="vIdx" 
+                class="p-4 bg-white rounded-xl border border-slate-200 space-y-2 relative shadow-xs"
+              >
+                <div class="flex items-center justify-between gap-2">
+                  <span class="text-xs font-bold text-emerald-800">Nilai #{{ vIdx + 1 }}</span>
+                  <button 
+                    type="button" 
+                    @click="removeTataNilai(vIdx)" 
+                    class="text-rose-600 hover:text-rose-800 text-xs font-semibold"
+                  >
+                    Hapus
+                  </button>
+                </div>
+                <input 
+                  type="text" 
+                  v-model="val.judul" 
+                  placeholder="Nama Nilai (Contoh: Berorientasi Pelayanan)" 
+                  class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs font-bold" 
+                />
+                <textarea 
+                  rows="2" 
+                  v-model="val.deskripsi" 
+                  placeholder="Penerapan dan makna nilai pelayanan..." 
+                  class="w-full px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none text-xs"
+                ></textarea>
+              </div>
+            </div>
           </div>
 
           <!-- Bagian Pimpinan Lurah -->
@@ -364,6 +431,7 @@
           <table class="w-full text-left text-xs">
             <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
               <tr>
+                <th class="py-3 px-4">Foto</th>
                 <th class="py-3 px-4">Nama</th>
                 <th class="py-3 px-4">Jabatan</th>
                 <th class="py-3 px-4">Tugas / Bidang</th>
@@ -372,12 +440,18 @@
             </thead>
             <tbody class="divide-y divide-slate-100 text-slate-600">
               <tr v-for="p in perangkatList" :key="p.id" class="hover:bg-slate-50">
+                <td class="py-2.5 px-4">
+                  <div class="w-9 h-11 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shrink-0">
+                    <img v-if="p.foto" :src="p.foto" :alt="p.nama" class="w-full h-full object-cover object-top" />
+                    <span v-else class="text-xs font-bold text-slate-400">{{ p.nama.charAt(0) }}</span>
+                  </div>
+                </td>
                 <td class="py-3 px-4 font-bold text-slate-900">{{ p.nama }}</td>
                 <td class="py-3 px-4 text-emerald-700 font-semibold">{{ p.jabatan }}</td>
                 <td class="py-3 px-4">{{ p.bidang || '-' }}</td>
                 <td class="py-3 px-4 text-right whitespace-nowrap">
-                  <button @click="openPerangkatModal(p)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-semibold mr-1">Edit</button>
-                  <button @click="deletePerangkat(p.id)" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold">Hapus</button>
+                  <button @click="openPerangkatModal(p)" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 font-semibold mr-1 cursor-pointer">Edit</button>
+                  <button @click="deletePerangkat(p.id)" class="px-2.5 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold cursor-pointer">Hapus</button>
                 </td>
               </tr>
             </tbody>
@@ -413,9 +487,46 @@
             <label class="block font-bold text-slate-700 mb-1">Tugas / Bidang</label>
             <input type="text" v-model="perangkatForm.bidang" placeholder="Trantibum & Kependudukan" class="w-full px-3 py-2 rounded-xl border border-slate-200" />
           </div>
+
+          <!-- Foto Aparatur -->
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Foto Aparatur (Opsional)</label>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-14 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
+                <img v-if="perangkatForm.foto" :src="perangkatForm.foto" alt="Preview" class="w-full h-full object-cover object-top" />
+                <span v-else class="text-slate-400 text-xs">Foto</span>
+              </div>
+              <div class="flex-1 space-y-1.5">
+                <div class="flex gap-2">
+                  <input 
+                    type="text" 
+                    v-model="perangkatForm.foto" 
+                    placeholder="URL foto atau pilih file..." 
+                    class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 text-xs" 
+                  />
+                  <label class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl cursor-pointer text-xs flex items-center justify-center gap-1 shadow-2xs transition whitespace-nowrap">
+                    <span v-if="uploadingPerangkatFoto">...</span>
+                    <span v-else>Upload</span>
+                    <input type="file" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" @change="handlePerangkatFotoUpload" :disabled="uploadingPerangkatFoto" />
+                  </label>
+                  <button 
+                    v-if="perangkatForm.foto" 
+                    type="button" 
+                    @click="perangkatForm.foto = ''" 
+                    class="px-2.5 py-1.5 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded-xl text-xs font-semibold cursor-pointer"
+                    title="Hapus Foto"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <p class="text-[10px] text-slate-400">Format: JPG, PNG, atau WebP (Maks. 10MB)</p>
+              </div>
+            </div>
+          </div>
+
           <div class="flex justify-end gap-2 pt-3">
-            <button type="button" @click="showPerangkatModal = false" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold">Batal</button>
-            <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-700 text-white font-bold">Simpan</button>
+            <button type="button" @click="showPerangkatModal = false" class="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 font-semibold cursor-pointer">Batal</button>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-700 text-white font-bold cursor-pointer">Simpan</button>
           </div>
         </form>
       </div>
@@ -436,6 +547,7 @@ const saving = ref(false);
 const uploadingLogo = ref(false);
 const uploadingHero = ref(false);
 const uploadingLurahFoto = ref(false);
+const uploadingPerangkatFoto = ref(false);
 const successMsg = ref('');
 const misiText = ref('');
 const perangkatList = ref([]);
@@ -549,6 +661,37 @@ const handleLurahFotoUpload = async (event) => {
   }
 };
 
+const handlePerangkatFotoUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!isValidImageFile(file)) {
+    toast.warning('Format file tidak valid! Harap pilih file gambar (JPG, PNG, WebP).', 'Format Tidak Didukung');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    toast.warning('Ukuran file foto aparatur terlalu besar! Maksimal 10MB.', 'File Terlalu Besar');
+    event.target.value = '';
+    return;
+  }
+
+  uploadingPerangkatFoto.value = true;
+  try {
+    const res = await AdminService.uploadFile(file, 'image');
+    if (res.data?.url) {
+      perangkatForm.foto = res.data.url;
+      toast.success('Foto aparatur berhasil diunggah!');
+    }
+  } catch (err) {
+    const errText = err.response?.data?.message || err.message;
+    toast.error('Gagal mengunggah foto aparatur: ' + errText, 'Upload Gagal');
+  } finally {
+    uploadingPerangkatFoto.value = false;
+    event.target.value = '';
+  }
+};
+
 
 const profilForm = reactive({
   nama: '',
@@ -567,6 +710,20 @@ const profilForm = reactive({
   sejarah: '',
   visi: '',
   misi: [],
+  batas_wilayah: {
+    utara: '',
+    selatan: '',
+    timur: '',
+    barat: ''
+  },
+  potensi_unggulan: [],
+  tata_nilai: [],
+  sejarah_timeline: [],
+  custom_nav_menus: {
+    profil: [],
+    pemerintahan: [],
+    informasi: []
+  },
   lurah_nama: '',
   lurah_nip: '',
   lurah_jabatan: 'Lurah Kraksaan Wetan',
@@ -580,7 +737,8 @@ const profilForm = reactive({
 const perangkatForm = reactive({
   nama: '',
   jabatan: '',
-  bidang: ''
+  bidang: '',
+  foto: ''
 });
 
 const loadData = async () => {
@@ -602,6 +760,36 @@ const loadData = async () => {
     profilForm.deskripsi = data.deskripsi || '';
     profilForm.sejarah = data.sejarah || '';
     profilForm.visi = data.visi || '';
+    profilForm.batas_wilayah = data.batas_wilayah || {
+      utara: 'Desa Kalibuntu & Selat Madura',
+      selatan: 'Desa Sumberlele & Kecamatan Besuk',
+      timur: 'Desa Bulu & Desa Rondokuning',
+      barat: 'Sungai Kraksaan & Kelurahan Patokan'
+    };
+    profilForm.potensi_unggulan = data.potensi_unggulan ? JSON.parse(JSON.stringify(data.potensi_unggulan)) : [
+      { judul: 'UMKM Kuliner & Niaga', deskripsi: 'Pusat jajanan tradisional, olahan hasil laut Kraksaan, dan sentra pedagang pasar lokal.' },
+      { judul: 'Kawasan Pemukiman', deskripsi: 'Lingkungan RT/RW tertib dengan semangat gotong royong dan posyandu integrasi aktif.' },
+      { judul: 'Pelayanan Digital', deskripsi: 'Pemanfaatan sistem digital kependudukan dan transparansi informasi warga berbasis website.' }
+    ];
+    profilForm.tata_nilai = data.tata_nilai ? JSON.parse(JSON.stringify(data.tata_nilai)) : [
+      { judul: 'Berorientasi Pelayanan', deskripsi: 'Memahami dan memenuhi kebutuhan masyarakat secara ramah, cekatan, dan solutif.' },
+      { judul: 'Akuntabel & Transparan', deskripsi: 'Melaksanakan tugas dengan jujur, bertanggung jawab, cermat, disiplin, dan bebas pungli.' },
+      { judul: 'Harmonis & Gotong Royong', deskripsi: 'Saling peduli, menghargai keberagaman warga, dan menjaga kerukunan antarkomunitas.' },
+      { judul: 'Adaptif & Kolaboratif', deskripsi: 'Terus berinovasi dan memanfaatkan teknologi digital untuk percepatan layanan publik.' }
+    ];
+    profilForm.sejarah_timeline = data.sejarah_timeline ? JSON.parse(JSON.stringify(data.sejarah_timeline)) : [
+      { tahun: 'Era Hindia Belanda & Pra-Kemerdekaan', judul: 'Sentra Niaga Pesisir', deskripsi: 'Berkembang sebagai sentra niaga masyarakat agraris dan pesisir di sekitar stasiun dan jalur pos Daendels.' },
+      { tahun: 'Peralihan Menjadi Kelurahan Definitif', judul: 'Penataan Administrasi', deskripsi: 'Status tata kelola pemerintahan bertransformasi menjadi kelurahan dengan penataan administrasi RT/RW modern.' },
+      { tahun: 'Tahun 2010 - Sekarang: Ibu Kota Kabupaten', judul: 'Pusat Ibu Kota Baru', deskripsi: 'Pusat pemekaran infrastruktur perkotaan, digitalisasi pelayanan, dan penguatan UMKM warga.' }
+    ];
+    profilForm.custom_nav_menus = data.custom_nav_menus ? JSON.parse(JSON.stringify(data.custom_nav_menus)) : {
+      profil: [],
+      pemerintahan: [],
+      informasi: []
+    };
+    if (!profilForm.custom_nav_menus.profil) profilForm.custom_nav_menus.profil = [];
+    if (!profilForm.custom_nav_menus.pemerintahan) profilForm.custom_nav_menus.pemerintahan = [];
+    if (!profilForm.custom_nav_menus.informasi) profilForm.custom_nav_menus.informasi = [];
     profilForm.link_span_lapor = data.link_span_lapor || 'https://www.lapor.go.id/';
     profilForm.halo_sae_wa = data.halo_sae_wa || '082131001001';
     profilForm.halo_sae_link = data.halo_sae_link || 'https://halosae.probolinggokab.go.id';
@@ -619,6 +807,33 @@ const loadData = async () => {
   }
 };
 
+
+const addPotensi = () => {
+  if (!profilForm.potensi_unggulan) profilForm.potensi_unggulan = [];
+  profilForm.potensi_unggulan.push({ judul: '', deskripsi: '' });
+};
+
+const removePotensi = (index) => {
+  profilForm.potensi_unggulan.splice(index, 1);
+};
+
+const addTimeline = () => {
+  if (!profilForm.sejarah_timeline) profilForm.sejarah_timeline = [];
+  profilForm.sejarah_timeline.push({ tahun: '', judul: '', deskripsi: '' });
+};
+
+const removeTimeline = (index) => {
+  profilForm.sejarah_timeline.splice(index, 1);
+};
+
+const addTataNilai = () => {
+  if (!profilForm.tata_nilai) profilForm.tata_nilai = [];
+  profilForm.tata_nilai.push({ judul: '', deskripsi: '' });
+};
+
+const removeTataNilai = (index) => {
+  profilForm.tata_nilai.splice(index, 1);
+};
 
 const saveProfil = async () => {
   saving.value = true;
@@ -643,11 +858,13 @@ const openPerangkatModal = (item = null) => {
     perangkatForm.nama = item.nama;
     perangkatForm.jabatan = item.jabatan;
     perangkatForm.bidang = item.bidang || '';
+    perangkatForm.foto = item.foto || '';
   } else {
     perangkatEditId.value = null;
     perangkatForm.nama = '';
     perangkatForm.jabatan = '';
     perangkatForm.bidang = '';
+    perangkatForm.foto = '';
   }
   showPerangkatModal.value = true;
 };

@@ -56,3 +56,19 @@ npm run dev
 ```
 
 Aplikasi sekarang dapat diakses melalui browser di alamat yang tertera pada terminal Anda.
+
+---
+
+## 🌐 Panduan Hosting di cPanel
+
+Untuk panduan lengkap cara melakukan deployment dan hosting aplikasi ini ke web hosting berbasis **cPanel**, silakan baca dokumen panduan khusus:
+
+👉 **[PANDUAN LENGKAP HOSTING DI CPANEL (README_CPANEL.md)](README_CPANEL.md)**
+
+Panduan tersebut mencakup:
+* Kebutuhan versi PHP dan ekstensi wajib cPanel.
+* Struktur pemisahan folder core & public demi keamanan maksimal.
+* Pengaturan file `.env` untuk production.
+* Cara menghubungkan storage (symlink) untuk berkas dan dokumen.
+* Troubleshooting error 500, aset Vite CSS/JS, dan routing SPA.
+

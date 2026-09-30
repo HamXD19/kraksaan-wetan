@@ -4,20 +4,26 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AgendaKegiatan;
+use App\Models\AnggaranRealisasi;
 use App\Models\Berita;
 use App\Models\Dokumen;
 use App\Models\Galeri;
+use App\Models\HalamanKustom;
 use App\Models\Layanan;
 use App\Models\Lembaga;
 use App\Models\Lingkungan;
+use App\Models\MaklumatPelayanan;
 use App\Models\MasterKategori;
 use App\Models\Pengumuman;
 use App\Models\PerangkatKelurahan;
 use App\Models\ProfilKelurahan;
 use App\Models\Statistik;
+use App\Models\SurveiSkm;
 use App\Models\TransparansiAnggaran;
+use App\Services\FileStorageHelper;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -36,6 +42,36 @@ class KelurahanController extends Controller
             ], 404);
         }
 
+        $customNavMenus = $profil->custom_nav_menus ?? [
+            'profil' => [],
+            'pemerintahan' => [],
+            'informasi' => [],
+        ];
+
+        // Otomatis sertakan HalamanKustom aktif ke navbar jika belum terdaftar
+        $halamanAktif = HalamanKustom::where('aktif', true)->orderBy('urutan')->get();
+        foreach ($halamanAktif as $h) {
+            $cat = in_array($h->kategori, ['profil', 'pemerintahan', 'informasi']) ? $h->kategori : 'profil';
+            if (! isset($customNavMenus[$cat])) {
+                $customNavMenus[$cat] = [];
+            }
+            $targetUrl = "/halaman/{$h->slug}";
+            $exists = false;
+            foreach ($customNavMenus[$cat] as $menuItem) {
+                if (($menuItem['url'] ?? '') === $targetUrl || ($menuItem['label'] ?? '') === $h->judul) {
+                    $exists = true;
+                    break;
+                }
+            }
+            if (! $exists) {
+                $customNavMenus[$cat][] = [
+                    'label' => $h->judul,
+                    'url' => $targetUrl,
+                    'target' => '_self',
+                ];
+            }
+        }
+
         return response()->json([
             'status' => 'success',
             'data' => [
@@ -50,14 +86,70 @@ class KelurahanController extends Controller
                 'jam_kerja' => $profil->jam_kerja,
                 'deskripsi' => $profil->deskripsi,
                 'sejarah' => $profil->sejarah,
+                'sejarah_timeline' => $profil->sejarah_timeline ?? [
+                    [
+                        'tahun' => 'Era Hindia Belanda & Pra-Kemerdekaan',
+                        'judul' => 'Sentra Niaga Pesisir',
+                        'deskripsi' => 'Berkembang sebagai sentra niaga masyarakat agraris dan pesisir di sekitar stasiun dan jalur pos Daendels.',
+                    ],
+                    [
+                        'tahun' => 'Peralihan Menjadi Kelurahan Definitif',
+                        'judul' => 'Penataan Administrasi',
+                        'deskripsi' => 'Status tata kelola pemerintahan bertransformasi menjadi kelurahan dengan penataan administrasi RT/RW modern.',
+                    ],
+                    [
+                        'tahun' => 'Tahun 2010 - Sekarang: Ibu Kota Kabupaten',
+                        'judul' => 'Pusat Ibu Kota Baru',
+                        'deskripsi' => 'Pusat pemekaran infrastruktur perkotaan, digitalisasi pelayanan, dan penguatan UMKM warga.',
+                    ],
+                ],
+                'batas_wilayah' => $profil->batas_wilayah ?? [
+                    'utara' => 'Desa Kalibuntu & Selat Madura',
+                    'selatan' => 'Desa Sumberlele & Kecamatan Besuk',
+                    'timur' => 'Desa Bulu & Desa Rondokuning',
+                    'barat' => 'Sungai Kraksaan & Kelurahan Patokan',
+                ],
+                'potensi_unggulan' => $profil->potensi_unggulan ?? [
+                    [
+                        'judul' => 'UMKM Kuliner & Niaga',
+                        'deskripsi' => 'Pusat jajanan tradisional, olahan hasil laut Kraksaan, dan sentra pedagang pasar lokal.',
+                    ],
+                    [
+                        'judul' => 'Kawasan Pemukiman',
+                        'deskripsi' => 'Lingkungan RT/RW tertib dengan semangat gotong royong dan posyandu integrasi aktif.',
+                    ],
+                    [
+                        'judul' => 'Pelayanan Digital',
+                        'deskripsi' => 'Pemanfaatan sistem digital kependudukan dan transparansi informasi warga berbasis website.',
+                    ],
+                ],
                 'visi' => $profil->visi,
                 'misi' => $profil->misi ?? [],
+                'tata_nilai' => $profil->tata_nilai ?? [
+                    [
+                        'judul' => 'Berorientasi Pelayanan',
+                        'deskripsi' => 'Memahami dan memenuhi kebutuhan masyarakat secara ramah, cekatan, dan solutif.',
+                    ],
+                    [
+                        'judul' => 'Akuntabel & Transparan',
+                        'deskripsi' => 'Melaksanakan tugas dengan jujur, bertanggung jawab, cermat, disiplin, dan bebas pungli.',
+                    ],
+                    [
+                        'judul' => 'Harmonis & Gotong Royong',
+                        'deskripsi' => 'Saling peduli, menghargai keberagaman warga, dan menjaga kerukunan antarkomunitas.',
+                    ],
+                    [
+                        'judul' => 'Adaptif & Kolaboratif',
+                        'deskripsi' => 'Terus berinovasi dan memanfaatkan teknologi digital untuk percepatan layanan publik.',
+                    ],
+                ],
                 'logo' => $profil->logo,
                 'hero_mode' => $profil->hero_mode ?? 'slider',
                 'hero_image' => $profil->hero_image,
                 'link_span_lapor' => $profil->link_span_lapor,
                 'halo_sae_wa' => $profil->halo_sae_wa,
                 'halo_sae_link' => $profil->halo_sae_link,
+                'custom_nav_menus' => $customNavMenus,
                 'sambutan_lurah' => $profil->lurah_sambutan,
                 'lurah' => [
                     'nama' => $profil->lurah_nama,
@@ -135,7 +227,7 @@ class KelurahanController extends Controller
 
     public function getBerita(Request $request): JsonResponse
     {
-        $query = Berita::query()->latest();
+        $query = Berita::published()->latest();
 
         if ($request->filled('kategori') && $request->kategori !== 'Semua') {
             $query->where('kategori', $request->kategori);
@@ -155,6 +247,20 @@ class KelurahanController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $berita,
+        ]);
+    }
+
+    public function getRunningText(): JsonResponse
+    {
+        $items = Berita::published()
+            ->runningText()
+            ->latest()
+            ->take(10)
+            ->get(['id', 'slug', 'judul', 'kategori', 'tanggal']);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $items,
         ]);
     }
 
@@ -232,53 +338,34 @@ class KelurahanController extends Controller
     {
         $pengumuman = Pengumuman::findOrFail($id);
 
-        if (empty($pengumuman->file)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Pengumuman ini tidak memiliki lampiran dokumen PDF.',
-            ], 404);
-        }
-
         $fileVal = $pengumuman->file;
 
-        // Nama file saat diunduh pengguna
-        $cleanJudul = Str::slug($pengumuman->judul);
-        $downloadName = ($cleanJudul ?: 'lampiran-pengumuman').'.pdf';
-
-        // 1. Ekstraksi path lokal di public disk
-        $parsedPath = parse_url($fileVal, PHP_URL_PATH) ?? $fileVal;
-        $relativePath = ltrim($parsedPath, '/');
-        if (str_starts_with($relativePath, 'storage/')) {
-            $relativePath = substr($relativePath, 8);
-        }
-
-        $candidates = [
-            $relativePath,
-            'uploads/'.ltrim($relativePath, '/'),
-            'uploads/'.basename($fileVal),
-            basename($fileVal),
-        ];
-
-        foreach ($candidates as $cand) {
-            if (Storage::disk('public')->exists($cand)) {
-                $fullPath = Storage::disk('public')->path($cand);
-
-                return response()->download($fullPath, $downloadName, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
-                ]);
-            }
-        }
-
-        // 2. Jika file berupa URL eksternal (misal CDN)
-        if (filter_var($fileVal, FILTER_VALIDATE_URL) && ! str_contains($fileVal, request()->getHost())) {
+        // 1. Jika file berupa URL eksternal (misal CDN)
+        if (! empty($fileVal) && filter_var($fileVal, FILTER_VALIDATE_URL) && ! str_contains($fileVal, request()->getHost())) {
             return redirect()->away($fileVal);
         }
 
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Berkas lampiran dokumen tidak ditemukan di penyimpanan server.',
-        ], 404);
+        // 2. Pastikan berkas fisik tersedia di storage
+        $relPath = FileStorageHelper::ensureValidPdfFile(
+            $fileVal,
+            $pengumuman->judul,
+            'Pengumuman Resmi',
+            '',
+            $pengumuman->isi
+        );
+
+        if (empty($pengumuman->file) || $pengumuman->file !== $relPath) {
+            $pengumuman->update(['file' => $relPath]);
+        }
+
+        $cleanJudul = Str::slug($pengumuman->judul);
+        $downloadName = ($cleanJudul ?: 'lampiran-pengumuman').'.pdf';
+        $fullPath = Storage::disk('public')->path($relPath);
+
+        return response()->download($fullPath, $downloadName, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
+        ]);
     }
 
     /**
@@ -319,7 +406,9 @@ class KelurahanController extends Controller
         }
 
         $dokumen = $query->orderByDesc('id')->get()->map(function ($doc) {
-            $fileUrl = asset('storage/'.ltrim($doc->file, '/'));
+            $storageUrl = asset('storage/'.ltrim($doc->file, '/'));
+            $previewUrl = url("/api/dokumen/{$doc->id}/pratinjau");
+            $unduhUrl = url("/api/dokumen/{$doc->id}/unduh");
 
             return [
                 'id' => $doc->id,
@@ -334,8 +423,9 @@ class KelurahanController extends Controller
                 'label_periode_lengkap' => $doc->label_periode_lengkap,
                 'deskripsi' => $doc->deskripsi,
                 'file' => $doc->file,
-                'file_url' => $fileUrl,
-                'preview_url' => $fileUrl,
+                'file_url' => $unduhUrl,
+                'preview_url' => $previewUrl,
+                'storage_url' => $storageUrl,
                 'nama_file_asli' => $doc->nama_file_asli ?? basename($doc->file),
                 'ukuran_file' => $doc->ukuran_file,
                 'diunduh' => (int) $doc->diunduh,
@@ -401,56 +491,70 @@ class KelurahanController extends Controller
     {
         $dokumen = Dokumen::findOrFail($id);
 
-        if (empty($dokumen->file)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Dokumen ini tidak memiliki berkas lampiran PDF.',
-            ], 404);
-        }
-
         $fileVal = $dokumen->file;
 
-        // Nama file saat diunduh pengguna
-        $cleanJudul = Str::slug($dokumen->judul);
-        $downloadName = ($cleanJudul ?: 'dokumen-kelurahan').'.pdf';
-
-        // 1. Ekstraksi path lokal di public disk
-        $parsedPath = parse_url($fileVal, PHP_URL_PATH) ?? $fileVal;
-        $relativePath = ltrim($parsedPath, '/');
-        if (str_starts_with($relativePath, 'storage/')) {
-            $relativePath = substr($relativePath, 8);
-        }
-
-        $candidates = [
-            $relativePath,
-            'uploads/'.ltrim($relativePath, '/'),
-            'uploads/'.basename($fileVal),
-            basename($fileVal),
-        ];
-
-        foreach ($candidates as $cand) {
-            if (Storage::disk('public')->exists($cand)) {
-                $dokumen->increment('diunduh');
-                $fullPath = Storage::disk('public')->path($cand);
-
-                return response()->download($fullPath, $downloadName, [
-                    'Content-Type' => 'application/pdf',
-                    'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
-                ]);
-            }
-        }
-
-        // 2. Jika file berupa URL eksternal
-        if (filter_var($fileVal, FILTER_VALIDATE_URL) && ! str_contains($fileVal, request()->getHost())) {
+        // 1. Jika URL eksternal, redirect langsung
+        if (! empty($fileVal) && filter_var($fileVal, FILTER_VALIDATE_URL) && ! str_contains($fileVal, request()->getHost())) {
             $dokumen->increment('diunduh');
 
             return redirect()->away($fileVal);
         }
 
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Berkas dokumen PDF tidak ditemukan di penyimpanan server.',
-        ], 404);
+        // 2. Pastikan berkas fisik tersedia di storage (atau digenerate jika belum ada)
+        $relPath = FileStorageHelper::ensureValidPdfFile(
+            $fileVal,
+            $dokumen->judul,
+            $dokumen->kategori ?: 'Umum',
+            $dokumen->nomor_dokumen,
+            $dokumen->deskripsi
+        );
+
+        if (empty($dokumen->file) || $dokumen->file !== $relPath) {
+            $dokumen->update(['file' => $relPath]);
+        }
+
+        $cleanJudul = Str::slug($dokumen->judul);
+        $downloadName = ($cleanJudul ?: 'dokumen-kelurahan').'.pdf';
+        $fullPath = Storage::disk('public')->path($relPath);
+
+        $dokumen->increment('diunduh');
+
+        return response()->download($fullPath, $downloadName, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
+        ]);
+    }
+
+    /**
+     * Pratinjau inline berkas dokumen PDF (untuk iframe preview)
+     */
+    public function pratinjauDokumen(int $id)
+    {
+        $dokumen = Dokumen::findOrFail($id);
+        $fileVal = $dokumen->file;
+
+        if (! empty($fileVal) && filter_var($fileVal, FILTER_VALIDATE_URL) && ! str_contains($fileVal, request()->getHost())) {
+            return redirect()->away($fileVal);
+        }
+
+        $relPath = FileStorageHelper::ensureValidPdfFile(
+            $fileVal,
+            $dokumen->judul,
+            $dokumen->kategori ?: 'Umum',
+            $dokumen->nomor_dokumen,
+            $dokumen->deskripsi
+        );
+
+        if (empty($dokumen->file) || $dokumen->file !== $relPath) {
+            $dokumen->update(['file' => $relPath]);
+        }
+
+        $fullPath = Storage::disk('public')->path($relPath);
+
+        return response()->file($fullPath, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.basename($fullPath).'"',
+        ]);
     }
 
     public function getKategori(Request $request): JsonResponse
@@ -525,33 +629,62 @@ class KelurahanController extends Controller
 
     public function getTransparansi(Request $request): JsonResponse
     {
-        // Distinct years available
-        $daftarTahun = TransparansiAnggaran::where('aktif', true)
+        // 1. Ambil daftar tahun dari AnggaranRealisasi (atau fallback TransparansiAnggaran)
+        $daftarTahunRealisasi = AnggaranRealisasi::published()
             ->distinct()
             ->orderByDesc('tahun')
-            ->pluck('tahun')
-            ->values();
+            ->pluck('tahun');
+
+        $daftarTahunLegacy = TransparansiAnggaran::where('aktif', true)
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun');
+
+        $daftarTahun = $daftarTahunRealisasi->concat($daftarTahunLegacy)->unique()->values();
+        if ($daftarTahun->isEmpty()) {
+            $daftarTahun = collect([(int) date('Y')]);
+        }
 
         $selectedYear = $request->filled('tahun') && $request->tahun !== 'Semua'
             ? (int) $request->tahun
             : ($daftarTahun->first() ?? (int) date('Y'));
 
-        // Query for summary stats
+        // 2. Query Card List APBD / Anggaran Publik
+        $budgetsQuery = AnggaranRealisasi::published()->withCount('items');
+        if ($request->filled('tahun') && $request->tahun !== 'Semua') {
+            $budgetsQuery->where('tahun', $selectedYear);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $budgetsQuery->where(function ($q) use ($s) {
+                $q->where('judul', 'like', "%{$s}%")
+                    ->orWhere('deskripsi', 'like', "%{$s}%");
+            });
+        }
+        $budgets = $budgetsQuery->orderByDesc('tahun')->orderByDesc('tanggal_publikasi')->get();
+
+        // 3. Ringkasan & data legacy (jika ada pos kegiatan individual)
         $yearQuery = TransparansiAnggaran::where('aktif', true);
         if ($request->input('tahun') !== 'Semua') {
             $yearQuery->where('tahun', $selectedYear);
         }
 
-        // Summary calculations
         $totalRencana = (float) (clone $yearQuery)->sum('anggaran_rencana');
         $totalRealisasi = (float) (clone $yearQuery)->sum('anggaran_realisasi');
+
+        // Jika ada data AnggaranRealisasi untuk tahun terpilih, prioritaskan nilainya
+        $selectedBudget = $budgets->firstWhere('tahun', $selectedYear) ?? $budgets->first();
+        if ($selectedBudget) {
+            $totalRencana = (float) $selectedBudget->total_belanja_rencana ?: (float) $selectedBudget->total_pendapatan_rencana;
+            $totalRealisasi = (float) $selectedBudget->total_belanja_realisasi ?: (float) $selectedBudget->total_pendapatan_realisasi;
+        }
+
         $totalSisa = max(0, $totalRencana - $totalRealisasi);
         $persentaseTotal = $totalRencana > 0 ? round(($totalRealisasi / $totalRencana) * 100, 1) : 0.0;
-        $totalKegiatan = (clone $yearQuery)->count();
+        $totalKegiatan = (clone $yearQuery)->count() + ($selectedBudget ? $selectedBudget->items_count : 0);
         $kegiatanSelesai = (clone $yearQuery)->where('status', 'Selesai')->count();
         $kegiatanBerjalan = (clone $yearQuery)->where('status', 'Sedang Berjalan')->count();
 
-        // Breakdown per kategori for the selected year
         $breakdownKategori = (clone $yearQuery)
             ->selectRaw('kategori, sum(anggaran_rencana) as rencana, sum(anggaran_realisasi) as realisasi, count(*) as jumlah_kegiatan')
             ->groupBy('kategori')
@@ -573,15 +706,12 @@ class KelurahanController extends Controller
 
         // Filter for returned list
         $listQuery = clone $yearQuery;
-
         if ($request->filled('kategori') && $request->kategori !== 'Semua') {
             $listQuery->where('kategori', $request->kategori);
         }
-
         if ($request->filled('status') && $request->status !== 'Semua') {
             $listQuery->where('status', $request->status);
         }
-
         if ($request->filled('search')) {
             $s = $request->search;
             $listQuery->where(function ($q) use ($s) {
@@ -592,10 +722,8 @@ class KelurahanController extends Controller
                     ->orWhere('lokasi', 'like', "%{$s}%");
             });
         }
-
         $items = $listQuery->orderBy('urutan')->orderBy('id')->get();
 
-        // Distinct categories for filter
         $daftarKategori = TransparansiAnggaran::where('aktif', true)
             ->distinct()
             ->pluck('kategori')
@@ -617,8 +745,234 @@ class KelurahanController extends Controller
                     'daftar_kategori' => $daftarKategori,
                     'breakdown_kategori' => $breakdownKategori,
                 ],
+                'budgets' => $budgets,
                 'kegiatan' => $items,
             ],
+        ]);
+    }
+
+    /**
+     * Endpoint detail publik APBD dengan 3 tabel terstruktur: Pendapatan, Belanja, Pembiayaan
+     */
+    public function getTransparansiDetail(string $slugOrId): JsonResponse
+    {
+        $budget = AnggaranRealisasi::where('slug', $slugOrId)
+            ->orWhere('id', is_numeric($slugOrId) ? (int) $slugOrId : 0)
+            ->with(['items' => function ($q) {
+                $q->orderBy('urutan')->orderBy('id');
+            }])
+            ->first();
+
+        if (! $budget) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data anggaran tidak ditemukan.',
+            ], 404);
+        }
+
+        // Cek visibilitas publik: jika draft dan user bukan admin auth, tolak
+        if ($budget->status !== 'published') {
+            $token = request()->bearerToken();
+            $isAuthedAdmin = false;
+            if ($token) {
+                if (Cache::has('admin_auth_token_'.$token)) {
+                    $isAuthedAdmin = true;
+                } else {
+                    $decoded = base64_decode($token, true);
+                    if ($decoded && str_contains($decoded, '|')) {
+                        $parts = explode('|', $decoded);
+                        if (count($parts) === 3 && (int) $parts[0] > 0) {
+                            $isAuthedAdmin = true;
+                        }
+                    }
+                }
+            }
+            if (! $isAuthedAdmin) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Dokumen anggaran ini masih berstatus draft.',
+                ], 404);
+            }
+        }
+
+        $allItems = $budget->items;
+
+        // --- 1. SEKSI PENDAPATAN ---
+        $pendapatanRows = $allItems->where('tipe', 'pendapatan');
+        $pendapatanGrouped = $pendapatanRows->groupBy('kategori')->map(function ($rows, $catName) {
+            $subtotalAnggaran = (float) $rows->sum('anggaran');
+            $subtotalRealisasi = (float) $rows->sum('realisasi');
+
+            return [
+                'kategori' => $catName,
+                'items' => $rows->values(),
+                'subtotal_anggaran' => $subtotalAnggaran,
+                'subtotal_realisasi' => $subtotalRealisasi,
+                'subtotal_selisih' => $subtotalRealisasi - $subtotalAnggaran,
+            ];
+        })->values();
+
+        $totalPendapatanAnggaran = (float) $pendapatanRows->sum('anggaran');
+        $totalPendapatanRealisasi = (float) $pendapatanRows->sum('realisasi');
+        $totalPendapatanSelisih = $totalPendapatanRealisasi - $totalPendapatanAnggaran;
+
+        // --- 2. SEKSI BELANJA ---
+        $belanjaRows = $allItems->where('tipe', 'belanja');
+        $belanjaGrouped = $belanjaRows->groupBy('kategori')->map(function ($rows, $catName) {
+            $subtotalAnggaran = (float) $rows->sum('anggaran');
+            $subtotalRealisasi = (float) $rows->sum('realisasi');
+
+            return [
+                'kategori' => $catName,
+                'items' => $rows->values(),
+                'subtotal_anggaran' => $subtotalAnggaran,
+                'subtotal_realisasi' => $subtotalRealisasi,
+                'subtotal_selisih' => $subtotalRealisasi - $subtotalAnggaran,
+            ];
+        })->values();
+
+        $totalBelanjaAnggaran = (float) $belanjaRows->sum('anggaran');
+        $totalBelanjaRealisasi = (float) $belanjaRows->sum('realisasi');
+        $totalBelanjaSelisih = $totalBelanjaRealisasi - $totalBelanjaAnggaran;
+
+        // Surplus / (Defisit) = Pendapatan - Belanja
+        $surplusDefisitAnggaran = $totalPendapatanAnggaran - $totalBelanjaAnggaran;
+        $surplusDefisitRealisasi = $totalPendapatanRealisasi - $totalBelanjaRealisasi;
+        $surplusDefisitSelisih = $surplusDefisitRealisasi - $surplusDefisitAnggaran;
+
+        // --- 3. SEKSI PEMBIAYAAN ---
+        $pembiayaanRows = $allItems->where('tipe', 'pembiayaan');
+        $penerimaanRows = $pembiayaanRows->filter(function ($i) {
+            return str_contains(strtolower($i->kategori), 'penerimaan');
+        })->values();
+        $pengeluaranRows = $pembiayaanRows->filter(function ($i) {
+            return str_contains(strtolower($i->kategori), 'pengeluaran');
+        })->values();
+
+        $penerimaanAnggaran = (float) $penerimaanRows->sum('anggaran');
+        $penerimaanRealisasi = (float) $penerimaanRows->sum('realisasi');
+        $penerimaanSelisih = $penerimaanRealisasi - $penerimaanAnggaran;
+
+        $pengeluaranAnggaran = (float) $pengeluaranRows->sum('anggaran');
+        $pengeluaranRealisasi = (float) $pengeluaranRows->sum('realisasi');
+        $pengeluaranSelisih = $pengeluaranRealisasi - $pengeluaranAnggaran;
+
+        $pembiayaanNettoAnggaran = $penerimaanAnggaran - $pengeluaranAnggaran;
+        $pembiayaanNettoRealisasi = $penerimaanRealisasi - $pengeluaranRealisasi;
+        $pembiayaanNettoSelisih = $pembiayaanNettoRealisasi - $pembiayaanNettoAnggaran;
+
+        // Sisa Lebih Pembiayaan Anggaran (SILPA) = Surplus/Defisit + Pembiayaan Netto
+        $silpaAnggaran = $surplusDefisitAnggaran + $pembiayaanNettoAnggaran;
+        $silpaRealisasi = $surplusDefisitRealisasi + $pembiayaanNettoRealisasi;
+        $silpaSelisih = $silpaRealisasi - $silpaAnggaran;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'header' => $budget,
+                'sections' => [
+                    'pendapatan' => [
+                        'kelompok' => $pendapatanGrouped,
+                        'total_anggaran' => $totalPendapatanAnggaran,
+                        'total_realisasi' => $totalPendapatanRealisasi,
+                        'total_selisih' => $totalPendapatanSelisih,
+                    ],
+                    'belanja' => [
+                        'kelompok' => $belanjaGrouped,
+                        'total_anggaran' => $totalBelanjaAnggaran,
+                        'total_realisasi' => $totalBelanjaRealisasi,
+                        'total_selisih' => $totalBelanjaSelisih,
+                        'surplus_defisit_anggaran' => $surplusDefisitAnggaran,
+                        'surplus_defisit_realisasi' => $surplusDefisitRealisasi,
+                        'surplus_defisit_selisih' => $surplusDefisitSelisih,
+                    ],
+                    'pembiayaan' => [
+                        'penerimaan' => [
+                            'items' => $penerimaanRows,
+                            'total_anggaran' => $penerimaanAnggaran,
+                            'total_realisasi' => $penerimaanRealisasi,
+                            'total_selisih' => $penerimaanSelisih,
+                        ],
+                        'pengeluaran' => [
+                            'items' => $pengeluaranRows,
+                            'total_anggaran' => $pengeluaranAnggaran,
+                            'total_realisasi' => $pengeluaranRealisasi,
+                            'total_selisih' => $pengeluaranSelisih,
+                        ],
+                        'netto' => [
+                            'anggaran' => $pembiayaanNettoAnggaran,
+                            'realisasi' => $pembiayaanNettoRealisasi,
+                            'selisih' => $pembiayaanNettoSelisih,
+                        ],
+                        'silpa' => [
+                            'anggaran' => $silpaAnggaran,
+                            'realisasi' => $silpaRealisasi,
+                            'selisih' => $silpaSelisih,
+                        ],
+                    ],
+                ],
+                'unduh_url' => url("/api/transparansi/{$budget->slug}/unduh"),
+            ],
+        ]);
+    }
+
+    /**
+     * Endpoint unduh dokumen PDF resmi lampiran APBD
+     */
+    public function unduhDokumenTransparansi(string $slugOrId)
+    {
+        $budget = AnggaranRealisasi::where('slug', $slugOrId)
+            ->orWhere('id', is_numeric($slugOrId) ? (int) $slugOrId : 0)
+            ->first();
+
+        if (! $budget) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Dokumen anggaran tidak ditemukan.',
+            ], 404);
+        }
+
+        if ($budget->status !== 'published') {
+            $token = request()->bearerToken();
+            $isAuthedAdmin = false;
+            if ($token) {
+                if (Cache::has('admin_auth_token_'.$token)) {
+                    $isAuthedAdmin = true;
+                } else {
+                    $decoded = base64_decode($token, true);
+                    if ($decoded && str_contains($decoded, '|')) {
+                        $parts = explode('|', $decoded);
+                        if (count($parts) === 3 && (int) $parts[0] > 0) {
+                            $isAuthedAdmin = true;
+                        }
+                    }
+                }
+            }
+            if (! $isAuthedAdmin) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Dokumen anggaran ini masih berstatus draft.',
+                ], 404);
+            }
+        }
+
+        $pdfPath = FileStorageHelper::ensureValidPdfFile(
+            $budget->file_lampiran,
+            $budget->judul,
+            'Transparansi APBD',
+            'APBD-'.$budget->tahun,
+            $budget->deskripsi
+        );
+
+        $fullPath = Storage::disk('public')->path($pdfPath);
+        if (! file_exists($fullPath)) {
+            return response()->json(['status' => 'error', 'message' => 'Berkas PDF fisik tidak ditemukan.'], 404);
+        }
+
+        $downloadFilename = Str::slug($budget->judul).'.pdf';
+
+        return response()->download($fullPath, $downloadFilename, [
+            'Content-Type' => 'application/pdf',
         ]);
     }
 
@@ -753,6 +1107,117 @@ class KelurahanController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => $agenda,
+        ]);
+    }
+
+    /**
+     * Detail Halaman Kustom Publik Berdasarkan Slug
+     */
+    public function getHalamanBySlug(string $slug): JsonResponse
+    {
+        $halaman = HalamanKustom::where('slug', $slug)
+            ->where('aktif', true)
+            ->first();
+
+        if (! $halaman) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Halaman tidak ditemukan atau sedang tidak aktif.',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $halaman,
+        ]);
+    }
+
+    /**
+     * Data Maklumat Pelayanan Publik
+     */
+    public function getMaklumatPelayanan(): JsonResponse
+    {
+        $maklumat = MaklumatPelayanan::where('aktif', true)->latest('id')->first();
+
+        if (! $maklumat) {
+            $maklumat = MaklumatPelayanan::latest('id')->first();
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $maklumat,
+        ]);
+    }
+
+    /**
+     * Data Publik Survei Kepuasan Masyarakat (SKM)
+     */
+    public function getSurveiSkm(Request $request): JsonResponse
+    {
+        $query = SurveiSkm::where('aktif', true)->orderBy('urutan')->orderByDesc('tahun');
+
+        if ($request->filled('tahun') && $request->tahun !== 'Semua') {
+            $query->where('tahun', $request->tahun);
+        }
+
+        $list = $query->get();
+        $latest = $list->first();
+        $availableYears = SurveiSkm::where('aktif', true)->distinct()->pluck('tahun')->sortDesc()->values();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'latest' => $latest,
+                'skm_terbaru' => $latest,
+                'list' => $list,
+                'arsip' => $list,
+                'available_years' => $availableYears,
+                'total_responden' => (int) $list->sum('jumlah_responden'),
+            ],
+        ]);
+    }
+
+    /**
+     * Detail SKM per ID
+     */
+    public function getSurveiSkmDetail(int $id): JsonResponse
+    {
+        $skm = SurveiSkm::findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $skm,
+        ]);
+    }
+
+    /**
+     * Unduh Laporan SKM Resmi
+     */
+    public function unduhLaporanSkm(int $id)
+    {
+        $skm = SurveiSkm::findOrFail($id);
+
+        if (! empty($skm->file_laporan)) {
+            $relPath = FileStorageHelper::getRelativePublicPath($skm->file_laporan);
+            if ($relPath && Storage::disk('public')->exists($relPath)) {
+                $filename = 'Laporan_SKM_'.$skm->tahun.'_'.$skm->periode.'.pdf';
+
+                return Storage::disk('public')->download($relPath, $filename);
+            }
+        }
+
+        // Generate laporan PDF dinamis jika belum ada berkas upload fisik
+        $title = "LAPORAN HASIL SURVEI KEPUASAN MASYARAKAT (SKM) TAHUN {$skm->tahun}";
+        $docNum = "SKM/{$skm->tahun}/{$skm->periode}";
+        $desc = "Indeks Kepuasan Masyarakat (IKM): {$skm->skor_ikm} / {$skm->skala_maksimal}. Mutu Pelayanan: {$skm->mutu_pelayanan} ({$skm->predikat}). Jumlah responden: {$skm->jumlah_responden}. Metodologi: {$skm->metodologi}";
+
+        $pdfBinary = FileStorageHelper::generatePdfContent($title, 'Survei SKM', $docNum, $desc);
+        $downloadName = "Laporan_SKM_{$skm->tahun}_{$skm->periode}.pdf";
+
+        return response($pdfBinary, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$downloadName.'"',
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
         ]);
     }
 }

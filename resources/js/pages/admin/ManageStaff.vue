@@ -138,6 +138,7 @@
             <tr>
               <th class="px-6 py-3.5">Nama Staf & Email</th>
               <th class="px-6 py-3.5">Peran (Role) & Tanggung Jawab</th>
+              <th class="px-6 py-3.5">Hak Akses Menu</th>
               <th class="px-6 py-3.5">Terdaftar Sejak</th>
               <th class="px-6 py-3.5 text-right">Aksi</th>
             </tr>
@@ -178,6 +179,39 @@
                   <p class="text-[10px] text-slate-500 leading-tight">
                     {{ getRoleScopeDescription(staf.role) }}
                   </p>
+                </div>
+              </td>
+
+              <!-- Hak Akses Menu -->
+              <td class="px-6 py-4">
+                <div v-if="staf.role === 'super_admin'" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-bold">
+                  <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Semua Menu (Penuh)</span>
+                </div>
+                <div v-else class="space-y-1">
+                  <div class="flex flex-wrap gap-1 max-w-xs">
+                    <span 
+                      v-for="mKey in (staf.effective_menus || staf.accessible_menus || []).slice(0, 3)" 
+                      :key="mKey"
+                      class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-medium border border-slate-200"
+                    >
+                      <span>{{ getMenuIcon(mKey) }}</span>
+                      <span>{{ getMenuShortLabel(mKey) }}</span>
+                    </span>
+                    <span 
+                      v-if="(staf.effective_menus || staf.accessible_menus || []).length > 3"
+                      class="inline-flex items-center px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 text-[10px] font-bold border border-purple-200 cursor-help"
+                      :title="formatAllMenusTitle(staf.effective_menus || staf.accessible_menus)"
+                    >
+                      +{{ (staf.effective_menus || staf.accessible_menus || []).length - 3 }} lainnya
+                    </span>
+                    <span 
+                      v-if="!(staf.effective_menus || staf.accessible_menus)?.length"
+                      class="text-[10px] text-amber-600 italic font-semibold"
+                    >
+                      Belum ada akses menu
+                    </span>
+                  </div>
                 </div>
               </td>
 
@@ -319,7 +353,8 @@
                       name="role" 
                       :value="opt.value" 
                       v-model="form.role"
-                      class="mt-0.5 text-purple-600 focus:ring-purple-500" 
+                      @change="onRoleChange(opt.value)"
+                      class="mt-0.5 text-purple-600 focus:ring-purple-500 cursor-pointer" 
                     />
                     <div class="space-y-0.5">
                       <p class="font-bold" :class="opt.titleClass">{{ opt.label }}</p>
@@ -327,6 +362,97 @@
                     </div>
                   </label>
                 </div>
+              </div>
+            </div>
+
+            <!-- Bagian Pemilihan Hak Akses Menu Granular -->
+            <div class="mt-6 pt-5 border-t border-slate-200">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <label class="text-xs font-bold text-slate-900">
+                      Hak Akses Menu & Modul Kelurahan *
+                    </label>
+                    <span 
+                      class="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                      :class="form.role === 'super_admin' ? 'bg-purple-100 text-purple-800' : (form.accessible_menus.length > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800')"
+                    >
+                      {{ form.role === 'super_admin' ? 'Semua Menu (Kendali Penuh)' : `${form.accessible_menus.length} Modul Dipilih` }}
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-0.5">
+                    Tentukan modul mana saja yang dapat dibuka dan dikelola oleh akun staf ini di Panel Admin.
+                  </p>
+                </div>
+
+                <!-- Tombol Shortcut / Preset Hak Akses -->
+                <div v-if="form.role !== 'super_admin'" class="flex items-center gap-1.5 flex-wrap">
+                  <button 
+                    type="button" 
+                    @click="applyRolePreset(form.role)"
+                    class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition cursor-pointer"
+                    title="Kembalikan modul terpilih sesuai rekomendasi peran"
+                  >
+                    Preset Peran
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="selectAllMenus"
+                    class="px-2.5 py-1 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-[11px] font-semibold transition cursor-pointer"
+                  >
+                    Pilih Semua
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="clearMenus"
+                    class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold transition cursor-pointer"
+                  >
+                    Kosongkan
+                  </button>
+                </div>
+              </div>
+
+              <!-- Notifikasi Khusus Super Admin -->
+              <div v-if="form.role === 'super_admin'" class="p-3.5 rounded-2xl bg-purple-50 border border-purple-200 text-purple-900 text-xs flex items-center gap-3 shadow-2xs">
+                <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                </div>
+                <div class="space-y-0.5">
+                  <p class="font-bold text-purple-950">Akses Penuh Tanpa Batasan</p>
+                  <p class="text-[11px] text-purple-700">Akun dengan peran Super Admin memegang otoritas tertinggi sistem. Seluruh 11 modul CMS, pengelolaan staf, audit log, dan pengaturan sistem aktif otomatis.</p>
+                </div>
+              </div>
+
+              <!-- Grid Pilihan Menu Checkbox -->
+              <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                <label 
+                  v-for="menu in menuDefinitions" 
+                  :key="menu.key"
+                  class="flex items-start gap-3 p-3 rounded-2xl border transition cursor-pointer select-none"
+                  :class="form.accessible_menus.includes(menu.key) ? 'border-purple-300 bg-purple-50/40 ring-1 ring-purple-300 shadow-2xs' : 'border-slate-200 hover:bg-slate-50 opacity-80'"
+                >
+                  <input 
+                    type="checkbox" 
+                    :value="menu.key" 
+                    v-model="form.accessible_menus" 
+                    class="mt-0.5 w-4 h-4 rounded text-purple-600 focus:ring-purple-500 border-slate-300 cursor-pointer flex-shrink-0"
+                  />
+                  <div class="space-y-0.5 min-w-0">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-sm shrink-0">{{ menu.icon }}</span>
+                      <p class="font-bold text-xs text-slate-900 leading-tight truncate">{{ menu.label }}</p>
+                    </div>
+                    <p class="text-[10px] text-slate-500 leading-snug">{{ menu.desc }}</p>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Peringatan Jika Kosong -->
+              <div v-if="form.role !== 'super_admin' && form.accessible_menus.length === 0" class="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-center gap-2.5">
+                <svg class="w-4 h-4 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <p class="text-[11px] leading-tight">
+                  <span class="font-bold">Perhatian:</span> Akun ini belum diberi izin ke modul manapun. Pengguna staf hanya dapat mengakses halaman beranda Dashboard tanpa menu kelola.
+                </p>
               </div>
             </div>
           </div>
@@ -482,7 +608,67 @@ const form = reactive({
   email: '',
   role: 'staff_pelayanan',
   password: '',
+  accessible_menus: [],
 });
+
+const menuDefinitions = [
+  { key: 'berita', label: 'Kelola Berita', icon: '📰', desc: 'Warta berita kelurahan, artikel, liputan kegiatan, dan running text portal warga.' },
+  { key: 'pengumuman', label: 'Pengumuman Resmi', icon: '📢', desc: 'Siaran pengumuman penting, info mendesak, dan surat edaran bagi warga.' },
+  { key: 'agenda', label: 'Agenda Kegiatan', icon: '📅', desc: 'Jadwal agenda acara, musyawarah desa, gotong royong, dan kegiatan dinas.' },
+  { key: 'galeri', label: 'Galeri Foto', icon: '🖼️', desc: 'Dokumentasi album foto dokumenter kegiatan kelurahan dan arsip visual.' },
+  { key: 'dokumen', label: 'Dokumen PDF', icon: '📁', desc: 'Publikasi berkas PDF resmi (Musrenbang, UMKM, Renstra & Renja, Regulasi).' },
+  { key: 'layanan', label: 'Katalog Layanan', icon: '📑', desc: 'SOP administrasi warga, persyaratan izin, maklumat pelayanan, dan SKM.' },
+  { key: 'lembaga', label: 'Lembaga (LKK)', icon: '🏛️', desc: 'Profil lembaga kemasyarakatan (LPM, PKK, Karang Taruna, RT/RW, Posyandu).' },
+  { key: 'statistik', label: 'Statistik Kependudukan', icon: '📊', desc: 'Data demografi kependudukan, piramida usia, pekerjaan, dan batas wilayah.' },
+  { key: 'transparansi', label: 'Transparansi Anggaran', icon: '💰', desc: 'Publikasi APBD, realisasi anggaran, rincian belanja operasi & pembiayaan.' },
+  { key: 'kategori', label: 'Master Kategori', icon: '🏷️', desc: 'Kelola master kategori terpusat berita, dokumen PDF, dan pengumuman.' },
+  { key: 'profil', label: 'Profil & Aparatur', icon: '🏢', desc: 'Struktur organisasi pemerintahan dan susunan pamong aparatur kelurahan.' },
+];
+
+const roleDefaultMenus = {
+  super_admin: ['berita', 'pengumuman', 'agenda', 'galeri', 'dokumen', 'layanan', 'lembaga', 'statistik', 'transparansi', 'kategori', 'profil'],
+  staff_konten: ['berita', 'pengumuman', 'agenda', 'galeri', 'dokumen', 'kategori'],
+  staff_pelayanan: ['layanan', 'dokumen', 'kategori'],
+  staff_administrasi: ['dokumen', 'lembaga', 'statistik', 'transparansi', 'kategori'],
+};
+
+const getMenuIcon = (key) => {
+  const found = menuDefinitions.find(m => m.key === key);
+  return found ? found.icon : '📌';
+};
+
+const getMenuShortLabel = (key) => {
+  const found = menuDefinitions.find(m => m.key === key);
+  return found ? found.label : key;
+};
+
+const formatAllMenusTitle = (menus) => {
+  if (!Array.isArray(menus)) return '';
+  return menus.map(m => getMenuShortLabel(m)).join(', ');
+};
+
+const selectAllMenus = () => {
+  form.accessible_menus = menuDefinitions.map(m => m.key);
+};
+
+const clearMenus = () => {
+  form.accessible_menus = [];
+};
+
+const applyRolePreset = (role) => {
+  form.accessible_menus = [...(roleDefaultMenus[role] || [])];
+};
+
+const onRoleChange = (newRole) => {
+  if (newRole === 'super_admin') {
+    form.accessible_menus = [...roleDefaultMenus['super_admin']];
+  } else {
+    // Selalu sinkronkan ke preset peran yang baru dipilih bila membuat baru atau jika daftar menu kosong
+    if (!isEditing.value || form.accessible_menus.length === 0) {
+      form.accessible_menus = [...(roleDefaultMenus[newRole] || [])];
+    }
+  }
+};
 
 const pwdForm = reactive({
   password: '',
@@ -636,6 +822,7 @@ const openModalCreate = () => {
   form.email = '';
   form.role = 'staff_pelayanan';
   form.password = '';
+  form.accessible_menus = [...(roleDefaultMenus['staff_pelayanan'] || [])];
   showModalForm.value = true;
 };
 
@@ -646,6 +833,15 @@ const openModalEdit = (staf) => {
   form.email = staf.email;
   form.role = staf.role;
   form.password = '';
+  if (staf.role === 'super_admin') {
+    form.accessible_menus = [...roleDefaultMenus['super_admin']];
+  } else if (Array.isArray(staf.accessible_menus) && staf.accessible_menus.length > 0) {
+    form.accessible_menus = [...staf.accessible_menus];
+  } else if (Array.isArray(staf.effective_menus) && staf.effective_menus.length > 0) {
+    form.accessible_menus = [...staf.effective_menus];
+  } else {
+    form.accessible_menus = [...(roleDefaultMenus[staf.role] || [])];
+  }
   showModalForm.value = true;
 };
 
@@ -654,24 +850,23 @@ const submitForm = async () => {
   successMsg.value = '';
   errorMsg.value = '';
   try {
+    const payload = {
+      name: form.name,
+      email: form.email,
+      role: form.role,
+      accessible_menus: form.role === 'super_admin' ? null : form.accessible_menus,
+    };
+    if (form.password) {
+      payload.password = form.password;
+    }
+
     if (isEditing.value) {
-      const payload = {
-        name: form.name,
-        email: form.email,
-        role: form.role,
-      };
-      if (form.password) payload.password = form.password;
       const res = await AdminService.updateStaff(editId.value, payload);
       const msg = res.message || 'Data staf berhasil diperbarui.';
       successMsg.value = msg;
       toast.success(msg, 'Akun Staf');
     } else {
-      const res = await AdminService.storeStaff({
-        name: form.name,
-        email: form.email,
-        role: form.role,
-        password: form.password,
-      });
+      const res = await AdminService.storeStaff(payload);
       const msg = res.message || 'Akun staf berhasil dibuat.';
       successMsg.value = msg;
       toast.success(msg, 'Akun Staf');

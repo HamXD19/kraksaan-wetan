@@ -14,6 +14,20 @@ class Berita extends Model
 
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'tampil_running_text' => 'boolean',
+    ];
+
+    public function scopePublished($query)
+    {
+        return $query->where('status', 'published');
+    }
+
+    public function scopeRunningText($query)
+    {
+        return $query->where('status', 'published')->where('tampil_running_text', true);
+    }
+
     protected static function booted(): void
     {
         static::deleting(function (Berita $berita) {

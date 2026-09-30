@@ -102,6 +102,16 @@ const routes = [
         meta: { title: 'Pelayanan Masyarakat - Kelurahan Kraksaan Wetan' }
       },
       {
+        path: 'survei-skm',
+        name: 'survei-skm',
+        component: () => import('../pages/SurveiSkm.vue'),
+        meta: { title: 'Survei Kepuasan Masyarakat (SKM) - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'pelayanan/skm',
+        redirect: '/survei-skm'
+      },
+      {
         path: 'kontak',
         name: 'kontak',
         component: () => import('../pages/Kontak.vue'),
@@ -112,6 +122,20 @@ const routes = [
         name: 'transparansi',
         component: () => import('../pages/Transparansi.vue'),
         meta: { title: 'Transparansi & Akuntabilitas Anggaran - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'transparansi/:slug',
+        name: 'transparansi-detail',
+        component: () => import('../pages/TransparansiDetail.vue'),
+        meta: { title: 'Detail Anggaran & Realisasi APBD - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'apbd',
+        redirect: '/transparansi'
+      },
+      {
+        path: 'apbd/:slug',
+        redirect: to => `/transparansi/${to.params.slug}`
       },
       {
         path: 'informasi-publik/transparansi',
@@ -132,6 +156,36 @@ const routes = [
       {
         path: 'informasi-publik/agenda',
         redirect: '/agenda'
+      },
+      {
+        path: 'halaman/:slug',
+        name: 'halaman-detail',
+        component: () => import('../pages/CustomPage.vue'),
+        meta: { title: 'Informasi - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'profil/:slug',
+        name: 'profil-custom-page',
+        component: () => import('../pages/CustomPage.vue'),
+        meta: { title: 'Profil - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'pemerintahan/:slug',
+        name: 'pemerintahan-custom-page',
+        component: () => import('../pages/CustomPage.vue'),
+        meta: { title: 'Pemerintahan - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'informasi-publik/:slug',
+        name: 'informasi-publik-custom-page',
+        component: () => import('../pages/CustomPage.vue'),
+        meta: { title: 'Informasi Publik - Kelurahan Kraksaan Wetan' }
+      },
+      {
+        path: 'informasi/:slug',
+        name: 'informasi-custom-page',
+        component: () => import('../pages/CustomPage.vue'),
+        meta: { title: 'Informasi - Kelurahan Kraksaan Wetan' }
       }
     ]
   },
@@ -172,67 +226,73 @@ const routes = [
         path: 'berita',
         name: 'admin-berita',
         component: () => import('../pages/admin/ManageBerita.vue'),
-        meta: { title: 'Kelola Berita - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+        meta: { title: 'Kelola Berita - Admin Kelurahan', requiresAuth: true, menu: 'berita', roles: ['super_admin', 'staff_konten'] }
       },
       {
         path: 'pengumuman',
         name: 'admin-pengumuman',
         component: () => import('../pages/admin/ManagePengumuman.vue'),
-        meta: { title: 'Kelola Pengumuman - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+        meta: { title: 'Kelola Pengumuman - Admin Kelurahan', requiresAuth: true, menu: 'pengumuman', roles: ['super_admin', 'staff_konten'] }
       },
       {
         path: 'layanan',
         name: 'admin-layanan',
         component: () => import('../pages/admin/ManageLayanan.vue'),
-        meta: { title: 'Kelola Layanan - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_pelayanan'] }
+        meta: { title: 'Kelola Layanan - Admin Kelurahan', requiresAuth: true, menu: 'layanan', roles: ['super_admin', 'staff_pelayanan'] }
       },
       {
         path: 'galeri',
         name: 'admin-galeri',
         component: () => import('../pages/admin/ManageGaleri.vue'),
-        meta: { title: 'Kelola Galeri Foto - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+        meta: { title: 'Kelola Galeri Foto - Admin Kelurahan', requiresAuth: true, menu: 'galeri', roles: ['super_admin', 'staff_konten'] }
       },
       {
         path: 'agenda',
         name: 'admin-agenda',
         component: () => import('../pages/admin/ManageAgenda.vue'),
-        meta: { title: 'Kelola Agenda Kegiatan - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten'] }
+        meta: { title: 'Kelola Agenda Kegiatan - Admin Kelurahan', requiresAuth: true, menu: 'agenda', roles: ['super_admin', 'staff_konten'] }
       },
       {
         path: 'dokumen',
         name: 'admin-dokumen',
         component: () => import('../pages/admin/ManageDokumen.vue'),
-        meta: { title: 'Kelola Dokumen PDF - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten', 'staff_administrasi'] }
+        meta: { title: 'Kelola Dokumen PDF - Admin Kelurahan', requiresAuth: true, menu: 'dokumen', roles: ['super_admin', 'staff_konten', 'staff_administrasi'] }
       },
       {
         path: 'profil',
         name: 'admin-profil',
         component: () => import('../pages/admin/ManageProfil.vue'),
-        meta: { title: 'Profil & Aparatur - Admin Kelurahan', requiresAuth: true, roles: ['super_admin'] }
+        meta: { title: 'Profil & Aparatur - Admin Kelurahan', requiresAuth: true, menu: 'profil', roles: ['super_admin'] }
+      },
+      {
+        path: 'system-settings',
+        name: 'admin-system-settings',
+        component: () => import('../pages/admin/ManageSystemSettings.vue'),
+        meta: { title: 'Setting System - Admin Kelurahan', requiresAuth: true, roles: ['super_admin'] }
       },
       {
         path: 'lembaga',
         name: 'admin-lembaga',
         component: () => import('../pages/admin/ManageLembaga.vue'),
-        meta: { title: 'Kelola Lembaga Kemasyarakatan - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_administrasi'] }
+        meta: { title: 'Kelola Lembaga Kemasyarakatan - Admin Kelurahan', requiresAuth: true, menu: 'lembaga', roles: ['super_admin', 'staff_administrasi'] }
       },
       {
         path: 'statistik',
         name: 'admin-statistik',
         component: () => import('../pages/admin/ManageStatistik.vue'),
-        meta: { title: 'Statistik Wilayah - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_administrasi'] }
+        meta: { title: 'Statistik Wilayah - Admin Kelurahan', requiresAuth: true, menu: 'statistik', roles: ['super_admin', 'staff_administrasi'] }
       },
       {
         path: 'transparansi',
         name: 'admin-transparansi',
         component: () => import('../pages/admin/ManageTransparansi.vue'),
-        meta: { title: 'Transparansi Anggaran - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_administrasi'] }
+        meta: { title: 'Transparansi Anggaran - Admin Kelurahan', requiresAuth: true, menu: 'transparansi', roles: ['super_admin', 'staff_administrasi'] }
       },
       {
         path: 'kategori',
         name: 'admin-kategori',
         component: () => import('../pages/admin/ManageKategori.vue'),
-        meta: { title: 'Master Kategori - Admin Kelurahan', requiresAuth: true, roles: ['super_admin', 'staff_konten', 'staff_pelayanan', 'staff_administrasi'] }
+        meta: { title: 'Master Kategori - Admin Kelurahan', requiresAuth: true, menu: 'kategori', roles: ['super_admin', 'staff_konten', 'staff_pelayanan', 'staff_administrasi'] }
       }
     ]
   },
@@ -273,14 +333,38 @@ router.beforeEach((to, from, next) => {
     next('/admin/login');
   } else if (to.path === '/admin/login' && isAuth) {
     next('/admin');
-  } else if (to.meta.roles && isAuth) {
+  } else if (to.meta.requiresAuth && isAuth) {
     const user = AdminService.getAuthUser();
     const userRole = user?.role || '';
-    if (userRole === 'super_admin' || to.meta.roles.includes(userRole)) {
+
+    // Super Admin memiliki hak penuh ke semua rute
+    if (userRole === 'super_admin') {
       next();
-    } else {
-      next('/admin');
+      return;
     }
+
+    // Pengecekan izin akses menu granular
+    if (to.meta.menu) {
+      const allowedMenus = user?.effective_menus || user?.accessible_menus;
+      if (Array.isArray(allowedMenus) && allowedMenus.includes(to.meta.menu)) {
+        next();
+        return;
+      }
+      next('/admin');
+      return;
+    }
+
+    // Fallback pengecekan role jika tidak ada meta.menu khusus (misal admin-staff, activity-logs)
+    if (to.meta.roles) {
+      if (to.meta.roles.includes(userRole)) {
+        next();
+      } else {
+        next('/admin');
+      }
+      return;
+    }
+
+    next();
   } else {
     next();
   }

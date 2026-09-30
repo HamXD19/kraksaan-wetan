@@ -6,6 +6,7 @@ use App\Models\AgendaKegiatan;
 use App\Models\Berita;
 use App\Models\Dokumen;
 use App\Models\Galeri;
+use App\Models\HalamanKustom;
 use App\Models\Lembaga;
 use App\Models\Pengumuman;
 use App\Models\PerangkatKelurahan;
@@ -293,5 +294,112 @@ class FileCleanupOnDeleteTest extends TestCase
         $savedPath = $response->json('data.path');
         $this->assertNotNull($savedPath);
         $this->assertTrue(Storage::disk('public')->exists($savedPath));
+    }
+
+    public function test_agenda_deletes_photo_from_storage_on_admin_delete(): void
+    {
+        Storage::fake('public');
+        $token = $this->getAdminToken();
+
+        $photoName = 'agenda_'.uniqid().'.jpg';
+        Storage::disk('public')->put('uploads/'.$photoName, 'dummy agenda photo');
+
+        $agenda = AgendaKegiatan::create([
+            'judul' => 'Agenda Bersih Desa',
+            'slug' => 'agenda-bersih-desa-'.uniqid(),
+            'foto' => 'uploads/'.$photoName,
+            'lokasi' => 'Balai Kelurahan',
+            'tanggal_mulai' => now(),
+            'tanggal_selesai' => now()->addHours(2),
+            'deskripsi' => 'Deskripsi agenda',
+            'is_aktif' => true,
+        ]);
+
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$photoName));
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->deleteJson('/api/admin/agenda/'.$agenda->id);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('agenda_kegiatans', ['id' => $agenda->id]);
+        $this->assertFalse(Storage::disk('public')->exists('uploads/'.$photoName));
+    }
+
+    public function test_halaman_kustom_deletes_image_from_storage_on_admin_delete(): void
+    {
+        Storage::fake('public');
+        $token = $this->getAdminToken();
+
+        $imgName = 'halaman_'.uniqid().'.jpg';
+        Storage::disk('public')->put('uploads/'.$imgName, 'dummy page image');
+
+        $halaman = HalamanKustom::create([
+            'judul' => 'Halaman Kustom Test',
+            'slug' => 'halaman-kustom-test-'.uniqid(),
+            'kategori' => 'profil',
+            'ringkasan' => 'Ringkasan halaman',
+            'gambar' => 'uploads/'.$imgName,
+            'konten' => '<p>Konten</p>',
+            'aktif' => true,
+            'urutan' => 1,
+        ]);
+
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$imgName));
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->deleteJson('/api/admin/halaman-kustom/'.$halaman->id);
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('halaman_kustoms', ['id' => $halaman->id]);
+        $this->assertFalse(Storage::disk('public')->exists('uploads/'.$imgName));
+    }
+
+    public function test_storage_stats_and_clean_orphans_endpoints_work_properly(): void
+    {
+        Storage::fake('public');
+        $token = $this->getAdminToken();
+
+        // 1. Simpan satu berkas aktif yang terdaftar di database
+        $activeName = 'active_file_'.uniqid().'.pdf';
+        Storage::disk('public')->put('uploads/'.$activeName, 'active file content');
+
+        $dokumen = Dokumen::create([
+            'judul' => 'Dokumen Aktif',
+            'file' => 'uploads/'.$activeName,
+            'kategori' => 'Transparansi',
+            'aktif' => true,
+            'diunduh' => 0,
+        ]);
+
+        // 2. Simpan 2 berkas yang tidak terdaftar di database (orphaned)
+        $orphan1 = 'orphan_1_'.uniqid().'.jpg';
+        $orphan2 = 'orphan_2_'.uniqid().'.png';
+        Storage::disk('public')->put('uploads/'.$orphan1, 'dummy orphan 1 content');
+        Storage::disk('public')->put('uploads/'.$orphan2, 'dummy orphan 2 content');
+
+        // Cek endpoint getStorageStats
+        $statsResponse = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/admin/storage/stats');
+
+        $statsResponse->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.orphaned_files_count', 2);
+
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$activeName));
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$orphan1));
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$orphan2));
+
+        // Bersihkan via cleanOrphanedStorage endpoint
+        $cleanResponse = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/admin/storage/clean-orphans');
+
+        $cleanResponse->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.deleted_count', 2);
+
+        // Verifikasi: Berkas orphan terhapus, berkas aktif tetap aman
+        $this->assertTrue(Storage::disk('public')->exists('uploads/'.$activeName));
+        $this->assertFalse(Storage::disk('public')->exists('uploads/'.$orphan1));
+        $this->assertFalse(Storage::disk('public')->exists('uploads/'.$orphan2));
     }
 }

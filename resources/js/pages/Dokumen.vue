@@ -1,31 +1,21 @@
 <template>
-  <div class="pb-20">
+  <div class="min-h-screen bg-slate-50/50 pb-20">
     <!-- Breadcrumb Nav -->
-    <Breadcrumb :items="[{ label: 'Beranda', to: '/' }, { label: 'Unduh Dokumen Publik' }]" />
+    <Breadcrumb :items="[{ label: 'Beranda', to: '/' }, { label: 'Dokumen' }]" />
 
     <!-- Hero Header -->
-    <section class="relative bg-emerald-950 text-white overflow-hidden py-12 sm:py-16 border-b border-emerald-800 reveal-fade">
-      <!-- Background: Mengambil Foto Latar Hero Beranda -->
+    <section class="relative bg-emerald-950 text-white overflow-hidden py-10 sm:py-14 border-b border-emerald-800">
+      <!-- Background Hero Image -->
       <div class="absolute inset-0 z-0 overflow-hidden">
         <img 
           :src="heroImage" 
           alt="Latar Hero Kelurahan Kraksaan Wetan" 
-          class="w-full h-full object-cover object-[center_35%] pointer-events-none"
+          class="w-full h-full object-cover object-[center_35%] pointer-events-none opacity-25"
           fetchpriority="high"
           loading="eager"
         />
-
-        <!-- Government Gradient Masks -->
-        <div class="absolute inset-0 z-1 bg-gradient-to-r from-emerald-950/95 via-emerald-950/90 to-emerald-950/70"></div>
+        <div class="absolute inset-0 z-1 bg-gradient-to-r from-emerald-950 via-emerald-950/90 to-emerald-900/80"></div>
         <div class="absolute inset-0 z-1 bg-gradient-to-t from-emerald-950 via-transparent to-emerald-950/40"></div>
-        <div class="absolute inset-0 z-1 bg-radial at-top opacity-20 mix-blend-overlay"></div>
-      </div>
-
-      <!-- Permanent Decorative Landscape Silhouette Contour at Bottom -->
-      <div class="absolute bottom-0 inset-x-0 z-2 pointer-events-none opacity-40">
-        <svg class="w-full h-10 sm:h-12 text-emerald-950 fill-current preserve-3d" viewBox="0 0 1440 120" preserveAspectRatio="none">
-          <path d="M0,32L60,42.7C120,53,240,75,360,69.3C480,64,600,32,720,32C840,32,960,64,1080,69.3C1200,75,1320,53,1380,42.7L1440,32L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
-        </svg>
       </div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -33,1196 +23,752 @@
           <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
           Pusat Unduhan & Dokumen Resmi
         </div>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          Unduh Dokumen Publik Kelurahan
+        <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          Daftar Dokumen Publik
         </h1>
-        <p class="text-xs sm:text-sm md:text-base text-emerald-200/90 mt-3 max-w-3xl leading-relaxed">
-          Layanan pengunduhan berkas dokumen resmi kedinasan, formulir permohonan surat kependudukan, produk hukum, surat keputusan lurah, laporan kinerja, dan pedoman pelayanan warga Kelurahan Kraksaan Wetan secara transparan, mudah, dan bebas biaya (Rp 0).
+        <p class="text-xs sm:text-sm md:text-base text-emerald-200/90 mt-2.5 max-w-3xl leading-relaxed">
+          Akses dan unduh berkas dokumen kedinasan, perencanaan, laporan pertanggungjawaban, produk hukum, dan regulasi Kelurahan Kraksaan Wetan secara transparan dan mudah.
         </p>
 
-        <!-- Quick Metrics -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-8 max-w-2xl">
-          <div class="bg-emerald-900/60 border border-emerald-700/50 backdrop-blur-xs p-3.5 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center font-bold text-sm">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-            <div>
-              <div class="text-lg sm:text-xl font-extrabold text-white">{{ meta.total || documents.length }}</div>
-              <div class="text-[11px] text-emerald-300/80 font-medium">Dokumen Tersedia</div>
-            </div>
+        <!-- Quick Summary Counters -->
+        <div class="flex flex-wrap items-center gap-3 sm:gap-6 mt-6 text-xs sm:text-sm text-emerald-200/90">
+          <div class="flex items-center gap-2 bg-emerald-900/60 border border-emerald-700/60 px-3.5 py-1.5 rounded-xl backdrop-blur-xs">
+            <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Total: <strong class="text-white font-bold">{{ documents.length }}</strong> Dokumen</span>
           </div>
-
-          <div class="bg-emerald-900/60 border border-emerald-700/50 backdrop-blur-xs p-3.5 rounded-2xl flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center font-bold text-sm">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-            </div>
-            <div>
-              <div class="text-lg sm:text-xl font-extrabold text-white">{{ totalDownloads }}</div>
-              <div class="text-[11px] text-emerald-300/80 font-medium">Kali Diunduh</div>
-            </div>
+          <div class="flex items-center gap-2 bg-emerald-900/60 border border-emerald-700/60 px-3.5 py-1.5 rounded-xl backdrop-blur-xs">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>Total Diunduh: <strong class="text-white font-bold">{{ totalDownloads }}</strong> Kali</span>
           </div>
-
-          <div class="hidden sm:flex bg-emerald-900/60 border border-emerald-700/50 backdrop-blur-xs p-3.5 rounded-2xl items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-sky-400/20 text-sky-300 flex items-center justify-center font-bold text-sm">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            </div>
-            <div>
-              <div class="text-lg sm:text-xl font-extrabold text-white">Format PDF</div>
-              <div class="text-[11px] text-emerald-300/80 font-medium">Resmi & Terverifikasi</div>
-            </div>
+          <div v-if="selectedKategori !== 'Semua Kategori'" class="flex items-center gap-2 bg-amber-400/20 border border-amber-400/40 text-amber-200 px-3 py-1 rounded-xl">
+            <span>Filter Kategori: <strong class="text-amber-300 font-bold">{{ selectedKategori }}</strong></span>
+            <button @click="selectedKategori = 'Semua Kategori'; handleFilterChange()" class="hover:text-white cursor-pointer ml-1 font-bold">&times;</button>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Main Container -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 space-y-8">
-      <!-- Search & Mode Switcher Bar -->
-      <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
-        <!-- Search Input -->
-        <div class="relative w-full md:w-96">
-          <input 
-            v-model="searchQuery" 
-            @input="handleSearch"
-            type="text" 
-            placeholder="Cari berkas dokumen, nomor SK, kata kunci..." 
-            class="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition"
-          />
-          <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
-          <button 
-            v-if="searchQuery" 
-            @click="clearSearch"
-            class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 p-0.5 rounded-full cursor-pointer"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 sm:mt-8">
+      <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-4 sm:p-6 space-y-6">
+        
+        <!-- Controls Bar (Filter Tahun, Kategori, Show entries, Search) -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-slate-100">
+          <!-- Left Controls (Dropdowns) -->
+          <div class="flex flex-wrap items-center gap-3 sm:gap-4 text-xs sm:text-sm font-medium text-slate-700">
+            <!-- Filter Tahun -->
+            <div class="flex items-center gap-2">
+              <label for="filter-tahun" class="font-semibold text-slate-700 shrink-0">Tahun:</label>
+              <div class="relative">
+                <select 
+                  id="filter-tahun"
+                  v-model="selectedTahun"
+                  @change="handleFilterChange"
+                  class="appearance-none bg-slate-50 border border-emerald-300/80 hover:border-emerald-500 rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition cursor-pointer"
+                >
+                  <option v-for="t in allTahunOptions" :key="t" :value="t">{{ t }}</option>
+                </select>
+                <svg class="w-4 h-4 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </div>
 
-        <!-- View Switcher & Quick Reset -->
-        <div class="flex items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-          <div class="inline-flex p-1 rounded-2xl bg-slate-100 border border-slate-200/80 text-xs font-bold">
+            <!-- Filter Kategori -->
+            <div class="flex items-center gap-2">
+              <label for="filter-kategori" class="font-semibold text-slate-700 shrink-0">Kategori:</label>
+              <div class="relative">
+                <select 
+                  id="filter-kategori"
+                  v-model="selectedKategori"
+                  @change="handleFilterChange"
+                  class="appearance-none bg-slate-50 border border-emerald-400 hover:border-emerald-600 rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-semibold text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition cursor-pointer max-w-[210px] sm:max-w-xs truncate"
+                >
+                  <option v-for="cat in allKategoriOptions" :key="cat" :value="cat">{{ cat }}</option>
+                </select>
+                <svg class="w-4 h-4 text-emerald-700 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Show Entries -->
+            <div class="flex items-center gap-2">
+              <label for="filter-show" class="font-semibold text-slate-700 shrink-0">Show:</label>
+              <div class="relative">
+                <select 
+                  id="filter-show"
+                  v-model.number="perPage"
+                  @change="currentPage = 1"
+                  class="appearance-none bg-slate-50 border border-emerald-300/80 hover:border-emerald-500 rounded-xl px-3.5 py-2 pr-8 text-xs sm:text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white transition cursor-pointer"
+                >
+                  <option :value="10">10 entries</option>
+                  <option :value="25">25 entries</option>
+                  <option :value="50">50 entries</option>
+                  <option :value="100">100 entries</option>
+                </select>
+                <svg class="w-4 h-4 text-slate-500 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Reset Filter Button -->
             <button 
+              v-if="hasActiveFilters"
+              @click="resetFilters"
               type="button"
-              @click="switchViewMode('folder')"
-              class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl transition cursor-pointer"
-              :class="viewMode === 'folder' ? 'bg-white text-emerald-800 shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
+              class="text-xs text-rose-600 hover:text-rose-800 font-semibold underline cursor-pointer ml-1"
             >
-              <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
-              <span>Mode Folder</span>
-            </button>
-            <button 
-              type="button"
-              @click="switchViewMode('all')"
-              class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl transition cursor-pointer"
-              :class="viewMode === 'all' ? 'bg-white text-emerald-800 shadow-xs font-extrabold' : 'text-slate-600 hover:text-slate-900'"
-            >
-              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-              <span>Semua Dokumen</span>
+              Reset Filter
             </button>
           </div>
 
-          <button 
-            v-if="hasActiveFilter" 
-            @click="resetFilters" 
-            class="text-xs text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer ml-2"
-          >
-            Reset Filter
-          </button>
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      <LoadingSpinner v-if="loading" />
-
-      <!-- Main Content Area -->
-      <template v-else>
-        <!-- ========================================================================= -->
-        <!-- STATE A: SEARCH ACTIVE (Shows Search Results with Folder badges)          -->
-        <!-- ========================================================================= -->
-        <div v-if="searchQuery.trim()" class="space-y-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-amber-50/80 border border-amber-200">
-            <div class="flex items-center gap-2 text-xs sm:text-sm text-amber-900 font-semibold">
-              <svg class="w-5 h-5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              <span>Hasil pencarian untuk <strong>"{{ searchQuery }}"</strong> &bull; Ditemukan <strong>{{ searchResults.length }}</strong> berkas</span>
-            </div>
-            <button 
-              @click="clearSearch" 
-              class="text-xs font-bold text-amber-800 hover:text-amber-950 underline cursor-pointer self-start sm:self-auto"
-            >
-              &times; Bersihkan Pencarian
-            </button>
-          </div>
-
-          <!-- Empty search -->
-          <div v-if="searchResults.length === 0" class="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto space-y-4">
-            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Tidak ada dokumen yang sesuai</h3>
-              <p class="text-xs text-slate-500 mt-1">Coba gunakan kata kunci lain seperti "Renstra", "DPA", "Surat", atau "2026".</p>
-            </div>
-            <button 
-              @click="clearSearch"
-              class="px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition cursor-pointer"
-            >
-              Kembali ke Semua Berkas
-            </button>
-          </div>
-
-          <!-- Search Cards Grid -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div 
-              v-for="doc in searchResults" 
-              :key="doc.id"
-              class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all p-5 sm:p-6 flex flex-col justify-between group relative overflow-hidden"
-            >
-              <!-- Card Content -->
-              <div>
-                <div class="flex flex-wrap items-center gap-1.5 mb-3">
-                  <!-- Folder indicator badge -->
-                  <button 
-                    @click="openFolder(doc.periode)" 
-                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-200 hover:bg-amber-100 transition cursor-pointer"
-                    title="Buka folder ini"
-                  >
-                    <svg class="w-3.5 h-3.5 text-amber-600" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
-                    <span>Folder: {{ doc.periode || 'Umum' }}</span>
-                  </button>
-
-                  <!-- Kategori Badge -->
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
-                    {{ doc.kategori || 'Dokumen' }}
-                  </span>
-
-                  <!-- Year / Period Time Detail -->
-                  <span v-if="doc.label_periode_lengkap || doc.tahun" class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
-                    {{ doc.label_periode_lengkap || doc.tahun }}
-                  </span>
-                </div>
-
-                <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
-                  {{ doc.judul }}
-                </h3>
-
-                <div v-if="doc.nomor_dokumen" class="text-xs font-mono text-emerald-800 font-semibold mt-1 flex items-center gap-1.5">
-                  <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                  <span>No: {{ doc.nomor_dokumen }}</span>
-                </div>
-
-                <p v-if="doc.deskripsi" class="text-xs text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
-                  {{ (doc.deskripsi || '').replace(/<[^>]*>?/gm, '') }}
-                </p>
-              </div>
-
-              <!-- Card Action -->
-              <div class="pt-4 mt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div class="flex items-center gap-3 text-xs text-slate-500">
-                  <span v-if="doc.ukuran_file">{{ doc.ukuran_file }}</span>
-                  <span class="font-medium text-emerald-700">{{ doc.diunduh || 0 }} unduhan</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button 
-                    type="button"
-                    @click="openPreviewModal(doc)"
-                    class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition text-xs font-semibold cursor-pointer"
-                  >
-                    Detail
-                  </button>
-                  <button 
-                    type="button"
-                    @click="handleDownload(doc)"
-                    class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs cursor-pointer"
-                  >
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                    <span>Unduh</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- STATE B: MODE FOLDER - ROOT DIRECTORY (Showing the 6 Folder Cards)        -->
-        <!-- ========================================================================= -->
-        <div v-else-if="viewMode === 'folder' && !activeFolder" class="space-y-6">
-          <!-- Folder Directory Header -->
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-200">
-            <div>
-              <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2">
-                <svg class="w-6 h-6 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
-                <span>Direktori Folder Dokumen Kelurahan</span>
-              </h2>
-              <p class="text-xs text-slate-500 mt-0.5">
-                Pilih folder periode di bawah untuk membuka dan melihat daftar berkas dokumen yang tersimpan:
-              </p>
-            </div>
-            <div class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-600 self-start sm:self-auto">
-              Total {{ documents.length }} Berkas Tersedia
-            </div>
-          </div>
-
-          <!-- Folder Cards Grid (2 cols on md, 3 cols on xl) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <div 
-              v-for="folder in folderList" 
-              :key="folder.id"
-              @click="openFolder(folder.id)"
-              class="group relative bg-white rounded-3xl border border-slate-200 p-6 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between cursor-pointer overflow-hidden"
-              :class="folder.accentBorder"
-            >
-              <!-- Subtle gradient glow backdrop -->
-              <div 
-                class="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-30 blur-2xl pointer-events-none group-hover:scale-150 transition-transform duration-500"
-                :style="{ backgroundColor: folder.folderColor }"
-              ></div>
-
-              <!-- Top Content -->
-              <div class="relative z-10 space-y-4">
-                <div class="flex items-center justify-between">
-                  <!-- Big Folder Tab Icon -->
-                  <div 
-                    class="w-14 h-14 rounded-2xl flex items-center justify-center border transition-transform duration-200 group-hover:scale-110 shadow-xs"
-                    :class="folder.iconBg"
-                  >
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
-                    </svg>
-                  </div>
-
-                  <!-- Count Badge -->
-                  <span 
-                    class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold border shadow-2xs"
-                    :class="folder.badgeClass"
-                  >
-                    {{ folder.count }} Berkas
-                  </span>
-                </div>
-
-                <div>
-                  <h3 class="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-emerald-700 transition-colors flex items-center justify-between">
-                    <span>{{ folder.name }}</span>
-                  </h3>
-                  <p class="text-xs text-slate-500 mt-1.5 leading-relaxed line-clamp-2">
-                    {{ folder.subtitle }}
-                  </p>
-                </div>
-
-                <!-- Available Year Pills in Folder -->
-                <div v-if="folder.years.length > 0" class="flex items-center gap-1.5 flex-wrap pt-1">
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tahun:</span>
-                  <span 
-                    v-for="y in folder.years.slice(0, 3)" 
-                    :key="y"
-                    class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"
-                  >
-                    {{ y }}
-                  </span>
-                  <span v-if="folder.years.length > 3" class="text-[10px] text-slate-400 font-bold">
-                    +{{ folder.years.length - 3 }} lainnya
-                  </span>
-                </div>
-              </div>
-
-              <!-- Bottom Footer: Click Prompt -->
-              <div class="relative z-10 pt-4 mt-5 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 group-hover:text-emerald-700 transition-colors">
-                <span class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span>Buka Folder</span>
-                </span>
-                <span class="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  <span>Lihat Berkas</span>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- STATE C: MODE FOLDER - DRILLDOWN VIEW (Inside a Specific Folder)          -->
-        <!-- ========================================================================= -->
-        <div v-else-if="viewMode === 'folder' && activeFolder" class="space-y-6">
-          <!-- Folder Navigation Breadcrumb Bar -->
-          <div class="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 text-xs sm:text-sm">
+          <!-- Right Controls (Search Input + Search Button) -->
+          <div class="flex items-center w-full lg:w-auto">
+            <div class="relative flex items-stretch w-full sm:w-72">
+              <input 
+                v-model="searchQuery"
+                @input="currentPage = 1"
+                @keyup.enter="currentPage = 1"
+                type="text" 
+                placeholder="Search Here..." 
+                class="w-full pl-3.5 pr-8 py-2 rounded-l-xl bg-slate-50 border border-slate-300 text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white focus:border-emerald-600 transition"
+              />
               <button 
-                type="button" 
-                @click="openFolder(null)"
-                class="font-bold text-slate-500 hover:text-emerald-700 flex items-center gap-1.5 transition cursor-pointer"
+                v-if="searchQuery" 
+                @click="searchQuery = ''; currentPage = 1" 
+                class="absolute right-12 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                title="Hapus pencarian"
               >
-                <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
-                <span>Direktori Folder</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
               </button>
-              <span class="text-slate-300 font-bold">/</span>
-              <span class="font-extrabold text-slate-900 flex items-center gap-1.5 bg-amber-50 px-2.5 py-1 rounded-xl text-amber-900 border border-amber-200/80">
-                <svg class="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
-                <span>{{ currentFolder?.name || activeFolder }}</span>
+              <button 
+                type="button"
+                @click="currentPage = 1"
+                class="inline-flex items-center justify-center px-4 py-2 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white rounded-r-xl font-medium transition cursor-pointer shadow-xs"
+                title="Cari"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="loading" class="py-16">
+          <LoadingSpinner />
+        </div>
+
+        <!-- Table View Section -->
+        <template v-else>
+          <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-xs">
+            <table class="w-full text-left border-collapse">
+              <!-- Table Header: Solid Emerald Green -->
+              <thead class="bg-emerald-800 text-white">
+                <tr>
+                  <!-- NO -->
+                  <th 
+                    @click="handleSort('id')" 
+                    scope="col"
+                    class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-center w-14 cursor-pointer hover:bg-emerald-900 transition select-none"
+                    title="Urutkan berdasarkan Nomor"
+                  >
+                    <div class="inline-flex items-center gap-1">
+                      <span>NO</span>
+                      <span class="text-[10px] opacity-80" :class="sortField === 'id' ? 'opacity-100 font-extrabold text-amber-300' : ''">
+                        {{ sortField === 'id' ? (sortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+                      </span>
+                    </div>
+                  </th>
+
+                  <!-- JUDUL DOKUMEN -->
+                  <th 
+                    @click="handleSort('judul')" 
+                    scope="col"
+                    class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider min-w-[280px] cursor-pointer hover:bg-emerald-900 transition select-none"
+                    title="Urutkan berdasarkan Judul Dokumen"
+                  >
+                    <div class="inline-flex items-center gap-1.5">
+                      <span>JUDUL DOKUMEN</span>
+                      <span class="text-[10px] opacity-80" :class="sortField === 'judul' ? 'opacity-100 font-extrabold text-amber-300' : ''">
+                        {{ sortField === 'judul' ? (sortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+                      </span>
+                    </div>
+                  </th>
+
+                  <!-- PDF -->
+                  <th scope="col" class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-center w-24">
+                    PDF
+                  </th>
+
+                  <!-- ZIP -->
+                  <th scope="col" class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-center w-20">
+                    ZIP
+                  </th>
+
+                  <!-- KATEGORI -->
+                  <th 
+                    @click="handleSort('kategori')" 
+                    scope="col"
+                    class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-center min-w-[150px] cursor-pointer hover:bg-emerald-900 transition select-none"
+                    title="Urutkan berdasarkan Kategori"
+                  >
+                    <div class="inline-flex items-center gap-1.5 justify-center">
+                      <span>KATEGORI</span>
+                      <span class="text-[10px] opacity-80" :class="sortField === 'kategori' ? 'opacity-100 font-extrabold text-amber-300' : ''">
+                        {{ sortField === 'kategori' ? (sortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+                      </span>
+                    </div>
+                  </th>
+
+                  <!-- TANGGAL -->
+                  <th 
+                    @click="handleSort('tanggal')" 
+                    scope="col"
+                    class="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-center w-32 cursor-pointer hover:bg-emerald-900 transition select-none"
+                    title="Urutkan berdasarkan Tanggal"
+                  >
+                    <div class="inline-flex items-center gap-1.5 justify-center">
+                      <span>TANGGAL</span>
+                      <span class="text-[10px] opacity-80" :class="sortField === 'tanggal' ? 'opacity-100 font-extrabold text-amber-300' : ''">
+                        {{ sortField === 'tanggal' ? (sortOrder === 'asc' ? '▲' : '▼') : '▲▼' }}
+                      </span>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+
+              <!-- Table Body -->
+              <tbody class="divide-y divide-slate-200/80 text-xs sm:text-sm bg-white">
+                <tr 
+                  v-for="(doc, idx) in paginatedDocuments" 
+                  :key="doc.id"
+                  class="hover:bg-emerald-50/40 transition-colors group"
+                >
+                  <!-- NO -->
+                  <td class="py-4 px-4 text-center font-semibold text-slate-600 align-middle">
+                    {{ (currentPage - 1) * perPage + idx + 1 }}
+                  </td>
+
+                  <!-- JUDUL DOKUMEN -->
+                  <td class="py-4 px-4 align-middle">
+                    <div class="flex flex-col">
+                      <button 
+                        @click="openPreviewModal(doc)" 
+                        class="text-left font-bold text-slate-900 hover:text-emerald-700 transition cursor-pointer text-xs sm:text-sm leading-snug"
+                      >
+                        {{ doc.judul }}
+                      </button>
+                      
+                      <div class="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                        <span v-if="doc.nomor_dokumen" class="font-medium text-slate-600 mr-1.5 font-mono">
+                          [{{ doc.nomor_dokumen }}]
+                        </span>
+                        <span>{{ doc.deskripsi || 'Dokumen publikasi resmi kedinasan Kelurahan Kraksaan Wetan.' }}</span>
+                      </div>
+
+                      <div class="flex items-center gap-2 mt-1.5 text-[10px] text-slate-400">
+                        <span v-if="doc.ukuran_file">&bull; {{ doc.ukuran_file }}</span>
+                        <span>&bull; Diunduh {{ doc.diunduh || 0 }} kali</span>
+                        <span v-if="doc.tahun">&bull; TA {{ doc.tahun }}</span>
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- PDF Column (Preview Pop-up & Quick Download) -->
+                  <td class="py-4 px-4 text-center align-middle">
+                    <div class="inline-flex items-center justify-center gap-1.5">
+                      <button 
+                        @click="openPreviewModal(doc)"
+                        type="button"
+                        class="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition active:scale-95 cursor-pointer"
+                        :title="'Lihat Pratinjau Pop-up PDF: ' + doc.judul"
+                      >
+                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                        <span>PDF</span>
+                      </button>
+
+                      <button 
+                        @click.stop="handleDownload(doc)"
+                        type="button"
+                        class="p-1 rounded-full text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 transition cursor-pointer"
+                        :title="'Unduh Berkas Langsung: ' + doc.judul"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+
+                  <!-- ZIP Column -->
+                  <td class="py-4 px-4 text-center align-middle">
+                    <button 
+                      v-if="isZipFile(doc)"
+                      @click="handleDownload(doc)"
+                      type="button"
+                      class="inline-flex items-center justify-center gap-1 px-3 py-1.5 rounded-full bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-xs transition active:scale-95 cursor-pointer"
+                      :title="'Unduh Arsip ZIP: ' + doc.judul"
+                    >
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+                      </svg>
+                      <span>ZIP</span>
+                    </button>
+                    <span v-else class="text-slate-400 font-bold select-none text-base">-</span>
+                  </td>
+
+                  <!-- KATEGORI Column -->
+                  <td class="py-4 px-4 text-center align-middle">
+                    <button 
+                      @click="selectedKategori = doc.kategori; handleFilterChange()"
+                      class="inline-block px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold transition cursor-pointer text-center max-w-[160px] truncate"
+                      :title="'Filter dokumen dengan kategori: ' + doc.kategori"
+                    >
+                      {{ doc.kategori || 'Umum' }}
+                    </button>
+                  </td>
+
+                  <!-- TANGGAL Column -->
+                  <td class="py-4 px-4 text-center align-middle font-medium text-slate-700 whitespace-nowrap text-xs sm:text-sm">
+                    {{ formatDisplayDate(doc) }}
+                  </td>
+                </tr>
+
+                <!-- Empty State Row -->
+                <tr v-if="filteredDocuments.length === 0">
+                  <td colspan="6" class="py-12 px-4 text-center">
+                    <div class="flex flex-col items-center justify-center max-w-sm mx-auto space-y-3">
+                      <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                      </div>
+                      <div class="text-sm font-bold text-slate-700">Tidak ada dokumen yang sesuai</div>
+                      <p class="text-xs text-slate-500">
+                        Tidak ditemukan berkas dokumen dengan filter atau kata kunci yang Anda masukkan. Silakan ubah filter atau reset.
+                      </p>
+                      <button 
+                        @click="resetFilters" 
+                        class="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold transition cursor-pointer shadow-xs"
+                      >
+                        Reset Semua Filter
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer: Pagination & Info -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2 text-xs sm:text-sm text-slate-600">
+            <!-- Entry counter text -->
+            <div>
+              <span v-if="filteredDocuments.length > 0">
+                Showing <strong>{{ showingFrom }}</strong> to <strong>{{ showingTo }}</strong> of <strong>{{ filteredDocuments.length }}</strong> entries
+              </span>
+              <span v-else>
+                Showing 0 entries
               </span>
             </div>
 
-            <!-- Back to Folders Button -->
-            <button 
-              type="button" 
-              @click="openFolder(null)"
-              class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer self-start sm:self-auto"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-              <span>Kembali ke Semua Folder</span>
-            </button>
-          </div>
-
-          <!-- Active Folder Context Header Banner -->
-          <div class="bg-gradient-to-r from-emerald-900 via-emerald-950 to-[#0f2922] text-white p-6 sm:p-8 rounded-3xl border border-emerald-800 shadow-md relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="relative z-10 space-y-2 max-w-2xl">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-800/90 text-amber-300 text-xs font-bold uppercase tracking-wider border border-emerald-700/60">
-                <span>📁 Isi Folder: {{ currentFolder?.shortName || activeFolder }}</span>
-              </div>
-              <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                {{ currentFolder?.name || activeFolder }}
-              </h1>
-              <p class="text-xs sm:text-sm text-emerald-200/90 leading-relaxed">
-                {{ currentFolder?.subtitle }}
-              </p>
-            </div>
-
-            <div class="relative z-10 flex flex-col items-start md:items-end gap-2 shrink-0">
-              <div class="px-4 py-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white">
-                <span class="text-xs text-emerald-200 block">Berkas di Folder Ini:</span>
-                <span class="text-xl sm:text-2xl font-black text-amber-300">{{ folderDocuments.length }} Dokumen</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Sub-filters inside Active Folder (Year Filter Pills) -->
-          <div v-if="folderAvailableYears.length > 1" class="bg-white p-4 rounded-2xl border border-slate-200 flex items-center gap-2 overflow-x-auto scrollbar-none">
-            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap pr-2">Filter Tahun:</span>
-            <button 
-              @click="selectedFolderTahun = 'Semua'"
-              class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer"
-              :class="selectedFolderTahun === 'Semua' ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-            >
-              Semua Tahun ({{ folderDocumentsCountAll }})
-            </button>
-            <button 
-              v-for="y in folderAvailableYears" 
-              :key="y"
-              @click="selectedFolderTahun = y"
-              class="px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer"
-              :class="selectedFolderTahun === y ? 'bg-emerald-700 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-            >
-              Tahun {{ y }}
-            </button>
-          </div>
-
-          <!-- Empty in Folder -->
-          <div v-if="folderDocuments.length === 0" class="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto space-y-4">
-            <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
-              <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Belum ada dokumen di folder ini</h3>
-              <p class="text-xs text-slate-500 mt-1">Silakan kembali ke direktori utama untuk memilih folder lainnya.</p>
-            </div>
-            <button 
-              @click="openFolder(null)"
-              class="px-4 py-2 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-900 transition cursor-pointer"
-            >
-              Kembali ke Direktori Folder
-            </button>
-          </div>
-
-          <!-- Documents List in Active Folder (Grouped Cleanly) -->
-          <div v-else class="space-y-8">
-            <div v-for="group in folderGroupedDocuments" :key="group.title" class="space-y-4">
-              <!-- Group Header -->
-              <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
-                <div class="w-2.5 h-6 bg-emerald-600 rounded-full"></div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-800">
-                  {{ group.title }}
-                </h2>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                  {{ group.items.length }} berkas
-                </span>
-              </div>
-
-              <!-- Cards Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div 
-                  v-for="doc in group.items" 
-                  :key="doc.id"
-                  class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all p-5 sm:p-6 flex flex-col justify-between group relative overflow-hidden"
-                >
-                  <!-- Card Header: Badges & Info -->
-                  <div>
-                    <div class="flex flex-wrap items-center gap-1.5 mb-3">
-                      <!-- Kategori Badge -->
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        {{ doc.kategori || 'Dokumen Resmi' }}
-                      </span>
-
-                      <!-- Subkategori Badge -->
-                      <span v-if="doc.subkategori" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                        {{ doc.subkategori }}
-                      </span>
-
-                      <!-- Periode Badge -->
-                      <span v-if="doc.periode_ke" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-teal-100 text-teal-800">
-                        {{ doc.periode_ke }}
-                      </span>
-
-                      <!-- Year / Period Time Detail -->
-                      <span v-if="doc.label_periode_lengkap || doc.tahun" class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/60">
-                        {{ doc.label_periode_lengkap || doc.tahun }}
-                      </span>
-                    </div>
-
-                    <!-- Title & Number -->
-                    <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
-                      {{ doc.judul }}
-                    </h3>
-
-                    <div v-if="doc.nomor_dokumen" class="text-xs font-mono text-emerald-800 font-semibold mt-1 flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                      <span>No: {{ doc.nomor_dokumen }}</span>
-                    </div>
-
-                    <!-- Description snippet -->
-                    <p v-if="doc.deskripsi" class="text-xs text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
-                      {{ (doc.deskripsi || '').replace(/<[^>]*>?/gm, '') }}
-                    </p>
-                  </div>
-
-                  <!-- Card Footer Action Buttons -->
-                  <div class="pt-4 mt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 text-xs text-slate-500">
-                      <span v-if="doc.ukuran_file" class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16"/></svg>
-                        {{ doc.ukuran_file }}
-                      </span>
-                      <span class="flex items-center gap-1 font-medium text-emerald-700">
-                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        {{ doc.diunduh || 0 }} unduhan
-                      </span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                      <button 
-                        type="button"
-                        @click="openPreviewModal(doc)"
-                        class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition text-xs font-semibold cursor-pointer inline-flex items-center gap-1.5"
-                        title="Lihat Detail & Pratinjau Dokumen"
-                      >
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <span>Detail</span>
-                      </button>
-
-                      <button 
-                        type="button"
-                        @click="handleDownload(doc)"
-                        class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs cursor-pointer group-hover:scale-[1.02] active:scale-[0.98]"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        <span>Unduh</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ========================================================================= -->
-        <!-- STATE D: MODE ALL DOCUMENTS (Flat List with Multi-Filter Toolbar)         -->
-        <!-- ========================================================================= -->
-        <div v-else class="space-y-6">
-          <!-- Comprehensive Multi-Filter Bar -->
-          <div class="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-xs space-y-3">
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              <!-- Periode Filter -->
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Periode</label>
-                <select 
-                  v-model="selectedPeriode" 
-                  @change="fetchDocuments"
-                  class="w-full py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  <option value="Semua">Semua Periode</option>
-                  <option value="5 Tahunan">5 Tahunan</option>
-                  <option value="Tahunan">Tahunan</option>
-                  <option value="Semesteran">Semesteran</option>
-                  <option value="Triwulanan">Triwulanan</option>
-                  <option value="Bulanan">Bulanan</option>
-                  <option value="Sewaktu-waktu">Sewaktu-waktu</option>
-                </select>
-              </div>
-
-              <!-- Tahun Filter -->
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Tahun</label>
-                <select 
-                  v-model="selectedTahun" 
-                  @change="fetchDocuments"
-                  class="w-full py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  <option value="Semua">Semua Tahun</option>
-                  <option v-for="y in (meta.tahun_list || [2026, 2025, 2024])" :key="y" :value="y">Tahun {{ y }}</option>
-                </select>
-              </div>
-
-              <!-- Kategori Filter -->
-              <div>
-                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Kategori</label>
-                <select 
-                  v-model="selectedKategori" 
-                  @change="selectCategory(selectedKategori)"
-                  class="w-full py-2.5 px-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700"
-                >
-                  <option value="Semua">Semua Kategori</option>
-                  <option v-for="c in availableCategories" :key="c" :value="c">{{ c }}</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Subkategori if any -->
-            <div v-if="availableSubcategories.length > 0" class="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-slate-100">
-              <span class="text-xs font-bold text-slate-400 whitespace-nowrap">Sub:</span>
+            <!-- Pagination Buttons -->
+            <div v-if="totalPages > 1" class="flex items-center gap-1">
+              <!-- Previous Button -->
               <button 
-                @click="selectSubcategory('Semua')"
-                class="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer"
-                :class="selectedSubkategori === 'Semua' ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-slate-100 text-slate-600'"
+                @click="goToPage(currentPage - 1)" 
+                :disabled="currentPage === 1"
+                class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
               >
-                Semua Subkategori
+                Previous
               </button>
+
+              <!-- Page Numbers -->
+              <template v-for="page in visiblePages" :key="page">
+                <span v-if="page === '...'" class="px-2 py-1 text-slate-400">...</span>
+                <button 
+                  v-else
+                  @click="goToPage(page)"
+                  class="px-3 py-1.5 rounded-lg border text-xs font-bold transition cursor-pointer"
+                  :class="currentPage === page ? 'bg-emerald-700 text-white border-emerald-700 shadow-xs' : 'border-slate-200 text-slate-700 hover:bg-slate-100'"
+                >
+                  {{ page }}
+                </button>
+              </template>
+
+              <!-- Next Button -->
               <button 
-                v-for="s in availableSubcategories" 
-                :key="s"
-                @click="selectSubcategory(s)"
-                class="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition cursor-pointer"
-                :class="selectedSubkategori === s ? 'bg-emerald-100 text-emerald-800 font-bold' : 'bg-slate-100 text-slate-600'"
+                @click="goToPage(currentPage + 1)" 
+                :disabled="currentPage === totalPages"
+                class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
               >
-                {{ s }}
+                Next
               </button>
             </div>
           </div>
-
-          <!-- Empty State -->
-          <div 
-            v-if="documents.length === 0" 
-            class="bg-white rounded-3xl border border-slate-200 p-12 text-center max-w-lg mx-auto space-y-4"
-          >
-            <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-            <div>
-              <h3 class="text-base font-bold text-slate-900">Tidak ada dokumen ditemukan</h3>
-              <p class="text-xs text-slate-500 mt-1">Belum ada dokumen publik yang terdaftar pada kriteria filter ini.</p>
-            </div>
-            <button 
-              @click="resetFilters"
-              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition cursor-pointer"
-            >
-              Reset Semua Filter
-            </button>
-          </div>
-
-          <!-- Grouped Document View by Year / Period -->
-          <div v-else class="space-y-8">
-            <div v-for="group in groupedDocuments" :key="group.title" class="space-y-4">
-              <!-- Group Section Header -->
-              <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
-                <div class="w-2.5 h-6 bg-emerald-600 rounded-full"></div>
-                <h2 class="text-base sm:text-lg font-bold text-slate-800">
-                  {{ group.title }}
-                </h2>
-                <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                  {{ group.items.length }} berkas
-                </span>
-              </div>
-
-              <!-- Cards Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div 
-                  v-for="doc in group.items" 
-                  :key="doc.id"
-                  class="bg-white rounded-3xl border border-slate-200/90 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all p-5 sm:p-6 flex flex-col justify-between group relative overflow-hidden"
-                >
-                  <!-- Top Card Header: Badges -->
-                  <div>
-                    <div class="flex flex-wrap items-center gap-1.5 mb-3">
-                      <!-- Kategori Badge -->
-                      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200/80">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        {{ doc.kategori || 'Dokumen Resmi' }}
-                      </span>
-
-                      <!-- Subkategori Badge -->
-                      <span v-if="doc.subkategori" class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
-                        {{ doc.subkategori }}
-                      </span>
-
-                      <!-- Periode Badge -->
-                      <span v-if="doc.periode" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider" :class="getPeriodeBadgeClass(doc.periode)">
-                        {{ doc.periode }}
-                      </span>
-
-                      <!-- Year / Period Time Detail -->
-                      <span v-if="doc.label_periode_lengkap || doc.tahun" class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-50 text-amber-900 border border-amber-200/60">
-                        {{ doc.label_periode_lengkap || doc.tahun }}
-                      </span>
-                    </div>
-
-                    <!-- Title & Number -->
-                    <h3 class="text-base sm:text-lg font-bold text-slate-900 group-hover:text-emerald-700 transition-colors leading-snug">
-                      {{ doc.judul }}
-                    </h3>
-
-                    <div v-if="doc.nomor_dokumen" class="text-xs font-mono text-emerald-800 font-semibold mt-1 flex items-center gap-1.5">
-                      <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                      <span>No: {{ doc.nomor_dokumen }}</span>
-                    </div>
-
-                    <!-- Description snippet -->
-                    <p v-if="doc.deskripsi" class="text-xs text-slate-600 mt-2.5 leading-relaxed line-clamp-2">
-                      {{ (doc.deskripsi || '').replace(/<[^>]*>?/gm, '') }}
-                    </p>
-                  </div>
-
-                  <!-- Bottom Card Meta & Action Buttons -->
-                  <div class="pt-4 mt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div class="flex items-center gap-3 text-xs text-slate-500">
-                      <span v-if="doc.ukuran_file" class="flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7M4 7c0-2 1.5-3 3.5-3h9c2 0 3.5 1 3.5 3M4 7h16"/></svg>
-                        {{ doc.ukuran_file }}
-                      </span>
-                      <span class="flex items-center gap-1 font-medium text-emerald-700">
-                        <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        {{ doc.diunduh || 0 }} unduhan
-                      </span>
-                    </div>
-
-                    <div class="flex items-center gap-2">
-                      <button 
-                        type="button"
-                        @click="openPreviewModal(doc)"
-                        class="px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition text-xs font-semibold cursor-pointer inline-flex items-center gap-1.5"
-                      >
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        <span>Detail</span>
-                      </button>
-
-                      <button 
-                        type="button"
-                        @click="handleDownload(doc)"
-                        class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs cursor-pointer group-hover:scale-[1.02] active:scale-[0.98]"
-                      >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        <span>Unduh</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </template>
-
-      <!-- Bottom Information Card: Bantuan & Kontak -->
-      <div class="bg-gradient-to-br from-emerald-50 to-emerald-100/60 p-6 sm:p-8 rounded-3xl border border-emerald-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div class="space-y-1 max-w-2xl">
-          <div class="flex items-center gap-2 text-emerald-900 font-bold text-sm">
-            <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span>Membutuhkan Dokumen atau Formulir Khusus Lainnya?</span>
-          </div>
-          <p class="text-xs text-emerald-800 leading-relaxed">
-            Jika dokumen atau blangko surat permohonan yang Anda butuhkan belum tersedia dalam daftar unduhan, silakan hubungi petugas pelayanan di Balai Kelurahan Kraksaan Wetan atau melalui layanan WhatsApp Halo SAE.
-          </p>
-        </div>
-
-        <div class="flex items-center gap-3 w-full md:w-auto">
-          <router-link 
-            to="/kontak" 
-            class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition shadow-sm"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-            <span>Hubungi Layanan Warga</span>
-          </router-link>
-        </div>
+        </template>
       </div>
-    </div>
+    </main>
 
-    <!-- Modal Pratinjau & Detail Dokumen -->
-    <div 
-      v-if="selectedPreviewDoc" 
-      class="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4"
-    >
+    <!-- Modal Pratinjau Dokumen PDF Pop-up -->
+    <Teleport to="body">
       <div 
-        class="bg-white rounded-3xl max-w-4xl w-full shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-200"
+        v-if="selectedPreviewDoc" 
+        class="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/80 backdrop-blur-xs animate-fade-in"
+        @click.self="closePreviewModal"
       >
-        <!-- Modal Sticky Header -->
-        <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80 shrink-0">
-          <div class="flex items-center gap-2">
-            <span class="p-2 rounded-xl bg-emerald-100 text-emerald-800">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </span>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 line-clamp-1">Pratinjau & Detail Berkas</h3>
-              <p class="text-[11px] text-slate-500">Kelurahan Kraksaan Wetan</p>
-            </div>
-          </div>
-          <!-- Close button ONLY -->
-          <button 
-            @click="closePreviewModal" 
-            class="text-slate-400 hover:text-slate-600 p-2 rounded-full hover:bg-slate-100 transition cursor-pointer"
-            title="Tutup Jendela"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-
-        <!-- Modal Body (Scrollable) -->
-        <div class="p-6 overflow-y-auto space-y-6">
-          <!-- Metadata Badges Grid -->
-          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-3">
-            <h4 class="text-base font-bold text-slate-900">{{ selectedPreviewDoc.judul }}</h4>
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Kategori</span>
-                <span class="font-semibold text-slate-800">{{ selectedPreviewDoc.kategori || '-' }}</span>
+        <div class="bg-white rounded-2xl sm:rounded-3xl max-w-5xl w-full shadow-2xl border border-slate-200 flex flex-col max-h-[96vh] overflow-hidden">
+          <!-- Modal Top Bar / Header -->
+          <div class="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-slate-200 bg-slate-50/90 shrink-0">
+            <div class="flex items-center gap-3 min-w-0 pr-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
               </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Subkategori</span>
-                <span class="font-semibold text-slate-800">{{ selectedPreviewDoc.subkategori || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Periode / Waktu</span>
-                <span class="font-semibold text-slate-800">{{ selectedPreviewDoc.label_periode_lengkap || selectedPreviewDoc.tahun || '-' }}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block text-[10px] uppercase font-bold">Nomor Dokumen</span>
-                <span class="font-mono text-emerald-800 font-semibold">{{ selectedPreviewDoc.nomor_dokumen || '-' }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Description if available -->
-          <div v-if="selectedPreviewDoc.deskripsi" class="space-y-1">
-            <h5 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Keterangan / Ringkasan Dokumen:</h5>
-            <div 
-              class="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-100 prose prose-sm max-w-none"
-              v-html="selectedPreviewDoc.deskripsi"
-            ></div>
-          </div>
-
-          <!-- PDF Embed / Viewer Frame -->
-          <div class="border border-slate-200 rounded-2xl overflow-hidden bg-slate-100">
-            <div class="bg-slate-200/80 px-4 py-2 flex items-center justify-between text-xs text-slate-600">
-              <span class="font-semibold">Pratinjau Dokumen (PDF)</span>
-              <a 
-                :href="selectedPreviewDoc.file_url" 
-                target="_blank" 
-                class="text-emerald-700 hover:underline font-bold flex items-center gap-1"
-              >
-                <span>Buka di Tab Baru</span>
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-              </a>
-            </div>
-            <div class="h-96 w-full bg-slate-50 flex items-center justify-center">
-              <iframe 
-                :src="selectedPreviewDoc.file_url" 
-                class="w-full h-full border-none"
-                title="Pratinjau Dokumen PDF"
-              >
-                <div class="p-6 text-center text-xs text-slate-500">
-                  Peramban Anda tidak mendukung pratinjau PDF langsung. Silakan klik tombol "Buka di Tab Baru" atau "Unduh Dokumen".
+              <div class="min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="inline-block px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase">
+                    {{ selectedPreviewDoc.kategori || 'Dokumen Publik' }}
+                  </span>
+                  <span v-if="selectedPreviewDoc.nomor_dokumen" class="text-xs text-slate-500 font-mono hidden sm:inline truncate">
+                    No: {{ selectedPreviewDoc.nomor_dokumen }}
+                  </span>
                 </div>
-              </iframe>
+                <h3 class="text-xs sm:text-sm md:text-base font-bold text-slate-900 truncate" :title="selectedPreviewDoc.judul">
+                  {{ selectedPreviewDoc.judul }}
+                </h3>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 shrink-0">
+              <!-- Buka Tab Baru -->
+              <a 
+                :href="`/api/dokumen/${selectedPreviewDoc.id}/pratinjau`" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold transition"
+                title="Buka dokumen di tab jendela baru"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                <span>Tab Baru</span>
+              </a>
+
+              <!-- Unduh PDF Button -->
+              <button 
+                @click="handleDownload(selectedPreviewDoc)" 
+                type="button" 
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs cursor-pointer"
+                title="Unduh berkas PDF ini"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span class="hidden sm:inline">Unduh PDF</span>
+              </button>
+
+              <!-- Close Button -->
+              <button 
+                @click="closePreviewModal" 
+                class="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                aria-label="Tutup pratinjau"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Modal Footer Sticky -->
-        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
-          <div class="text-xs text-slate-500">
-            Ukuran: <strong class="text-slate-700">{{ selectedPreviewDoc.ukuran_file || '-' }}</strong> &bull;
-            Diunduh: <strong class="text-emerald-700">{{ selectedPreviewDoc.diunduh || 0 }} kali</strong>
+          <!-- Modal Body: Embedded PDF Viewer -->
+          <div class="relative flex-1 bg-slate-900 w-full min-h-[55vh] max-h-[72vh] flex flex-col">
+            <iframe 
+              :src="`/api/dokumen/${selectedPreviewDoc.id}/pratinjau#toolbar=1&navpanes=0&view=FitH`"
+              class="w-full flex-1 border-0 bg-slate-900"
+              title="Pratinjau Dokumen PDF"
+            >
+              <div class="flex flex-col items-center justify-center h-full p-8 text-center text-white space-y-3">
+                <p class="text-sm text-slate-300">Pratinjau PDF tidak dapat ditampilkan langsung di peramban ini.</p>
+                <a 
+                  :href="`/api/dokumen/${selectedPreviewDoc.id}/pratinjau`" 
+                  target="_blank" 
+                  class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
+                >
+                  Buka Dokumen PDF di Tab Baru
+                </a>
+              </div>
+            </iframe>
           </div>
-          <div class="flex items-center gap-2">
-            <button 
-              type="button" 
-              @click="closePreviewModal" 
-              class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-            >
-              Tutup
-            </button>
-            <button 
-              type="button" 
-              @click="handleDownload(selectedPreviewDoc)" 
-              class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 text-white text-xs font-bold hover:bg-emerald-800 transition cursor-pointer shadow-xs"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-              <span>Unduh Dokumen</span>
-            </button>
+
+          <!-- Modal Bottom Bar / Footer -->
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-6 py-3 border-t border-slate-200 bg-slate-50/90 text-xs text-slate-600 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-slate-500">
+              <span v-if="selectedPreviewDoc.tahun">Tahun: <strong class="text-slate-700">{{ selectedPreviewDoc.tahun }}</strong></span>
+              <span v-if="selectedPreviewDoc.ukuran_file">&bull; Ukuran: <strong class="text-slate-700">{{ selectedPreviewDoc.ukuran_file }}</strong></span>
+              <span>&bull; Diunduh: <strong class="text-slate-700">{{ selectedPreviewDoc.diunduh || 0 }}x</strong></span>
+              <span>&bull; Tanggal: <strong class="text-slate-700">{{ formatDisplayDate(selectedPreviewDoc) }}</strong></span>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <button 
+                @click="closePreviewModal" 
+                type="button" 
+                class="px-4 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-semibold transition cursor-pointer"
+              >
+                Tutup
+              </button>
+              <button 
+                @click="handleDownload(selectedPreviewDoc)" 
+                type="button" 
+                class="px-4 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold transition shadow-xs cursor-pointer inline-flex items-center gap-1.5"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>Unduh PDF</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import Breadcrumb from '../components/Breadcrumb.vue';
 import LoadingSpinner from '../components/LoadingSpinner.vue';
 import { KelurahanService } from '../services/api';
+import { useToast } from '../composables/useToast';
+
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
 
 const loading = ref(true);
 const documents = ref([]);
-const meta = ref({ total: 0, kategori_list: [], tahun_list: [], master_kategori_tree: [] });
+const meta = ref({ total: 0, kategori_list: [], tahun_list: [] });
 const profil = ref({});
 
-// Folder State
-const viewMode = ref('folder'); // 'folder' | 'all'
-const activeFolder = ref(null);
-const selectedFolderTahun = ref('Semua');
-
-// Filters State
+// Filters
+const selectedTahun = ref('Semua Tahun');
+const selectedKategori = ref('Semua Kategori');
 const searchQuery = ref('');
-const selectedKategori = ref('Semua');
-const selectedSubkategori = ref('Semua');
-const selectedPeriode = ref('Semua');
-const selectedTahun = ref('Semua');
+const perPage = ref(10);
+const currentPage = ref(1);
+
+// Sorting
+const sortField = ref('id'); // 'id' | 'judul' | 'kategori' | 'tanggal'
+const sortOrder = ref('asc'); // 'asc' | 'desc'
+
+// Modal Preview
 const selectedPreviewDoc = ref(null);
 
 const heroImage = computed(() => {
   return profil.value?.hero_image || '/images/hero-bromo-vector.jpg';
 });
 
-// Master Folder Definitions
-const folderDefinitions = [
-  {
-    id: 'Tahunan',
-    name: 'Dokumen Tahunan',
-    shortName: 'Tahunan',
-    subtitle: 'Rencana Kerja (RKP), DPA, LKjIP, Buku Profil, dan dokumen laporan kerja tahunan',
-    iconBg: 'bg-amber-500/10 text-amber-600 border-amber-200 group-hover:bg-amber-500/20',
-    folderColor: '#f59e0b',
-    badgeClass: 'bg-amber-100 text-amber-900 border-amber-200/80',
-    accentBorder: 'hover:border-amber-400 group-hover:shadow-amber-500/10',
-  },
-  {
-    id: 'Triwulanan',
-    name: 'Dokumen Triwulanan',
-    shortName: 'Triwulanan',
-    subtitle: 'Laporan penyerapan anggaran per triwulan, survei berkala kepuasan masyarakat (IKM / SKM)',
-    iconBg: 'bg-emerald-500/10 text-emerald-600 border-emerald-200 group-hover:bg-emerald-500/20',
-    folderColor: '#10b981',
-    badgeClass: 'bg-emerald-100 text-emerald-900 border-emerald-200/80',
-    accentBorder: 'hover:border-emerald-400 group-hover:shadow-emerald-500/10',
-  },
-  {
-    id: 'Semesteran',
-    name: 'Dokumen Semesteran',
-    shortName: 'Semesteran',
-    subtitle: 'Laporan realisasi anggaran Semester I & II, laporan evaluasi capaian kinerja tengah tahun',
-    iconBg: 'bg-teal-500/10 text-teal-600 border-teal-200 group-hover:bg-teal-500/20',
-    folderColor: '#14b8a6',
-    badgeClass: 'bg-teal-100 text-teal-900 border-teal-200/80',
-    accentBorder: 'hover:border-teal-400 group-hover:shadow-teal-500/10',
-  },
-  {
-    id: '5 Tahunan',
-    name: 'Dokumen 5 Tahunan',
-    shortName: '5 Tahunan',
-    subtitle: 'Rencana Strategis (Renstra) dan RPJM Kelurahan untuk arah pembangunan lima tahunan',
-    iconBg: 'bg-purple-500/10 text-purple-600 border-purple-200 group-hover:bg-purple-500/20',
-    folderColor: '#9333ea',
-    badgeClass: 'bg-purple-100 text-purple-900 border-purple-200/80',
-    accentBorder: 'hover:border-purple-400 group-hover:shadow-purple-500/10',
-  },
-  {
-    id: 'Bulanan',
-    name: 'Dokumen Bulanan',
-    shortName: 'Bulanan',
-    subtitle: 'Rekapitulasi mutasi kependudukan bulanan dan laporan berkala rutin kelurahan',
-    iconBg: 'bg-blue-500/10 text-blue-600 border-blue-200 group-hover:bg-blue-500/20',
-    folderColor: '#2563eb',
-    badgeClass: 'bg-blue-100 text-blue-900 border-blue-200/80',
-    accentBorder: 'hover:border-blue-400 group-hover:shadow-blue-500/10',
-  },
-  {
-    id: 'Sewaktu-waktu',
-    name: 'Dokumen Sewaktu-waktu / Layanan',
-    shortName: 'Sewaktu-waktu',
-    subtitle: 'Blangko formulir permohonan surat warga, standar operasional (SOP), dan berkas insidental',
-    iconBg: 'bg-rose-500/10 text-rose-600 border-rose-200 group-hover:bg-rose-500/20',
-    folderColor: '#e11d48',
-    badgeClass: 'bg-rose-100 text-rose-900 border-rose-200/80',
-    accentBorder: 'hover:border-rose-400 group-hover:shadow-rose-500/10',
-  },
-];
-
-// Computed Folders List
-const folderList = computed(() => {
-  const allDocs = documents.value || [];
-  return folderDefinitions.map(f => {
-    const items = allDocs.filter(d => (d.periode || '').trim().toLowerCase() === f.id.toLowerCase());
-    const years = Array.from(new Set(items.map(d => d.tahun).filter(Boolean))).sort().reverse();
-    return {
-      ...f,
-      count: items.length,
-      years,
-      items,
-    };
-  });
-});
-
-// Currently Opened Folder
-const currentFolder = computed(() => {
-  if (!activeFolder.value) return null;
-  return folderList.value.find(f => f.id.toLowerCase() === activeFolder.value.toLowerCase()) || {
-    id: activeFolder.value,
-    name: `Dokumen ${activeFolder.value}`,
-    shortName: activeFolder.value,
-    subtitle: `Kumpulan berkas dokumen periode ${activeFolder.value}`,
-    count: folderDocuments.value.length,
-    years: [],
-    badgeClass: 'bg-slate-100 text-slate-800',
-    iconBg: 'bg-slate-100 text-slate-700',
-  };
-});
-
-// Available years in active folder
-const folderAvailableYears = computed(() => {
-  if (!activeFolder.value) return [];
-  const items = documents.value.filter(d => (d.periode || '').trim().toLowerCase() === activeFolder.value.toLowerCase());
-  return Array.from(new Set(items.map(d => d.tahun).filter(Boolean))).sort().reverse();
-});
-
-const folderDocumentsCountAll = computed(() => {
-  if (!activeFolder.value) return 0;
-  return documents.value.filter(d => (d.periode || '').trim().toLowerCase() === activeFolder.value.toLowerCase()).length;
-});
-
-// Documents in Active Folder (Filtered by selectedFolderTahun)
-const folderDocuments = computed(() => {
-  if (!activeFolder.value) return [];
-  let list = documents.value.filter(d => (d.periode || '').trim().toLowerCase() === activeFolder.value.toLowerCase());
-  if (selectedFolderTahun.value !== 'Semua') {
-    list = list.filter(d => d.tahun == selectedFolderTahun.value);
-  }
-  return list;
-});
-
-// Grouped documents inside active folder (by Year / Period)
-const folderGroupedDocuments = computed(() => {
-  if (folderDocuments.value.length === 0) return [];
-  const groups = {};
-  for (const doc of folderDocuments.value) {
-    let groupKey = 'Lainnya';
-    if (doc.periode === '5 Tahunan' && doc.tahun && doc.tahun_selesai) {
-      groupKey = `Periode ${doc.tahun}–${doc.tahun_selesai}`;
-    } else if (doc.tahun) {
-      groupKey = `Tahun ${doc.tahun}`;
-    }
-
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(doc);
-  }
-
-  return Object.keys(groups).sort((a, b) => {
-    if (a.includes('Periode') && !b.includes('Periode')) return -1;
-    if (!a.includes('Periode') && b.includes('Periode')) return 1;
-    return b.localeCompare(a);
-  }).map(key => ({
-    title: key,
-    items: groups[key]
-  }));
-});
-
-// Search Results Across All Documents
-const searchResults = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase();
-  if (!q) return [];
-  return documents.value.filter(d => {
-    const matchJudul = (d.judul || '').toLowerCase().includes(q);
-    const matchNomor = (d.nomor_dokumen || '').toLowerCase().includes(q);
-    const matchKategori = (d.kategori || '').toLowerCase().includes(q);
-    const matchSub = (d.subkategori || '').toLowerCase().includes(q);
-    const matchPeriode = (d.periode || '').toLowerCase().includes(q);
-    const matchDeskripsi = (d.deskripsi || '').toLowerCase().includes(q);
-    return matchJudul || matchNomor || matchKategori || matchSub || matchPeriode || matchDeskripsi;
-  });
-});
-
-const defaultCategories = [
-  'Formulir Layanan',
-  'Perencanaan & Kinerja',
-  'Transparansi & Keuangan',
-  'Produk Hukum & SK',
-  'Laporan Kependudukan',
-  'Pedoman & Surat Edaran'
-];
-
-const availableCategories = computed(() => {
-  const backendCategories = meta.value.kategori_list || [];
-  const merged = Array.from(new Set([...defaultCategories, ...backendCategories]));
-  return merged;
-});
-
-const availableSubcategories = computed(() => {
-  if (selectedKategori.value === 'Semua') return [];
-  const tree = meta.value.master_kategori_tree || [];
-  const parent = tree.find(k => k.nama.toLowerCase() === selectedKategori.value.toLowerCase());
-  if (!parent || !parent.subkategoris) return [];
-  return parent.subkategoris.map(s => s.nama);
-});
-
-const hasActiveFilter = computed(() => {
-  return searchQuery.value.trim() !== '' || 
-    selectedKategori.value !== 'Semua' || 
-    selectedSubkategori.value !== 'Semua' || 
-    selectedPeriode.value !== 'Semua' || 
-    selectedTahun.value !== 'Semua' ||
-    activeFolder.value !== null;
-});
-
 const totalDownloads = computed(() => {
   return documents.value.reduce((sum, d) => sum + (parseInt(d.diunduh, 10) || 0), 0);
 });
 
-const groupedDocuments = computed(() => {
-  if (documents.value.length === 0) return [];
+// Category list based on screenshot + database
+const baseCategories = [
+  'Semua Kategori',
+  'Musrenbang',
+  'UMKM',
+  'Renstra & Renja',
+  'SK Kelembagaan',
+  'Regulasi & Kebijakan',
+];
 
-  const groups = {};
-  for (const doc of documents.value) {
-    let groupKey = 'Lainnya';
-    if (doc.periode === '5 Tahunan' && doc.tahun && doc.tahun_selesai) {
-      groupKey = `Periode ${doc.tahun}–${doc.tahun_selesai}`;
-    } else if (doc.tahun) {
-      groupKey = `Tahun ${doc.tahun}`;
-    }
-
-    if (!groups[groupKey]) {
-      groups[groupKey] = [];
-    }
-    groups[groupKey].push(doc);
-  }
-
-  return Object.keys(groups).sort((a, b) => {
-    if (a.includes('Periode') && !b.includes('Periode')) return -1;
-    if (!a.includes('Periode') && b.includes('Periode')) return 1;
-    return b.localeCompare(a);
-  }).map(key => ({
-    title: key,
-    items: groups[key]
-  }));
+const allKategoriOptions = computed(() => {
+  const metaCats = meta.value.kategori_list || [];
+  const docCats = documents.value.map(d => d.kategori).filter(Boolean);
+  const otherCats = Array.from(new Set([...metaCats, ...docCats]))
+    .filter(c => !baseCategories.includes(c));
+  
+  return [...baseCategories, ...otherCats];
 });
 
-function getPeriodeBadgeClass(periode) {
-  switch (periode) {
-    case '5 Tahunan': return 'bg-purple-100 text-purple-800';
-    case 'Tahunan': return 'bg-blue-100 text-blue-800';
-    case 'Semesteran': return 'bg-teal-100 text-teal-800';
-    case 'Triwulanan': return 'bg-amber-100 text-amber-800';
-    case 'Bulanan': return 'bg-indigo-100 text-indigo-800';
-    case 'Sewaktu-waktu': return 'bg-rose-100 text-rose-800';
-    default: return 'bg-slate-100 text-slate-800';
+const allTahunOptions = computed(() => {
+  const metaTahun = meta.value.tahun_list || [];
+  const docTahun = documents.value.map(d => d.tahun).filter(Boolean);
+  const combined = Array.from(new Set([...metaTahun, ...docTahun])).sort().reverse();
+  if (combined.length === 0) {
+    return ['Semua Tahun', '2026', '2025'];
   }
-}
+  return ['Semua Tahun', ...combined];
+});
 
-const openFolder = (folderId) => {
-  activeFolder.value = folderId;
-  selectedFolderTahun.value = 'Semua';
-  viewMode.value = 'folder';
-};
+const hasActiveFilters = computed(() => {
+  return selectedTahun.value !== 'Semua Tahun' || 
+    selectedKategori.value !== 'Semua Kategori' || 
+    searchQuery.value.trim() !== '';
+});
 
-const switchViewMode = (mode) => {
-  viewMode.value = mode;
-  if (mode === 'all') {
-    activeFolder.value = null;
+// Filtered Documents
+const filteredDocuments = computed(() => {
+  let list = [...documents.value];
+
+  // Filter Tahun
+  if (selectedTahun.value !== 'Semua Tahun') {
+    list = list.filter(d => String(d.tahun) === String(selectedTahun.value));
   }
-};
 
-let searchTimeout = null;
-const handleSearch = () => {
-  clearTimeout(searchTimeout);
-  searchTimeout = setTimeout(() => {
-    if (viewMode.value === 'all') {
-      fetchDocuments();
+  // Filter Kategori
+  if (selectedKategori.value !== 'Semua Kategori') {
+    list = list.filter(d => (d.kategori || '').trim().toLowerCase() === selectedKategori.value.trim().toLowerCase());
+  }
+
+  // Search Query
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.trim().toLowerCase();
+    list = list.filter(d => {
+      const matchJudul = (d.judul || '').toLowerCase().includes(q);
+      const matchNomor = (d.nomor_dokumen || '').toLowerCase().includes(q);
+      const matchKategori = (d.kategori || '').toLowerCase().includes(q);
+      const matchDeskripsi = (d.deskripsi || '').toLowerCase().includes(q);
+      return matchJudul || matchNomor || matchKategori || matchDeskripsi;
+    });
+  }
+
+  // Sorting
+  list.sort((a, b) => {
+    let aVal, bVal;
+    if (sortField.value === 'id') {
+      aVal = a.id || 0;
+      bVal = b.id || 0;
+    } else if (sortField.value === 'judul') {
+      aVal = (a.judul || '').toLowerCase();
+      bVal = (b.judul || '').toLowerCase();
+    } else if (sortField.value === 'kategori') {
+      aVal = (a.kategori || '').toLowerCase();
+      bVal = (b.kategori || '').toLowerCase();
+    } else if (sortField.value === 'tanggal') {
+      aVal = a.tanggal_publikasi || a.created_at || '';
+      bVal = b.tanggal_publikasi || b.created_at || '';
     }
-  }, 300);
-};
 
-const clearSearch = () => {
-  searchQuery.value = '';
-  if (viewMode.value === 'all') {
-    fetchDocuments();
+    if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  return list;
+});
+
+// Pagination
+const totalPages = computed(() => {
+  return Math.ceil(filteredDocuments.value.length / perPage.value) || 1;
+});
+
+const paginatedDocuments = computed(() => {
+  const start = (currentPage.value - 1) * perPage.value;
+  return filteredDocuments.value.slice(start, start + perPage.value);
+});
+
+const showingFrom = computed(() => {
+  if (filteredDocuments.value.length === 0) return 0;
+  return (currentPage.value - 1) * perPage.value + 1;
+});
+
+const showingTo = computed(() => {
+  return Math.min(currentPage.value * perPage.value, filteredDocuments.value.length);
+});
+
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  if (total <= 7) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+
+  const pages = [];
+  pages.push(1);
+  if (current > 3) {
+    pages.push('...');
+  }
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+  if (current < total - 2) {
+    pages.push('...');
+  }
+  pages.push(total);
+  return pages;
+});
+
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page;
+    window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 };
 
-const selectCategory = (category) => {
-  selectedKategori.value = category;
-  selectedSubkategori.value = 'Semua';
-  fetchDocuments();
+const handleSort = (field) => {
+  if (sortField.value === field) {
+    sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortField.value = field;
+    sortOrder.value = 'asc';
+  }
+  currentPage.value = 1;
 };
 
-const selectSubcategory = (sub) => {
-  selectedSubkategori.value = sub;
-  fetchDocuments();
+const handleFilterChange = () => {
+  currentPage.value = 1;
+  const query = { ...route.query };
+
+  if (selectedKategori.value && selectedKategori.value !== 'Semua Kategori') {
+    query.kategori = selectedKategori.value;
+  } else {
+    delete query.kategori;
+  }
+
+  if (selectedTahun.value && selectedTahun.value !== 'Semua Tahun') {
+    query.tahun = selectedTahun.value;
+  } else {
+    delete query.tahun;
+  }
+
+  router.replace({ query }).catch(() => {});
 };
 
 const resetFilters = () => {
+  selectedTahun.value = 'Semua Tahun';
+  selectedKategori.value = 'Semua Kategori';
   searchQuery.value = '';
-  selectedKategori.value = 'Semua';
-  selectedSubkategori.value = 'Semua';
-  selectedPeriode.value = 'Semua';
-  selectedTahun.value = 'Semua';
-  activeFolder.value = null;
-  selectedFolderTahun.value = 'Semua';
-  fetchDocuments();
+  currentPage.value = 1;
+  router.replace({ query: {} }).catch(() => {});
 };
 
-const fetchDocuments = async () => {
-  loading.value = true;
-  try {
-    const params = {};
-    if (viewMode.value === 'all') {
-      if (searchQuery.value.trim()) {
-        params.q = searchQuery.value.trim();
-      }
-      if (selectedKategori.value !== 'Semua') {
-        params.kategori = selectedKategori.value;
-      }
-      if (selectedSubkategori.value !== 'Semua') {
-        params.subkategori = selectedSubkategori.value;
-      }
-      if (selectedPeriode.value !== 'Semua') {
-        params.periode = selectedPeriode.value;
-      }
-      if (selectedTahun.value !== 'Semua') {
-        params.tahun = selectedTahun.value;
-      }
-    }
+const isZipFile = (doc) => {
+  const filename = (doc.file || doc.nama_file_asli || '').toLowerCase();
+  return filename.endsWith('.zip') || filename.endsWith('.rar') || filename.endsWith('.7z');
+};
 
-    const res = await KelurahanService.getDokumen(params);
-    documents.value = res.data || [];
-    meta.value = res.meta || { total: documents.value.length, kategori_list: [], tahun_list: [], master_kategori_tree: [] };
-  } catch (err) {
-    console.error('Failed to load documents:', err);
-    documents.value = [];
-  } finally {
-    loading.value = false;
+const formatDisplayDate = (doc) => {
+  if (doc.tanggal_publikasi) {
+    const parts = doc.tanggal_publikasi.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
   }
+  if (doc.created_at) {
+    const d = new Date(doc.created_at);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+  return '-';
 };
 
 const openPreviewModal = (doc) => {
@@ -1234,11 +780,14 @@ const closePreviewModal = () => {
 };
 
 const handleDownload = (doc) => {
+  if (!doc || !doc.id) return;
   const downloadUrl = KelurahanService.getDokumenUnduhUrl(doc.id);
   
+  toast.info(`Mengunduh berkas "${doc.judul}"...`, 'Memulai Unduhan');
+
   const link = document.createElement('a');
   link.href = downloadUrl;
-  link.setAttribute('download', `${doc.judul}.pdf`);
+  link.setAttribute('download', `${doc.judul || 'dokumen'}.pdf`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1246,15 +795,49 @@ const handleDownload = (doc) => {
   doc.diunduh = (doc.diunduh || 0) + 1;
 };
 
+const fetchDocuments = async () => {
+  loading.value = true;
+  try {
+    const res = await KelurahanService.getDokumen();
+    documents.value = res.data || [];
+    meta.value = res.meta || { total: documents.value.length, kategori_list: [], tahun_list: [] };
+  } catch (err) {
+    console.error('Failed to load documents:', err);
+    documents.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+const applyQueryFromRoute = () => {
+  if (route.query.kategori) {
+    const matched = allKategoriOptions.value.find(
+      c => c.toLowerCase() === route.query.kategori.toLowerCase()
+    );
+    selectedKategori.value = matched || route.query.kategori;
+  } else {
+    selectedKategori.value = 'Semua Kategori';
+  }
+
+  if (route.query.tahun) {
+    selectedTahun.value = route.query.tahun;
+  }
+};
+
+watch(() => route.query, () => {
+  applyQueryFromRoute();
+  currentPage.value = 1;
+});
+
 onMounted(async () => {
   try {
     const p = await KelurahanService.getProfil();
-    if (p) {
-      profil.value = p;
-    }
+    if (p) profil.value = p;
   } catch (err) {
-    console.error('Failed to load profil for hero image:', err);
+    console.error('Failed to load profil:', err);
   }
-  fetchDocuments();
+
+  await fetchDocuments();
+  applyQueryFromRoute();
 });
 </script>

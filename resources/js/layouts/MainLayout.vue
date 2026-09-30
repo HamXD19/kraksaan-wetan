@@ -3,6 +3,9 @@
     <!-- Main Sticky Navbar -->
     <Navbar />
 
+    <!-- Breaking News Running Text Ticker -->
+    <RunningTextBar />
+
     <!-- Page Content Container -->
     <main class="flex-1">
       <router-view v-slot="{ Component }">
@@ -33,6 +36,7 @@
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import Navbar from '../components/Navbar.vue';
+import RunningTextBar from '../components/RunningTextBar.vue';
 import Footer from '../components/Footer.vue';
 import { scanAndObserveElements, initAutoScrollReveal } from '../directives/vReveal';
 

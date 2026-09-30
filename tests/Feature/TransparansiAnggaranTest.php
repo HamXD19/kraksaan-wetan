@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Models\AnggaranRealisasi;
+use App\Models\AnggaranRealisasiItem;
 use App\Models\TransparansiAnggaran;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
@@ -286,11 +289,276 @@ class TransparansiAnggaranTest extends TestCase
             ->assertJsonValidationErrors(['anggaran_rencana']);
     }
 
+    public function test_admin_can_bulk_create_apbd_in_single_transaction(): void
+    {
+        $payload = [
+            'judul' => 'Anggaran Pendapatan dan Belanja Kelurahan Kraksaan Wetan Tahun Anggaran 2030',
+            'tahun' => 2030,
+            'tanggal_publikasi' => '2030-01-15',
+            'status' => 'published',
+            'deskripsi' => 'Pengujian bulk single form APBD dengan seluruh pos pendapatan, belanja, dan pembiayaan.',
+            'items' => [
+                [
+                    'tipe' => 'pendapatan',
+                    'kategori' => 'Pendapatan Asli',
+                    'uraian' => 'Hasil Pengelolaan Aset Kelurahan',
+                    'anggaran' => 50000000,
+                    'realisasi' => 50000000,
+                ],
+                [
+                    'tipe' => 'pendapatan',
+                    'kategori' => 'Pendapatan Transfer',
+                    'uraian' => 'Alokasi Dana Kelurahan (ADK)',
+                    'anggaran' => 400000000,
+                    'realisasi' => 380000000,
+                ],
+                [
+                    'tipe' => 'belanja',
+                    'kategori' => 'Penyelenggaraan Pemerintahan',
+                    'uraian' => 'Operasional Pelayanan Kantor & Lembaga',
+                    'anggaran' => 150000000,
+                    'realisasi' => 140000000,
+                ],
+                [
+                    'tipe' => 'belanja',
+                    'kategori' => 'Pelaksanaan Pembangunan',
+                    'uraian' => 'Pembangunan Drainase U-Ditch Kraksaan Wetan',
+                    'anggaran' => 200000000,
+                    'realisasi' => 190000000,
+                ],
+                [
+                    'tipe' => 'pembiayaan',
+                    'kategori' => 'Penerimaan Pembiayaan',
+                    'uraian' => 'SiLPA Tahun Anggaran 2029',
+                    'anggaran' => 30000000,
+                    'realisasi' => 30000000,
+                ],
+                [
+                    'tipe' => 'pembiayaan',
+                    'kategori' => 'Pengeluaran Pembiayaan',
+                    'uraian' => 'Pembentukan Dana Cadangan',
+                    'anggaran' => 10000000,
+                    'realisasi' => 10000000,
+                ],
+            ],
+        ];
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->postJson('/api/admin/transparansi', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.tahun', 2030)
+            ->assertJsonPath('data.total_pendapatan_rencana', 450000000)
+            ->assertJsonPath('data.total_pendapatan_realisasi', 430000000)
+            ->assertJsonPath('data.total_belanja_rencana', 350000000)
+            ->assertJsonPath('data.total_belanja_realisasi', 330000000)
+            ->assertJsonPath('data.pembiayaan_netto_rencana', 20000000)
+            ->assertJsonPath('data.pembiayaan_netto_realisasi', 20000000);
+
+        $this->assertDatabaseCount('anggaran_realisasis', 2);
+        $this->assertEquals(6, AnggaranRealisasiItem::where('anggaran_id', $response->json('data.id'))->count());
+    }
+
+    public function test_admin_can_update_apbd_and_sync_items(): void
+    {
+        $budget = AnggaranRealisasi::where('tahun', 2030)->first();
+        if (! $budget) {
+            $budget = AnggaranRealisasi::create([
+                'judul' => 'APBD Test 2030',
+                'tahun' => 2030,
+                'tanggal_publikasi' => '2030-01-15',
+                'status' => 'published',
+            ]);
+            $budget->items()->create([
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Asli',
+                'uraian' => 'Item Lama',
+                'anggaran' => 10000000,
+                'realisasi' => 10000000,
+            ]);
+            $budget->recalculateTotals();
+        }
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson("/api/admin/transparansi/{$budget->id}", [
+                'judul' => 'Anggaran Pendapatan dan Belanja Diperbarui Tahun 2030',
+                'tahun' => 2030,
+                'tanggal_publikasi' => '2030-02-01',
+                'status' => 'published',
+                'items' => [
+                    [
+                        'tipe' => 'pendapatan',
+                        'kategori' => 'Pendapatan Transfer',
+                        'uraian' => 'Dana Bagi Hasil Pajak Update',
+                        'anggaran' => 80000000,
+                        'realisasi' => 80000000,
+                    ],
+                    [
+                        'tipe' => 'belanja',
+                        'kategori' => 'Penyelenggaraan Pemerintahan',
+                        'uraian' => 'Operasional Pelayanan Update',
+                        'anggaran' => 60000000,
+                        'realisasi' => 55000000,
+                    ],
+                ],
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.total_pendapatan_rencana', 80000000)
+            ->assertJsonPath('data.total_belanja_rencana', 60000000);
+
+        $this->assertDatabaseHas('anggaran_realisasis', [
+            'id' => $budget->id,
+            'judul' => 'Anggaran Pendapatan dan Belanja Diperbarui Tahun 2030',
+        ]);
+    }
+
+    private function getOrCreateTestBudget(int $tahun = 2030, string $status = 'published'): AnggaranRealisasi
+    {
+        $budget = AnggaranRealisasi::where('tahun', $tahun)->first();
+        if (! $budget) {
+            $budget = AnggaranRealisasi::create([
+                'judul' => "Anggaran Pendapatan dan Belanja Test {$tahun}",
+                'tahun' => $tahun,
+                'tanggal_publikasi' => "{$tahun}-01-15",
+                'status' => $status,
+                'deskripsi' => 'Deskripsi APBD test pengujian.',
+            ]);
+            $budget->items()->create([
+                'tipe' => 'pendapatan',
+                'kategori' => 'Pendapatan Asli',
+                'uraian' => 'Hasil Pengelolaan Aset',
+                'anggaran' => 50000000,
+                'realisasi' => 50000000,
+            ]);
+            $budget->items()->create([
+                'tipe' => 'belanja',
+                'kategori' => 'Penyelenggaraan Pemerintahan',
+                'uraian' => 'Operasional Kantor',
+                'anggaran' => 40000000,
+                'realisasi' => 38000000,
+            ]);
+            $budget->items()->create([
+                'tipe' => 'pembiayaan',
+                'kategori' => 'Penerimaan Pembiayaan',
+                'uraian' => 'SiLPA Tahun Lalu',
+                'anggaran' => 10000000,
+                'realisasi' => 10000000,
+            ]);
+            $budget->recalculateTotals();
+        } else {
+            $budget->update(['status' => $status]);
+        }
+
+        return $budget;
+    }
+
+    public function test_admin_can_toggle_apbd_status(): void
+    {
+        $budget = $this->getOrCreateTestBudget(2030, 'published');
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->putJson("/api/admin/transparansi/{$budget->id}/toggle-status", [
+                'status' => 'draft',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonPath('data.status', 'draft');
+
+        $this->assertDatabaseHas('anggaran_realisasis', [
+            'id' => $budget->id,
+            'status' => 'draft',
+        ]);
+    }
+
+    public function test_public_cannot_view_draft_apbd_detail(): void
+    {
+        $budget = $this->getOrCreateTestBudget(2030, 'draft');
+
+        $response = $this->getJson("/api/transparansi/{$budget->slug}");
+        $response->assertStatus(404);
+    }
+
+    public function test_public_can_view_published_apbd_detail_with_3_sections(): void
+    {
+        $budget = $this->getOrCreateTestBudget(2030, 'published');
+
+        $response = $this->getJson("/api/transparansi/{$budget->slug}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'header',
+                    'sections' => [
+                        'pendapatan' => [
+                            'kelompok',
+                            'total_anggaran',
+                            'total_realisasi',
+                            'total_selisih',
+                        ],
+                        'belanja' => [
+                            'kelompok',
+                            'total_anggaran',
+                            'total_realisasi',
+                            'total_selisih',
+                            'surplus_defisit_anggaran',
+                            'surplus_defisit_realisasi',
+                            'surplus_defisit_selisih',
+                        ],
+                        'pembiayaan' => [
+                            'penerimaan',
+                            'pengeluaran',
+                            'netto',
+                            'silpa',
+                        ],
+                    ],
+                    'unduh_url',
+                ],
+            ]);
+    }
+
+    public function test_public_can_download_apbd_pdf_document(): void
+    {
+        Storage::fake('public');
+
+        $budget = $this->getOrCreateTestBudget(2030, 'published');
+
+        $response = $this->get("/api/transparansi/{$budget->slug}/unduh");
+
+        $response->assertStatus(200)
+            ->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_admin_can_delete_apbd_and_cascade_items(): void
+    {
+        $budget = $this->getOrCreateTestBudget(2030, 'published');
+        $budgetId = $budget->id;
+
+        $response = $this->withHeader('Authorization', 'Bearer '.$this->adminToken)
+            ->deleteJson("/api/admin/transparansi/{$budgetId}");
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        $this->assertDatabaseMissing('anggaran_realisasis', [
+            'id' => $budgetId,
+        ]);
+        $this->assertDatabaseMissing('anggaran_realisasi_items', [
+            'anggaran_id' => $budgetId,
+        ]);
+    }
+
     protected function tearDown(): void
     {
         TransparansiAnggaran::where('kegiatan', 'Kegiatan Uji Coba Input Realisasi Anggaran Baru')->delete();
         TransparansiAnggaran::where('kegiatan', 'Kegiatan Temp Hapus')->delete();
         TransparansiAnggaran::query()->update(['aktif' => true]);
+        AnggaranRealisasi::where('tahun', 2030)->delete();
         parent::tearDown();
     }
 }

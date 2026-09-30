@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\AgendaKegiatan;
+use App\Models\AnggaranRealisasi;
 use App\Models\Berita;
 use App\Models\Dokumen;
 use App\Models\Galeri;
+use App\Models\HalamanKustom;
 use App\Models\Layanan;
 use App\Models\Lembaga;
 use App\Models\Lingkungan;
@@ -24,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdminController extends Controller
@@ -154,6 +157,8 @@ class AdminController extends Controller
                     'email' => $user->email,
                     'role' => $user->role,
                     'role_label' => $user->role_label,
+                    'accessible_menus' => $user->accessible_menus,
+                    'effective_menus' => $user->effective_menus,
                 ],
             ],
         ]);
@@ -199,6 +204,8 @@ class AdminController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'role_label' => $user->role_label,
+                'accessible_menus' => $user->accessible_menus,
+                'effective_menus' => $user->effective_menus,
             ],
         ]);
     }
@@ -344,7 +351,7 @@ class AdminController extends Controller
                     'galeri' => Galeri::count(),
                     'aparatur' => PerangkatKelurahan::count(),
                     'lembaga' => Lembaga::count(),
-                    'transparansi' => TransparansiAnggaran::count(),
+                    'transparansi' => AnggaranRealisasi::count() ?: TransparansiAnggaran::count(),
                     'staff' => User::count(),
                 ],
                 'recent_berita' => Berita::latest()->take(5)->get(),
@@ -374,6 +381,8 @@ class AdminController extends Controller
             'ringkasan' => 'required|string',
             'konten' => 'required|string',
             'gambar' => 'nullable|string',
+            'status' => 'nullable|string|in:published,draft',
+            'tampil_running_text' => 'nullable|boolean',
         ]);
 
         $slug = Str::slug($validated['judul']);
@@ -392,22 +401,25 @@ class AdminController extends Controller
             'ringkasan' => $validated['ringkasan'],
             'konten' => $validated['konten'],
             'gambar' => $validated['gambar'] ?? 'https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=800&q=80',
+            'status' => $validated['status'] ?? 'published',
+            'tampil_running_text' => $validated['tampil_running_text'] ?? true,
             'dilihat' => 0,
         ]);
 
         $this->ensureMasterKategori('berita', $validated['kategori'] ?? null);
 
+        $statusLabel = $berita->status === 'published' ? 'Menerbitkan (Upload)' : 'Menyimpan sebagai Draft';
         ActivityLog::record(
             action: 'create',
             module: 'berita',
-            description: "Menerbitkan berita baru: \"{$berita->judul}\"",
-            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul, 'kategori' => $berita->kategori],
+            description: "{$statusLabel} warta berita: \"{$berita->judul}\"",
+            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul, 'status' => $berita->status],
             user: $request->user()
         );
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Berita berhasil diterbitkan.',
+            'message' => $berita->status === 'published' ? 'Berita berhasil diterbitkan (Upload).' : 'Berita berhasil disimpan sebagai draft.',
             'data' => $berita,
         ]);
     }
@@ -424,6 +436,8 @@ class AdminController extends Controller
             'ringkasan' => 'required|string',
             'konten' => 'required|string',
             'gambar' => 'nullable|string',
+            'status' => 'nullable|string|in:published,draft',
+            'tampil_running_text' => 'nullable|boolean',
         ]);
 
         if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $berita->gambar) {
@@ -438,7 +452,7 @@ class AdminController extends Controller
             action: 'update',
             module: 'berita',
             description: "Memperbarui berita: \"{$berita->judul}\"",
-            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul],
+            properties: ['berita_id' => $berita->id, 'judul' => $berita->judul, 'status' => $berita->status],
             user: $request->user()
         );
 
@@ -449,12 +463,57 @@ class AdminController extends Controller
         ]);
     }
 
+    public function toggleStatusBerita(Request $request, int $id): JsonResponse
+    {
+        $berita = Berita::findOrFail($id);
+        $newStatus = $berita->status === 'published' ? 'draft' : 'published';
+        $berita->update(['status' => $newStatus]);
+
+        $statusText = $newStatus === 'published' ? 'Menerbitkan (Upload)' : 'Menjadikan Draft';
+        ActivityLog::record(
+            action: 'update',
+            module: 'berita',
+            description: "{$statusText} berita: \"{$berita->judul}\"",
+            properties: ['berita_id' => $berita->id, 'status' => $newStatus],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Status berita berhasil diubah menjadi '.($newStatus === 'published' ? 'Terbit / Upload' : 'Draft').'.',
+            'data' => $berita,
+        ]);
+    }
+
+    public function toggleRunningTextBerita(Request $request, int $id): JsonResponse
+    {
+        $berita = Berita::findOrFail($id);
+        $newVal = ! $berita->tampil_running_text;
+        $berita->update(['tampil_running_text' => $newVal]);
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'berita',
+            description: ($newVal ? 'Menampilkan' : 'Menyembunyikan')." berita pada Running Text: \"{$berita->judul}\"",
+            properties: ['berita_id' => $berita->id, 'tampil_running_text' => $newVal],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pengaturan Running Text berita berhasil diubah.',
+            'data' => $berita,
+        ]);
+    }
+
     public function deleteBerita(Request $request, int $id): JsonResponse
     {
         $berita = Berita::findOrFail($id);
         $judul = $berita->judul;
         $beritaId = $berita->id;
+        $gambar = $berita->gambar;
         $berita->delete();
+        FileStorageHelper::deleteFileIfLocal($gambar);
 
         ActivityLog::record(
             action: 'delete',
@@ -576,7 +635,9 @@ class AdminController extends Controller
         $pengumuman = Pengumuman::findOrFail($id);
         $judul = $pengumuman->judul;
         $pengumumanId = $pengumuman->id;
+        $files = [$pengumuman->file, $pengumuman->banner, $pengumuman->thumbnail];
         $pengumuman->delete();
+        FileStorageHelper::deleteFilesIfLocal($files);
 
         ActivityLog::record(
             action: 'delete',
@@ -654,6 +715,11 @@ class AdminController extends Controller
             ->orderBy('nama')
             ->get();
 
+        $kategoriCounts = Dokumen::selectRaw('kategori, count(*) as count')
+            ->whereNotNull('kategori')
+            ->groupBy('kategori')
+            ->pluck('count', 'kategori');
+
         return response()->json([
             'status' => 'success',
             'data' => $items,
@@ -661,6 +727,7 @@ class AdminController extends Controller
                 'total' => Dokumen::count(),
                 'aktif' => Dokumen::where('aktif', true)->count(),
                 'total_unduhan' => (int) Dokumen::sum('diunduh'),
+                'kategori_counts' => $kategoriCounts,
             ],
             'meta' => [
                 'kategori_list' => Dokumen::distinct()->whereNotNull('kategori')->pluck('kategori')->filter()->values(),
@@ -1046,7 +1113,9 @@ class AdminController extends Controller
         $galeri = Galeri::findOrFail($id);
         $judul = $galeri->judul;
         $galeriId = $galeri->id;
+        $gambar = $galeri->gambar;
         $galeri->delete();
+        FileStorageHelper::deleteFileIfLocal($gambar);
 
         ActivityLog::record(
             action: 'delete',
@@ -1070,18 +1139,18 @@ class AdminController extends Controller
         $profil = ProfilKelurahan::firstOrFail();
 
         $validated = $request->validate([
-            'nama' => 'required|string|max:100',
+            'nama' => 'sometimes|required|string|max:100',
             'kecamatan' => 'nullable|string|max:100',
             'kabupaten' => 'nullable|string|max:100',
             'provinsi' => 'nullable|string|max:100',
             'kode_pos' => 'nullable|string|max:20',
-            'alamat' => 'required|string',
+            'alamat' => 'sometimes|required|string',
             'telepon' => 'nullable|string|max:50',
             'email' => 'nullable|email|max:100',
             'jam_kerja' => 'nullable|string|max:100',
-            'deskripsi' => 'required|string',
+            'deskripsi' => 'sometimes|required|string',
             'sejarah' => 'nullable|string',
-            'visi' => 'required|string',
+            'visi' => 'sometimes|required|string',
             'misi' => 'nullable|array',
             'logo' => 'nullable|string',
             'hero_mode' => 'nullable|string|max:50',
@@ -1094,6 +1163,26 @@ class AdminController extends Controller
             'link_span_lapor' => 'nullable|string|max:255',
             'halo_sae_wa' => 'nullable|string|max:50',
             'halo_sae_link' => 'nullable|string|max:255',
+            'batas_wilayah' => 'nullable|array',
+            'batas_wilayah.utara' => 'nullable|string|max:255',
+            'batas_wilayah.selatan' => 'nullable|string|max:255',
+            'batas_wilayah.timur' => 'nullable|string|max:255',
+            'batas_wilayah.barat' => 'nullable|string|max:255',
+            'potensi_unggulan' => 'nullable|array',
+            'potensi_unggulan.*.judul' => 'required_with:potensi_unggulan|string|max:255',
+            'potensi_unggulan.*.deskripsi' => 'nullable|string',
+            'tata_nilai' => 'nullable|array',
+            'tata_nilai.*.judul' => 'required_with:tata_nilai|string|max:255',
+            'tata_nilai.*.deskripsi' => 'nullable|string',
+            'sejarah_timeline' => 'nullable|array',
+            'sejarah_timeline.*.tahun' => 'required_with:sejarah_timeline|string|max:255',
+            'sejarah_timeline.*.judul' => 'nullable|string|max:255',
+            'sejarah_timeline.*.deskripsi' => 'nullable|string',
+            'custom_nav_menus' => 'nullable|array',
+            'custom_nav_menus.*' => 'nullable|array',
+            'custom_nav_menus.*.*.label' => 'required|string|max:255',
+            'custom_nav_menus.*.*.url' => 'required|string|max:500',
+            'custom_nav_menus.*.*.target' => 'nullable|string|in:_self,_blank',
         ]);
 
         // Bersihkan file lama jika berkas diubah atau direset
@@ -1189,7 +1278,9 @@ class AdminController extends Controller
         $nama = $p->nama;
         $jabatan = $p->jabatan;
         $perangkatId = $p->id;
+        $foto = $p->foto;
         $p->delete();
+        FileStorageHelper::deleteFileIfLocal($foto);
 
         ActivityLog::record(
             action: 'delete',
@@ -1213,7 +1304,7 @@ class AdminController extends Controller
         $stat = Statistik::firstOrFail();
 
         $validated = $request->validate([
-            'penduduk' => 'required|integer',
+            'penduduk' => 'nullable|integer',
             'kk' => 'required|integer',
             'laki_laki' => 'required|integer',
             'perempuan' => 'required|integer',
@@ -1223,13 +1314,30 @@ class AdminController extends Controller
             'kepadatan' => 'nullable|string',
         ]);
 
+        // Otomatis hitung total penduduk dari penjumlahan Laki-laki + Perempuan
+        $validated['penduduk'] = (int) $validated['laki_laki'] + (int) $validated['perempuan'];
+
+        // Jika kepadatan kosong atau belum disesuaikan, hitung otomatis jika luas wilayah numerik
+        if (empty($validated['kepadatan']) && is_numeric(str_replace(',', '.', $validated['luas_wilayah']))) {
+            $luas = (float) str_replace(',', '.', $validated['luas_wilayah']);
+            if ($luas > 0) {
+                $kepadatanNum = round($validated['penduduk'] / $luas);
+                $validated['kepadatan'] = number_format($kepadatanNum, 0, ',', '.').' jiwa/km²';
+            }
+        }
+
         $stat->update($validated);
 
         ActivityLog::record(
             action: 'update',
             module: 'statistik',
-            description: 'Memperbarui data statistik kependudukan wilayah',
-            properties: ['penduduk' => $validated['penduduk'], 'kk' => $validated['kk']],
+            description: 'Memperbarui data statistik kependudukan wilayah (Total Penduduk otomatis L+P)',
+            properties: [
+                'penduduk' => $validated['penduduk'],
+                'laki_laki' => $validated['laki_laki'],
+                'perempuan' => $validated['perempuan'],
+                'kk' => $validated['kk'],
+            ],
             user: $request->user()
         );
 
@@ -1442,7 +1550,9 @@ class AdminController extends Controller
         $lembaga = Lembaga::findOrFail($id);
         $nama = $lembaga->nama;
         $lembagaId = $lembaga->id;
+        $logo = $lembaga->logo;
         $lembaga->delete();
+        FileStorageHelper::deleteFileIfLocal($logo);
 
         ActivityLog::record(
             action: 'delete',
@@ -1463,19 +1573,38 @@ class AdminController extends Controller
      * ---------------------------------------------------- */
     public function getTransparansi(Request $request): JsonResponse
     {
-        $query = TransparansiAnggaran::query();
+        // 1. Ambil data AnggaranRealisasi (Struktur APBD per Tahun)
+        $budgetQuery = AnggaranRealisasi::withCount('items');
 
         if ($request->filled('tahun') && $request->tahun !== 'Semua') {
-            $query->where('tahun', (int) $request->tahun);
+            $budgetQuery->where('tahun', (int) $request->tahun);
         }
 
-        if ($request->filled('kategori') && $request->kategori !== 'Semua') {
-            $query->where('kategori', $request->kategori);
+        if ($request->filled('status') && $request->status !== 'Semua') {
+            $budgetQuery->where('status', $request->status);
         }
 
         if ($request->filled('search')) {
             $s = $request->search;
-            $query->where(function ($q) use ($s) {
+            $budgetQuery->where(function ($q) use ($s) {
+                $q->where('judul', 'like', "%{$s}%")
+                    ->orWhere('deskripsi', 'like', "%{$s}%");
+            });
+        }
+
+        $budgets = $budgetQuery->orderByDesc('tahun')->orderByDesc('tanggal_publikasi')->get();
+
+        // 2. Query legacy TransparansiAnggaran (pos individu)
+        $legacyQuery = TransparansiAnggaran::query();
+        if ($request->filled('tahun') && $request->tahun !== 'Semua') {
+            $legacyQuery->where('tahun', (int) $request->tahun);
+        }
+        if ($request->filled('kategori') && $request->kategori !== 'Semua') {
+            $legacyQuery->where('kategori', $request->kategori);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $legacyQuery->where(function ($q) use ($s) {
                 $q->where('program', 'like', "%{$s}%")
                     ->orWhere('kegiatan', 'like', "%{$s}%")
                     ->orWhere('deskripsi', 'like', "%{$s}%")
@@ -1483,12 +1612,12 @@ class AdminController extends Controller
                     ->orWhere('lokasi', 'like', "%{$s}%");
             });
         }
+        $legacyItems = $legacyQuery->orderByDesc('tahun')->orderBy('urutan')->orderBy('id')->get();
 
-        $items = $query->orderByDesc('tahun')->orderBy('urutan')->orderBy('id')->get();
-
-        // Calculations for admin summary
-        $totalRencana = (float) (clone $query)->sum('anggaran_rencana');
-        $totalRealisasi = (float) (clone $query)->sum('anggaran_realisasi');
+        // 3. Ringkasan Kalkulasi Admin (Khusus Modul APBD Baru: AnggaranRealisasi)
+        $totalRencana = (float) $budgets->sum('total_belanja_rencana');
+        $totalRealisasi = (float) $budgets->sum('total_belanja_realisasi');
+        $totalKegiatan = (int) $budgets->sum('items_count');
         $totalSisa = max(0, $totalRencana - $totalRealisasi);
         $persentaseTotal = $totalRencana > 0 ? round(($totalRealisasi / $totalRencana) * 100, 1) : 0.0;
 
@@ -1500,15 +1629,131 @@ class AdminController extends Controller
                     'total_realisasi' => $totalRealisasi,
                     'total_sisa' => $totalSisa,
                     'persentase_total' => $persentaseTotal,
-                    'total_kegiatan' => $items->count(),
+                    'total_kegiatan' => $totalKegiatan,
+                    'total_tahun' => $budgets->count(),
                 ],
-                'items' => $items,
+                'budgets' => $budgets,
+                'items' => $legacyItems,
             ],
+        ]);
+    }
+
+    /**
+     * Endpoint detail APBD untuk form sunting admin
+     */
+    public function showTransparansi(int $id): JsonResponse
+    {
+        $budget = AnggaranRealisasi::with(['items' => function ($q) {
+            $q->orderBy('urutan')->orderBy('id');
+        }])->find($id);
+
+        if ($budget) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $budget,
+            ]);
+        }
+
+        $legacy = TransparansiAnggaran::findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $legacy,
         ]);
     }
 
     public function storeTransparansi(Request $request): JsonResponse
     {
+        // Jalur 1: Single Form Bulk Input APBD Baru (Memiliki array items)
+        if ($request->has('items')) {
+            $validated = $request->validate([
+                'judul' => 'required|string|max:255',
+                'tahun' => 'required|integer|min:2000|max:2100',
+                'tanggal_publikasi' => 'required|date',
+                'deskripsi' => 'nullable|string',
+                'gambar' => 'nullable|string',
+                'file_lampiran' => 'nullable|string',
+                'status' => 'required|in:draft,published',
+                'items' => 'required|array|min:1',
+                'items.*.tipe' => 'required|in:pendapatan,belanja,pembiayaan',
+                'items.*.kategori' => 'required|string|max:150',
+                'items.*.uraian' => 'required|string|max:255',
+                'items.*.anggaran' => 'required|numeric|min:0',
+                'items.*.realisasi' => 'nullable|numeric|min:0',
+                'items.*.keterangan' => 'nullable|string|max:255',
+                'items.*.urutan' => 'nullable|integer',
+            ]);
+
+            // Cek keunikan tahun anggaran
+            if (AnggaranRealisasi::where('tahun', $validated['tahun'])->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Anggaran Pendapatan dan Belanja untuk Tahun {$validated['tahun']} sudah ada. Silakan gunakan tombol edit pada data yang telah ada.",
+                    'errors' => ['tahun' => ["Tahun anggaran {$validated['tahun']} sudah terdaftar."]],
+                ], 422);
+            }
+
+            return DB::transaction(function () use ($validated, $request) {
+                // Buat header anggaran
+                $header = AnggaranRealisasi::create([
+                    'judul' => $validated['judul'],
+                    'tahun' => $validated['tahun'],
+                    'tanggal_publikasi' => $validated['tanggal_publikasi'],
+                    'deskripsi' => $validated['deskripsi'] ?? null,
+                    'gambar' => $validated['gambar'] ?? null,
+                    'file_lampiran' => $validated['file_lampiran'] ?? null,
+                    'status' => $validated['status'] ?? 'published',
+                ]);
+
+                // Buat seluruh child items rincian anggaran
+                foreach ($validated['items'] as $index => $row) {
+                    $header->items()->create([
+                        'tipe' => $row['tipe'],
+                        'kategori' => $row['kategori'],
+                        'uraian' => $row['uraian'],
+                        'anggaran' => $row['anggaran'] ?? 0,
+                        'realisasi' => $row['realisasi'] ?? 0,
+                        'keterangan' => $row['keterangan'] ?? null,
+                        'urutan' => $row['urutan'] ?? ($index + 1),
+                    ]);
+                }
+
+                // Kalkulasi otomatis akumulasi total
+                $header->recalculateTotals();
+
+                // Pastikan berkas PDF lampiran valid jika disertakan
+                if (! empty($header->file_lampiran)) {
+                    FileStorageHelper::ensureValidPdfFile(
+                        $header->file_lampiran,
+                        $header->judul,
+                        'Transparansi APBD',
+                        'APBD-'.$header->tahun,
+                        $header->deskripsi
+                    );
+                }
+
+                ActivityLog::record(
+                    action: 'create',
+                    module: 'transparansi',
+                    description: "Menambahkan APBD Tahun {$header->tahun}: \"{$header->judul}\"",
+                    properties: [
+                        'anggaran_id' => $header->id,
+                        'tahun' => $header->tahun,
+                        'total_pendapatan' => $header->total_pendapatan_rencana,
+                        'total_belanja' => $header->total_belanja_rencana,
+                    ],
+                    user: $request->user()
+                );
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data formulir anggaran tahunan komprehensif berhasil disimpan.',
+                    'data' => $header->load('items'),
+                ], 201);
+            });
+        }
+
+        // Jalur 2: Legacy Single Item (Mendukung pengujian atau panggilan rincian individual)
         $validated = $request->validate([
             'tahun' => 'required|integer|min:2000|max:2100',
             'program' => 'required|string|max:255',
@@ -1554,6 +1799,90 @@ class AdminController extends Controller
 
     public function updateTransparansi(Request $request, int $id): JsonResponse
     {
+        // Cek apakah target merupakan AnggaranRealisasi (Header APBD Baru)
+        $header = AnggaranRealisasi::find($id);
+
+        if ($header || $request->has('items')) {
+            $header = $header ?: AnggaranRealisasi::findOrFail($id);
+
+            $validated = $request->validate([
+                'judul' => 'required|string|max:255',
+                'tahun' => 'required|integer|min:2000|max:2100',
+                'tanggal_publikasi' => 'required|date',
+                'deskripsi' => 'nullable|string',
+                'gambar' => 'nullable|string',
+                'file_lampiran' => 'nullable|string',
+                'status' => 'required|in:draft,published',
+                'items' => 'nullable|array',
+                'items.*.tipe' => 'required_with:items|in:pendapatan,belanja,pembiayaan',
+                'items.*.kategori' => 'required_with:items|string|max:150',
+                'items.*.uraian' => 'required_with:items|string|max:255',
+                'items.*.anggaran' => 'required_with:items|numeric|min:0',
+                'items.*.realisasi' => 'nullable|numeric|min:0',
+                'items.*.keterangan' => 'nullable|string|max:255',
+                'items.*.urutan' => 'nullable|integer',
+            ]);
+
+            // Cek duplikasi tahun pada record lain
+            if (AnggaranRealisasi::where('tahun', $validated['tahun'])->where('id', '!=', $header->id)->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Tahun anggaran {$validated['tahun']} telah digunakan pada entri APBD lainnya.",
+                    'errors' => ['tahun' => ["Tahun anggaran {$validated['tahun']} sudah terdaftar."]],
+                ], 422);
+            }
+
+            return DB::transaction(function () use ($header, $validated, $request) {
+                $header->update([
+                    'judul' => $validated['judul'],
+                    'tahun' => $validated['tahun'],
+                    'tanggal_publikasi' => $validated['tanggal_publikasi'],
+                    'deskripsi' => $validated['deskripsi'] ?? null,
+                    'gambar' => $validated['gambar'] ?? null,
+                    'file_lampiran' => $validated['file_lampiran'] ?? null,
+                    'status' => $validated['status'] ?? 'published',
+                ]);
+
+                // Sinkronisasi items jika dikirimkan
+                if (isset($validated['items']) && is_array($validated['items'])) {
+                    $header->items()->delete();
+                    foreach ($validated['items'] as $index => $row) {
+                        $header->items()->create([
+                            'tipe' => $row['tipe'],
+                            'kategori' => $row['kategori'],
+                            'uraian' => $row['uraian'],
+                            'anggaran' => $row['anggaran'] ?? 0,
+                            'realisasi' => $row['realisasi'] ?? 0,
+                            'keterangan' => $row['keterangan'] ?? null,
+                            'urutan' => $row['urutan'] ?? ($index + 1),
+                        ]);
+                    }
+                }
+
+                $header->recalculateTotals();
+
+                ActivityLog::record(
+                    action: 'update',
+                    module: 'transparansi',
+                    description: "Memperbarui APBD Tahun {$header->tahun}: \"{$header->judul}\"",
+                    properties: [
+                        'anggaran_id' => $header->id,
+                        'tahun' => $header->tahun,
+                        'total_pendapatan' => $header->total_pendapatan_rencana,
+                        'total_belanja' => $header->total_belanja_rencana,
+                    ],
+                    user: $request->user()
+                );
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Data anggaran tahunan komprehensif berhasil diperbarui.',
+                    'data' => $header->load('items'),
+                ]);
+            });
+        }
+
+        // Jalur 2: Legacy Single Item
         $item = TransparansiAnggaran::findOrFail($id);
 
         $validated = $request->validate([
@@ -1593,8 +1922,51 @@ class AdminController extends Controller
         ]);
     }
 
+    /**
+     * Ubah status publikasi APBD (published <-> draft)
+     */
+    public function toggleStatusTransparansi(Request $request, int $id): JsonResponse
+    {
+        $header = AnggaranRealisasi::find($id);
+
+        if ($header) {
+            $newStatus = $request->input('status');
+            if (! $newStatus) {
+                if ($request->has('aktif')) {
+                    $newStatus = $request->boolean('aktif') ? 'published' : 'draft';
+                } else {
+                    $newStatus = $header->status === 'published' ? 'draft' : 'published';
+                }
+            }
+
+            $header->update(['status' => $newStatus]);
+
+            ActivityLog::record(
+                action: 'update',
+                module: 'transparansi',
+                description: "Mengubah status publikasi APBD {$header->tahun} menjadi \"{$newStatus}\"",
+                properties: ['anggaran_id' => $header->id, 'status' => $newStatus],
+                user: $request->user()
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Status publikasi anggaran berhasil diubah.',
+                'data' => $header,
+            ]);
+        }
+
+        // Fallback ke toggle legacy
+        return $this->toggleAktifTransparansi($request, $id);
+    }
+
     public function toggleAktifTransparansi(Request $request, int $id): JsonResponse
     {
+        $header = AnggaranRealisasi::find($id);
+        if ($header) {
+            return $this->toggleStatusTransparansi($request, $id);
+        }
+
         $item = TransparansiAnggaran::findOrFail($id);
 
         $validated = $request->validate([
@@ -1621,6 +1993,30 @@ class AdminController extends Controller
 
     public function deleteTransparansi(Request $request, int $id): JsonResponse
     {
+        $header = AnggaranRealisasi::find($id);
+
+        if ($header) {
+            $judul = $header->judul;
+            $tahun = $header->tahun;
+            $anggaranId = $header->id;
+
+            // Model deleting event akan otomatis menghapus berkas gambar & file_lampiran
+            $header->delete();
+
+            ActivityLog::record(
+                action: 'delete',
+                module: 'transparansi',
+                description: "Menghapus entri APBD Tahun {$tahun}: \"{$judul}\"",
+                properties: ['anggaran_id' => $anggaranId, 'tahun' => $tahun, 'judul' => $judul],
+                user: $request->user()
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Dokumen APBD beserta seluruh rincian anggaran berhasil dihapus.',
+            ]);
+        }
+
         $item = TransparansiAnggaran::findOrFail($id);
         $kegiatan = $item->kegiatan;
         $tahun = $item->tahun;
@@ -1677,6 +2073,7 @@ class AdminController extends Controller
                 'counts' => $counts,
                 'staff' => $users,
                 'roles' => User::ROLES,
+                'menus' => User::MENUS,
             ],
         ]);
     }
@@ -1688,12 +2085,19 @@ class AdminController extends Controller
             'email' => 'required|email|max:150|unique:users,email',
             'role' => 'required|string|in:super_admin,staff_konten,staff_pelayanan,staff_administrasi',
             'password' => 'required|string|min:6',
+            'accessible_menus' => 'nullable|array',
+            'accessible_menus.*' => 'string|in:'.implode(',', array_keys(User::MENUS)),
         ]);
+
+        $accessibleMenus = $validated['role'] === User::ROLE_SUPER_ADMIN
+            ? null
+            : ($validated['accessible_menus'] ?? User::getDefaultMenusForRole($validated['role']));
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'role' => $validated['role'],
+            'accessible_menus' => $accessibleMenus,
             'password' => Hash::make($validated['password']),
         ]);
 
@@ -1701,7 +2105,13 @@ class AdminController extends Controller
             action: 'create',
             module: 'staff',
             description: "Menambahkan akun staf baru: {$user->name} ({$user->role_label})",
-            properties: ['staff_id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role],
+            properties: [
+                'staff_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'accessible_menus' => $user->accessible_menus,
+            ],
             user: $request->user()
         );
 
@@ -1721,6 +2131,8 @@ class AdminController extends Controller
             'email' => 'required|email|max:150|unique:users,email,'.$id,
             'role' => 'required|string|in:super_admin,staff_konten,staff_pelayanan,staff_administrasi',
             'password' => 'nullable|string|min:6',
+            'accessible_menus' => 'nullable|array',
+            'accessible_menus.*' => 'string|in:'.implode(',', array_keys(User::MENUS)),
         ]);
 
         // Cek keamanan: jika satu-satunya super_admin ingin mengubah perannya menjadi staf biasa
@@ -1737,6 +2149,9 @@ class AdminController extends Controller
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
+        $user->accessible_menus = $validated['role'] === User::ROLE_SUPER_ADMIN
+            ? null
+            : ($validated['accessible_menus'] ?? User::getDefaultMenusForRole($validated['role']));
 
         if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
@@ -1748,7 +2163,13 @@ class AdminController extends Controller
             action: 'update',
             module: 'staff',
             description: "Memperbarui data akun staf: {$user->name} ({$user->role_label})",
-            properties: ['staff_id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'role' => $user->role],
+            properties: [
+                'staff_id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'accessible_menus' => $user->accessible_menus,
+            ],
             user: $request->user()
         );
 
@@ -1961,6 +2382,61 @@ class AdminController extends Controller
         $nama = $kategori->nama;
         $modul = $kategori->modul;
         $kategoriId = $kategori->id;
+
+        // 1. Cek sub-kategori turunan
+        if ($kategori->subkategoris()->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => "Kategori \"{$nama}\" tidak dapat dihapus karena masih memiliki sub-kategori terkait.",
+            ], 422);
+        }
+
+        // 2. Cek penggunaan pada tabel-tabel modul aplikasi
+        $usages = [];
+        $beritaCount = Berita::where('kategori', $nama)->count();
+        if ($beritaCount > 0) {
+            $usages[] = "Berita ({$beritaCount} artikel)";
+        }
+
+        $layananCount = Layanan::where('kategori', $nama)->count();
+        if ($layananCount > 0) {
+            $usages[] = "Layanan ({$layananCount} layanan)";
+        }
+
+        $dokumenCount = Dokumen::where('kategori', $nama)->count();
+        if ($dokumenCount > 0) {
+            $usages[] = "Dokumen ({$dokumenCount} dokumen)";
+        }
+
+        $pengumumanCount = Pengumuman::where('kategori', $nama)->count();
+        if ($pengumumanCount > 0) {
+            $usages[] = "Pengumuman ({$pengumumanCount} pengumuman)";
+        }
+
+        $galeriCount = Galeri::where('kategori', $nama)->count();
+        if ($galeriCount > 0) {
+            $usages[] = "Galeri ({$galeriCount} foto)";
+        }
+
+        $transparansiCount = TransparansiAnggaran::where('kategori', $nama)->count();
+        if ($transparansiCount > 0) {
+            $usages[] = "Transparansi Anggaran ({$transparansiCount} pos)";
+        }
+
+        $agendaCount = AgendaKegiatan::where('kategori', $nama)->count();
+        if ($agendaCount > 0) {
+            $usages[] = "Agenda Kegiatan ({$agendaCount} agenda)";
+        }
+
+        if (! empty($usages)) {
+            $detail = implode(', ', $usages);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => "Kategori \"{$nama}\" tidak dapat dihapus karena masih digunakan pada data: {$detail}.",
+            ], 422);
+        }
+
         $kategori->delete();
 
         ActivityLog::record(
@@ -2238,7 +2714,9 @@ class AdminController extends Controller
     {
         $agenda = AgendaKegiatan::findOrFail($id);
         $title = $agenda->judul;
+        $foto = $agenda->foto;
         $agenda->delete();
+        FileStorageHelper::deleteFileIfLocal($foto);
 
         ActivityLog::record(
             action: 'delete',
@@ -2251,6 +2729,156 @@ class AdminController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Agenda kegiatan berhasil dihapus.',
+        ]);
+    }
+
+    /* ----------------------------------------------------
+     * HALAMAN KUSTOM MANAGEMENT (SETTING SYSTEM)
+     * ---------------------------------------------------- */
+
+    public function getHalamanKustom(Request $request): JsonResponse
+    {
+        $query = HalamanKustom::orderBy('urutan')->orderByDesc('id');
+
+        if ($request->filled('kategori') && $request->kategori !== 'Semua') {
+            $query->where('kategori', $request->kategori);
+        }
+
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function ($q) use ($s) {
+                $q->where('judul', 'like', "%{$s}%")
+                    ->orWhere('slug', 'like', "%{$s}%")
+                    ->orWhere('ringkasan', 'like', "%{$s}%");
+            });
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $query->get(),
+        ]);
+    }
+
+    public function storeHalamanKustom(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:halaman_kustoms,slug',
+            'kategori' => 'required|string|in:profil,pemerintahan,informasi',
+            'ringkasan' => 'nullable|string|max:500',
+            'gambar' => 'nullable|string',
+            'konten' => 'nullable|string',
+            'aktif' => 'nullable|boolean',
+            'urutan' => 'nullable|integer',
+        ]);
+
+        if (empty($validated['slug'])) {
+            $baseSlug = Str::slug($validated['judul']);
+            $slug = $baseSlug;
+            $count = 1;
+            while (HalamanKustom::where('slug', $slug)->exists()) {
+                $slug = "{$baseSlug}-{$count}";
+                $count++;
+            }
+            $validated['slug'] = $slug;
+        } else {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+
+        $validated['aktif'] = $request->boolean('aktif', true);
+        $validated['urutan'] = $validated['urutan'] ?? 0;
+
+        $halaman = HalamanKustom::create($validated);
+
+        ActivityLog::record(
+            action: 'create',
+            module: 'setting_system',
+            description: "Menambahkan halaman kustom baru: \"{$halaman->judul}\" (/halaman/{$halaman->slug})",
+            properties: ['halaman_id' => $halaman->id, 'slug' => $halaman->slug],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Halaman kustom berhasil dibuat.',
+            'data' => $halaman,
+        ], 201);
+    }
+
+    public function updateHalamanKustom(Request $request, int $id): JsonResponse
+    {
+        $halaman = HalamanKustom::findOrFail($id);
+
+        $validated = $request->validate([
+            'judul' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255|unique:halaman_kustoms,slug,'.$id,
+            'kategori' => 'required|string|in:profil,pemerintahan,informasi',
+            'ringkasan' => 'nullable|string|max:500',
+            'gambar' => 'nullable|string',
+            'konten' => 'nullable|string',
+            'aktif' => 'nullable|boolean',
+            'urutan' => 'nullable|integer',
+        ]);
+
+        if (empty($validated['slug'])) {
+            $baseSlug = Str::slug($validated['judul']);
+            $slug = $baseSlug;
+            $count = 1;
+            while (HalamanKustom::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+                $slug = "{$baseSlug}-{$count}";
+                $count++;
+            }
+            $validated['slug'] = $slug;
+        } else {
+            $validated['slug'] = Str::slug($validated['slug']);
+        }
+
+        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $halaman->gambar) {
+            FileStorageHelper::deleteFileIfLocal($halaman->gambar);
+        }
+
+        $validated['aktif'] = $request->boolean('aktif', true);
+
+        $halaman->update($validated);
+
+        ActivityLog::record(
+            action: 'update',
+            module: 'setting_system',
+            description: "Memperbarui halaman kustom: \"{$halaman->judul}\" (/halaman/{$halaman->slug})",
+            properties: ['halaman_id' => $halaman->id, 'slug' => $halaman->slug],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Halaman kustom berhasil diperbarui.',
+            'data' => $halaman,
+        ]);
+    }
+
+    public function deleteHalamanKustom(Request $request, int $id): JsonResponse
+    {
+        $halaman = HalamanKustom::findOrFail($id);
+        $title = $halaman->judul;
+        $slug = $halaman->slug;
+
+        if ($halaman->gambar) {
+            FileStorageHelper::deleteFileIfLocal($halaman->gambar);
+        }
+
+        $halaman->delete();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'setting_system',
+            description: "Menghapus halaman kustom: \"{$title}\" (/halaman/{$slug})",
+            properties: ['halaman_id' => $id, 'slug' => $slug],
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Halaman kustom berhasil dihapus.',
         ]);
     }
 
@@ -2283,5 +2911,57 @@ class AdminController extends Controller
                 );
             }
         }
+    }
+
+    public function getStorageStats(Request $request): JsonResponse
+    {
+        $allDiskFiles = Storage::disk('public')->allFiles();
+        $totalDiskFiles = 0;
+        $totalDiskBytes = 0;
+
+        foreach ($allDiskFiles as $file) {
+            if (str_ends_with($file, '.gitignore') || str_ends_with($file, '.gitkeep')) {
+                continue;
+            }
+            $totalDiskFiles++;
+            $totalDiskBytes += Storage::disk('public')->size($file);
+        }
+
+        $activeDbFiles = FileStorageHelper::getAllActiveDatabaseFiles();
+        $orphanedFiles = FileStorageHelper::getOrphanedFiles();
+        $orphanedBytes = array_sum(array_column($orphanedFiles, 'size'));
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'total_disk_files' => $totalDiskFiles,
+                'total_disk_size' => $totalDiskBytes,
+                'total_disk_size_formatted' => FileStorageHelper::formatBytes($totalDiskBytes),
+                'active_db_files_count' => count($activeDbFiles),
+                'orphaned_files_count' => count($orphanedFiles),
+                'orphaned_size' => $orphanedBytes,
+                'orphaned_size_formatted' => FileStorageHelper::formatBytes($orphanedBytes),
+                'orphaned_files' => $orphanedFiles,
+            ],
+        ]);
+    }
+
+    public function cleanOrphanedStorage(Request $request): JsonResponse
+    {
+        $result = FileStorageHelper::cleanOrphanedFiles();
+
+        ActivityLog::record(
+            action: 'delete',
+            module: 'setting_system',
+            description: "Membersihkan {$result['deleted_count']} berkas storage tidak terpakai ({$result['bytes_freed_formatted']})",
+            properties: $result,
+            user: $request->user()
+        );
+
+        return response()->json([
+            'status' => 'success',
+            'message' => "Berhasil membersihkan {$result['deleted_count']} berkas ({$result['bytes_freed_formatted']}).",
+            'data' => $result,
+        ]);
     }
 }

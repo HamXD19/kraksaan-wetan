@@ -123,6 +123,10 @@ export const KelurahanService = {
         return `/api/dokumen/${id}/unduh`;
     },
 
+    getDokumenPreviewUrl(id) {
+        return `/api/dokumen/${id}/pratinjau`;
+    },
+
     async getGaleri() {
         try {
             const res = await apiClient.get('/galeri');
@@ -160,9 +164,18 @@ export const KelurahanService = {
             const res = await apiClient.get('/transparansi', { params });
             return res.data?.data || res.data;
         } catch (e) {
-            console.warn('API /transparansi fallback to mock data:', e);
-            return mockTransparansi;
+            console.warn('API /transparansi error:', e);
+            return { summary: {}, budgets: [], kegiatan: [] };
         }
+    },
+
+    async getTransparansiDetail(slugOrId) {
+        const res = await apiClient.get(`/transparansi/${slugOrId}`);
+        return res.data?.data || res.data;
+    },
+
+    getTransparansiDownloadUrl(slugOrId) {
+        return `/api/transparansi/${slugOrId}/unduh`;
     },
 
     async getKategori(modul = '') {
@@ -184,6 +197,54 @@ export const KelurahanService = {
     async getAgendaBySlug(slug) {
         const res = await apiClient.get(`/agenda/${slug}`);
         return res.data?.data || res.data;
+    },
+
+    async getHalamanBySlug(slug) {
+        const res = await apiClient.get(`/halaman/${slug}`);
+        return res.data?.data || res.data;
+    },
+
+    async kirimKontak(data) {
+        const res = await apiClient.post('/kontak', data);
+        return res.data;
+    },
+
+    // Maklumat Pelayanan
+    async getMaklumatPelayanan() {
+        try {
+            const res = await apiClient.get('/maklumat-pelayanan');
+            return res.data?.data || res.data;
+        } catch (e) {
+            console.warn('API /maklumat-pelayanan fallback:', e);
+            return null;
+        }
+    },
+
+    // Survei Kepuasan Masyarakat (SKM)
+    async getSurveiSkm(params = {}) {
+        try {
+            const res = await apiClient.get('/survei-skm', { params });
+            return res.data?.data || res.data;
+        } catch (e) {
+            console.warn('API /survei-skm fallback:', e);
+            return { latest: null, list: [], available_years: [] };
+        }
+    },
+
+    async getSurveiSkmDetail(id) {
+        const res = await apiClient.get(`/survei-skm/${id}`);
+        return res.data?.data || res.data;
+    },
+
+    // Running Text Warta
+    async getRunningText() {
+        try {
+            const res = await apiClient.get('/running-text');
+            return res.data?.data || res.data || [];
+        } catch (e) {
+            console.warn('API /running-text fallback:', e);
+            return [];
+        }
     }
 };
 
@@ -203,6 +264,16 @@ export const AdminService = {
 
     isSuperAdmin() {
         return this.getRole() === 'super_admin';
+    },
+
+    canAccessMenu(menuKey) {
+        if (this.isSuperAdmin()) return true;
+        const user = this.getAuthUser();
+        const menus = user?.effective_menus || user?.accessible_menus;
+        if (Array.isArray(menus)) {
+            return menus.includes(menuKey);
+        }
+        return false;
     },
 
     hasRole(allowedRoles) {
@@ -286,6 +357,12 @@ export const AdminService = {
     },
     async deleteBerita(id) {
         return (await apiClient.delete(`/admin/berita/${id}`)).data;
+    },
+    async toggleStatusBerita(id) {
+        return (await apiClient.put(`/admin/berita/${id}/toggle-status`)).data;
+    },
+    async toggleRunningTextBerita(id) {
+        return (await apiClient.put(`/admin/berita/${id}/toggle-running-text`)).data;
     },
 
     // Pengumuman
@@ -431,9 +508,13 @@ export const AdminService = {
         return (await apiClient.delete(`/admin/lembaga/${id}`)).data;
     },
 
-    // Transparansi & Akuntabilitas Anggaran
+    // Transparansi & Akuntabilitas Anggaran (APBD)
     async getTransparansi(params = {}) {
         const res = await apiClient.get('/admin/transparansi', { params });
+        return res.data?.data;
+    },
+    async getTransparansiDetail(id) {
+        const res = await apiClient.get(`/admin/transparansi/${id}`);
         return res.data?.data;
     },
     async saveTransparansi(data, id = null) {
@@ -441,6 +522,9 @@ export const AdminService = {
             return (await apiClient.put(`/admin/transparansi/${id}`, data)).data;
         }
         return (await apiClient.post('/admin/transparansi', data)).data;
+    },
+    async toggleStatusTransparansi(id, status) {
+        return (await apiClient.put(`/admin/transparansi/${id}/toggle-status`, { status })).data;
     },
     async toggleAktifTransparansi(id, aktif) {
         return (await apiClient.put(`/admin/transparansi/${id}/toggle-aktif`, { aktif })).data;
@@ -509,6 +593,64 @@ export const AdminService = {
     },
     async deleteAgenda(id) {
         return (await apiClient.delete(`/admin/agenda/${id}`)).data;
+    },
+
+    // Kelola Setting System & Halaman Kustom
+    async getHalamanKustom(params = {}) {
+        const res = await apiClient.get('/admin/halaman-kustom', { params });
+        return res.data;
+    },
+    async saveHalamanKustom(data, id = null) {
+        if (id) {
+            return (await apiClient.put(`/admin/halaman-kustom/${id}`, data)).data;
+        }
+        return (await apiClient.post('/admin/halaman-kustom', data)).data;
+    },
+    async deleteHalamanKustom(id) {
+        return (await apiClient.delete(`/admin/halaman-kustom/${id}`)).data;
+    },
+
+    // Manajemen Penyimpanan & Berkas Orphan (Super Admin Only)
+    async getStorageStats() {
+        const res = await apiClient.get('/admin/storage/stats');
+        return res.data?.data || res.data;
+    },
+    async cleanOrphanedStorage() {
+        const res = await apiClient.post('/admin/storage/clean-orphans');
+        return res.data;
+    },
+
+    // Maklumat Pelayanan
+    async getMaklumatAdmin() {
+        const res = await apiClient.get('/admin/maklumat-pelayanan');
+        return res.data;
+    },
+    async saveMaklumatAdmin(data) {
+        return (await apiClient.post('/admin/maklumat-pelayanan', data)).data;
+    },
+    async toggleAktifMaklumat(id) {
+        return (await apiClient.put(`/admin/maklumat-pelayanan/${id}/toggle-aktif`)).data;
+    },
+    async deleteMaklumat(id) {
+        return (await apiClient.delete(`/admin/maklumat-pelayanan/${id}`)).data;
+    },
+
+    // Survei Kepuasan Masyarakat (SKM)
+    async getSurveiSkmAdmin() {
+        const res = await apiClient.get('/admin/survei-skm');
+        return res.data?.data || res.data;
+    },
+    async saveSurveiSkm(data, id = null) {
+        if (id) {
+            return (await apiClient.put(`/admin/survei-skm/${id}`, data)).data;
+        }
+        return (await apiClient.post('/admin/survei-skm', data)).data;
+    },
+    async toggleAktifSurveiSkm(id, aktif) {
+        return (await apiClient.put(`/admin/survei-skm/${id}/toggle-aktif`, { aktif })).data;
+    },
+    async deleteSurveiSkm(id) {
+        return (await apiClient.delete(`/admin/survei-skm/${id}`)).data;
     }
 };
 

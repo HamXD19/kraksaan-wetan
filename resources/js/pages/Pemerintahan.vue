@@ -69,12 +69,24 @@
               class="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:shadow-md transition reveal"
               :class="`delay-${((i % 3) + 1) * 75}`"
             >
-              <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center text-sm mb-4">
-                {{ p.nama.charAt(0) }}
+              <div class="flex items-center gap-4 mb-4">
+                <div class="w-14 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-200 bg-slate-100 flex items-center justify-center shadow-2xs">
+                  <img 
+                    v-if="p.foto" 
+                    :src="p.foto" 
+                    :alt="p.nama" 
+                    class="w-full h-full object-cover object-top"
+                  />
+                  <div v-else class="w-full h-full bg-emerald-50 text-emerald-700 font-bold flex items-center justify-center text-sm">
+                    {{ p.nama.charAt(0) }}
+                  </div>
+                </div>
+                <div class="min-w-0">
+                  <h4 class="font-bold text-slate-900 text-sm mb-0.5 leading-snug">{{ p.nama }}</h4>
+                  <p class="text-xs font-semibold text-emerald-700 leading-snug">{{ p.jabatan }}</p>
+                </div>
               </div>
-              <h4 class="font-bold text-slate-900 text-sm mb-1">{{ p.nama }}</h4>
-              <p class="text-xs font-semibold text-emerald-700 mb-2">{{ p.jabatan }}</p>
-              <p class="text-xs text-slate-500 border-t border-slate-100 pt-2">{{ p.bidang }}</p>
+              <p class="text-xs text-slate-500 border-t border-slate-100 pt-2">{{ p.bidang || '-' }}</p>
             </div>
           </div>
         </section>

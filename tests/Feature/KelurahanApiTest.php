@@ -21,7 +21,17 @@ class KelurahanApiTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('status', 'success')
             ->assertJsonPath('data.nama', 'Kelurahan Kraksaan Wetan')
-            ->assertJsonPath('data.kecamatan', 'Kraksaan');
+            ->assertJsonPath('data.kecamatan', 'Kraksaan')
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'nama',
+                    'batas_wilayah' => ['utara', 'selatan', 'timur', 'barat'],
+                    'potensi_unggulan',
+                    'tata_nilai',
+                    'sejarah_timeline',
+                ],
+            ]);
     }
 
     public function test_statistik_api_returns_success(): void

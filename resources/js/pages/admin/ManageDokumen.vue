@@ -33,6 +33,60 @@
       <button @click="errorMsg = ''" class="text-red-700 font-bold hover:text-red-900 cursor-pointer">&times;</button>
     </div>
 
+    <!-- Tab Pembagian Dokumen Secara Terpisah -->
+    <div class="bg-white p-4 rounded-3xl border border-slate-200 shadow-xs space-y-3">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Kategori Dokumen Terpisah</h3>
+            <p class="text-[11px] text-slate-500">Pilih kategori untuk melihat dan mengelola berkas PDF secara terfokus</p>
+          </div>
+        </div>
+
+        <div v-if="activeKategoriTab !== 'Semua'" class="flex items-center gap-2">
+          <span class="text-[11px] font-medium text-slate-500">Kategori Aktif:</span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+            <span>{{ activeKategoriTab }}</span>
+            <button 
+              @click="selectKategoriTab('Semua')" 
+              class="text-emerald-600 hover:text-emerald-900 font-bold ml-1 cursor-pointer"
+              title="Tampilkan Semua Kategori"
+            >
+              &times;
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <!-- Tab Buttons Bar -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <button
+          type="button"
+          v-for="tab in separateCategoryTabs"
+          :key="tab.nama"
+          @click="selectKategoriTab(tab.nama)"
+          class="flex items-center gap-2 px-3.5 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer shrink-0 border"
+          :class="activeKategoriTab === tab.nama
+            ? 'bg-emerald-700 border-emerald-700 text-white shadow-xs ring-2 ring-emerald-600/20'
+            : 'bg-slate-50 border-slate-200/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900'"
+        >
+          <span>{{ tab.icon }}</span>
+          <span>{{ tab.label }}</span>
+          <span 
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold"
+            :class="activeKategoriTab === tab.nama 
+              ? 'bg-emerald-800 text-emerald-100' 
+              : 'bg-slate-200 text-slate-600'"
+          >
+            {{ getCategoryCount(tab.nama) }}
+          </span>
+        </button>
+      </div>
+    </div>
+
     <!-- KPI Summary Metrics -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs flex items-center gap-4">
@@ -40,8 +94,8 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
         <div>
-          <div class="text-2xl font-extrabold text-slate-900">{{ summary.total || 0 }}</div>
-          <div class="text-xs text-slate-500 font-medium">Total Dokumen Publik</div>
+          <div class="text-2xl font-extrabold text-slate-900">{{ activeTabSummary.total }}</div>
+          <div class="text-xs text-slate-500 font-medium">{{ activeTabSummary.label }}</div>
         </div>
       </div>
 
@@ -50,7 +104,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         </div>
         <div>
-          <div class="text-2xl font-extrabold text-slate-900">{{ summary.aktif || 0 }}</div>
+          <div class="text-2xl font-extrabold text-slate-900">{{ activeTabSummary.aktif }}</div>
           <div class="text-xs text-slate-500 font-medium">Dokumen Aktif & Tampil</div>
         </div>
       </div>
@@ -60,7 +114,7 @@
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
         </div>
         <div>
-          <div class="text-2xl font-extrabold text-slate-900">{{ summary.total_unduhan || 0 }}</div>
+          <div class="text-2xl font-extrabold text-slate-900">{{ activeTabSummary.unduhan }}</div>
           <div class="text-xs text-slate-500 font-medium">Total Diunduh Warga</div>
         </div>
       </div>
@@ -212,6 +266,21 @@
     <!-- Data Table -->
     <LoadingSpinner v-if="loading" />
     <div v-else class="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden">
+      <!-- Contextual Category Info Bar -->
+      <div v-if="activeKategoriTab !== 'Semua'" class="px-5 py-3 bg-emerald-50/70 border-b border-emerald-100 flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-2 text-emerald-900 font-semibold">
+          <span class="text-base">📂</span>
+          <span>Menampilkan Dokumen Kategori: <strong class="text-emerald-950 font-bold underline">{{ activeKategoriTab }}</strong> ({{ dokumenList.length }} dokumen ditemukan)</span>
+        </div>
+        <button 
+          @click="selectKategoriTab('Semua')"
+          class="text-emerald-700 hover:text-emerald-900 font-bold hover:underline cursor-pointer flex items-center gap-1"
+        >
+          <span>Tampilkan Semua Kategori</span>
+          <span>&rarr;</span>
+        </button>
+      </div>
+
       <div class="overflow-x-auto">
         <table class="w-full text-left text-xs">
           <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
@@ -230,8 +299,9 @@
             <tr v-if="dokumenList.length === 0">
               <td colspan="8" class="py-12 text-center text-slate-400">
                 <div class="max-w-sm mx-auto space-y-2">
-                  <p class="font-bold text-slate-600">Tidak ada dokumen yang sesuai</p>
-                  <p class="text-xs text-slate-400">Silakan ubah kata kunci pencarian atau sesuaikan filter di atas.</p>
+                  <div class="text-3xl mb-1">📂</div>
+                  <p class="font-bold text-slate-700">Belum ada dokumen dalam kategori {{ activeKategoriTab === 'Semua' ? 'ini' : `"${activeKategoriTab}"` }}</p>
+                  <p class="text-xs text-slate-400">Silakan sesuaikan filter pencarian atau klik tombol "Tambah Dokumen PDF" di atas untuk menambahkan berkas baru.</p>
                 </div>
               </td>
             </tr>
@@ -821,12 +891,15 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import LoadingSpinner from '../../components/LoadingSpinner.vue';
 import RichTextEditor from '../../components/RichTextEditor.vue';
 import { AdminService } from '../../services/api';
 import { useToast } from '../../composables/useToast';
 
+const route = useRoute();
+const router = useRouter();
 const toast = useToast();
 const loading = ref(true);
 const saving = ref(false);
@@ -835,13 +908,14 @@ const uploading = ref(false);
 const isDragging = ref(false);
 
 const dokumenList = ref([]);
-const summary = ref({ total: 0, aktif: 0, total_unduhan: 0 });
+const summary = ref({ total: 0, aktif: 0, total_unduhan: 0, kategori_counts: {} });
 const meta = ref({ kategori_list: [], subkategori_list: [], periode_list: [], tahun_list: [], master_kategori_tree: [] });
 const successMsg = ref('');
 const errorMsg = ref('');
 const modalError = ref('');
 
-// Filter States
+// Tab Kategori Terpisah & Filter States
+const activeKategoriTab = ref('Semua');
 const searchQuery = ref('');
 const filterKategori = ref('Semua');
 const filterSubkategori = ref('Semua');
@@ -862,6 +936,11 @@ const isCustomSubkategori = ref(false);
 const masterKategoriTree = ref([]);
 
 const defaultKategoriList = [
+  'Musrenbang',
+  'UMKM',
+  'Renstra & Renja',
+  'SK Kelembagaan',
+  'Regulasi & Kebijakan',
   'Perencanaan & Pembangunan',
   'Keuangan & Anggaran',
   'Pemerintahan & Administrasi',
@@ -869,6 +948,93 @@ const defaultKategoriList = [
   'Kegiatan & Kemasyarakatan',
   'Transparansi & Akuntabilitas'
 ];
+
+// Tabs Pembagian Kategori Terpisah
+const standardCategoryTabs = [
+  { nama: 'Semua', label: 'Semua Dokumen', icon: '📁' },
+  { nama: 'Musrenbang', label: 'Musrenbang', icon: '🏛️' },
+  { nama: 'UMKM', label: 'UMKM', icon: '🏪' },
+  { nama: 'Renstra & Renja', label: 'Renstra & Renja', icon: '📊' },
+  { nama: 'SK Kelembagaan', label: 'SK Kelembagaan', icon: '📜' },
+  { nama: 'Regulasi & Kebijakan', label: 'Regulasi & Kebijakan', icon: '⚖️' }
+];
+
+const separateCategoryTabs = computed(() => {
+  const tabs = [...standardCategoryTabs];
+  const standardNames = standardCategoryTabs.map(t => t.nama.toLowerCase());
+
+  const extraCategories = [];
+  (meta.value.kategori_list || []).forEach(c => {
+    if (c && !standardNames.includes(c.toLowerCase()) && !extraCategories.some(e => e.toLowerCase() === c.toLowerCase())) {
+      extraCategories.push(c);
+    }
+  });
+
+  masterKategoriTree.value.forEach(k => {
+    if (k.nama && !standardNames.includes(k.nama.toLowerCase()) && !extraCategories.some(e => e.toLowerCase() === k.nama.toLowerCase())) {
+      extraCategories.push(k.nama);
+    }
+  });
+
+  extraCategories.forEach(c => {
+    tabs.push({
+      nama: c,
+      label: c,
+      icon: '📑'
+    });
+  });
+
+  return tabs;
+});
+
+const getCategoryCount = (categoryName) => {
+  if (categoryName === 'Semua') {
+    return summary.value.total || dokumenList.value.length;
+  }
+  if (summary.value.kategori_counts && summary.value.kategori_counts[categoryName] !== undefined) {
+    return summary.value.kategori_counts[categoryName];
+  }
+  if (summary.value.kategori_counts) {
+    const key = Object.keys(summary.value.kategori_counts).find(k => k.toLowerCase() === categoryName.toLowerCase());
+    if (key !== undefined) {
+      return summary.value.kategori_counts[key];
+    }
+  }
+  return dokumenList.value.filter(d => (d.kategori || '').toLowerCase() === categoryName.toLowerCase()).length;
+};
+
+const activeTabSummary = computed(() => {
+  if (activeKategoriTab.value === 'Semua') {
+    return {
+      total: summary.value.total || 0,
+      aktif: summary.value.aktif || 0,
+      unduhan: summary.value.total_unduhan || 0,
+      label: 'Total Dokumen Publik'
+    };
+  }
+  const count = getCategoryCount(activeKategoriTab.value);
+  const aktifInTab = dokumenList.value.filter(d => d.aktif).length;
+  const unduhanInTab = dokumenList.value.reduce((acc, d) => acc + (d.diunduh || 0), 0);
+  return {
+    total: count,
+    aktif: aktifInTab,
+    unduhan: unduhanInTab,
+    label: `Total Dokumen ${activeKategoriTab.value}`
+  };
+});
+
+const selectKategoriTab = (tabName) => {
+  activeKategoriTab.value = tabName;
+  filterKategori.value = tabName;
+  filterSubkategori.value = 'Semua';
+  router.replace({
+    query: {
+      ...route.query,
+      kategori: tabName !== 'Semua' ? tabName : undefined
+    }
+  });
+  fetchDokumen();
+};
 
 // Computed Categories for Form
 const kategoriOptions = computed(() => {
@@ -934,17 +1100,26 @@ const hasActiveFilter = computed(() => {
 });
 
 const onFilterKategoriChange = () => {
+  activeKategoriTab.value = filterKategori.value;
   filterSubkategori.value = 'Semua';
+  router.replace({
+    query: {
+      ...route.query,
+      kategori: filterKategori.value !== 'Semua' ? filterKategori.value : undefined
+    }
+  });
   fetchDokumen();
 };
 
 const resetFilters = () => {
   searchQuery.value = '';
+  activeKategoriTab.value = 'Semua';
   filterKategori.value = 'Semua';
   filterSubkategori.value = 'Semua';
   filterPeriode.value = 'Semua';
   filterTahun.value = 'Semua';
   filterStatus.value = 'semua';
+  router.replace({ query: {} });
   fetchDokumen();
 };
 
@@ -1064,12 +1239,18 @@ const openModal = (doc = null) => {
     }
   } else {
     isEditing.value = false;
+    const defaultCategory = (activeKategoriTab.value && activeKategoriTab.value !== 'Semua') 
+      ? activeKategoriTab.value 
+      : (kategoriOptions.value[0] || 'Musrenbang');
+
+    const isKnown = kategoriOptions.value.includes(defaultCategory);
+
     form.value = {
       id: null,
       judul: '',
       nomor_dokumen: '',
-      kategori: 'Perencanaan & Pembangunan',
-      customKategori: '',
+      kategori: isKnown ? defaultCategory : defaultCategory,
+      customKategori: isKnown ? '' : defaultCategory,
       subkategori: '',
       customSubkategori: '',
       periode: 'Tahunan',
@@ -1083,6 +1264,10 @@ const openModal = (doc = null) => {
       ukuran_file: '',
       aktif: true
     };
+
+    if (!isKnown && defaultCategory) {
+      isCustomKategori.value = true;
+    }
   }
   showModal.value = true;
 };
@@ -1186,6 +1371,7 @@ const saveDokumen = async () => {
     }
   }
 
+  if (saving.value) return;
   saving.value = true;
   try {
     const finalKategori = isCustomKategori.value 
@@ -1275,7 +1461,22 @@ const doDelete = async () => {
   }
 };
 
+watch(() => route.query.kategori, (newCat) => {
+  const cat = newCat ? decodeURIComponent(newCat) : 'Semua';
+  if (activeKategoriTab.value !== cat) {
+    activeKategoriTab.value = cat;
+    filterKategori.value = cat;
+    filterSubkategori.value = 'Semua';
+    fetchDokumen();
+  }
+});
+
 onMounted(() => {
+  if (route.query.kategori) {
+    const initialCat = decodeURIComponent(route.query.kategori);
+    activeKategoriTab.value = initialCat;
+    filterKategori.value = initialCat;
+  }
   fetchDokumen();
   fetchMasterTaxonomy();
 });

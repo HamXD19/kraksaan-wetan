@@ -23,8 +23,17 @@
         <form @submit.prevent="saveStatistik" class="space-y-4 text-xs sm:text-sm">
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div>
-              <label class="block font-bold text-slate-700 mb-1">Total Penduduk (Jiwa) *</label>
-              <input type="number" v-model.number="statForm.penduduk" required class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-mono" />
+              <div class="flex items-center justify-between mb-1">
+                <label class="block font-bold text-slate-700">Total Penduduk (Jiwa) *</label>
+                <span class="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">Otomatis (L+P)</span>
+              </div>
+              <input 
+                type="number" 
+                v-model.number="statForm.penduduk" 
+                required 
+                class="w-full px-3.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50/40 focus:ring-2 focus:ring-emerald-600 outline-none font-mono font-bold text-slate-900" 
+                title="Dihitung otomatis dari penjumlahan Laki-Laki + Perempuan"
+              />
             </div>
 
             <div>
@@ -34,12 +43,22 @@
 
             <div>
               <label class="block font-bold text-slate-700 mb-1">Laki-Laki</label>
-              <input type="number" v-model.number="statForm.laki_laki" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-mono" />
+              <input 
+                type="number" 
+                v-model.number="statForm.laki_laki" 
+                @input="calculateTotalPenduduk"
+                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-mono" 
+              />
             </div>
 
             <div>
               <label class="block font-bold text-slate-700 mb-1">Perempuan</label>
-              <input type="number" v-model.number="statForm.perempuan" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-mono" />
+              <input 
+                type="number" 
+                v-model.number="statForm.perempuan" 
+                @input="calculateTotalPenduduk"
+                class="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-emerald-600 outline-none font-mono" 
+              />
             </div>
           </div>
 
@@ -182,11 +201,27 @@ const lingkunganForm = reactive({
   penduduk: 950
 });
 
+const calculateTotalPenduduk = () => {
+  const l = parseInt(statForm.laki_laki, 10) || 0;
+  const p = parseInt(statForm.perempuan, 10) || 0;
+  statForm.penduduk = l + p;
+  updateKepadatan();
+};
+
+const updateKepadatan = () => {
+  if (statForm.luas_wilayah) {
+    const luas = parseFloat(String(statForm.luas_wilayah).replace(',', '.'));
+    if (luas > 0 && statForm.penduduk > 0) {
+      const kep = Math.round(statForm.penduduk / luas);
+      statForm.kepadatan = `${kep.toLocaleString('id-ID')} jiwa/km²`;
+    }
+  }
+};
+
 const loadData = async () => {
   loading.value = true;
   try {
     const data = await KelurahanService.getStatistik();
-    statForm.penduduk = data.penduduk || 0;
     statForm.kk = data.kk || 0;
     statForm.laki_laki = data.laki_laki || 0;
     statForm.perempuan = data.perempuan || 0;
@@ -195,6 +230,13 @@ const loadData = async () => {
     statForm.luas_wilayah = data.luas_wilayah || '1.84';
     statForm.kepadatan = data.kepadatan || '';
     lingkunganList.value = data.lingkungan || [];
+
+    // Jika ada data laki_laki dan perempuan, otomatis sinkronkan penduduk
+    if (statForm.laki_laki || statForm.perempuan) {
+      statForm.penduduk = (parseInt(statForm.laki_laki, 10) || 0) + (parseInt(statForm.perempuan, 10) || 0);
+    } else {
+      statForm.penduduk = data.penduduk || 0;
+    }
   } catch (e) {
     console.error(e);
   } finally {
@@ -203,6 +245,7 @@ const loadData = async () => {
 };
 
 const saveStatistik = async () => {
+  calculateTotalPenduduk();
   saving.value = true;
   try {
     const res = await AdminService.updateStatistik(statForm);
