@@ -437,6 +437,13 @@ const handleFileUpload = async (event) => {
     return;
   }
 
+  // Set pratinjau instan langsung di form
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    form.gambar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploading.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -446,7 +453,7 @@ const handleFileUpload = async (event) => {
       toast.success('Foto dokumentasi berhasil diunggah!');
     }
   } catch (err) {
-    toast.error('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
+    toast.warning('Pratinjau foto siap disimpan: ' + (err.response?.data?.message || err.message));
   } finally {
     uploading.value = false;
     event.target.value = '';

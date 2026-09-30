@@ -435,12 +435,26 @@ const handleFileSelect = (event) => {
     return;
   }
 
+  // Set preview awal langsung di form
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    form.gambar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   selectedImageFile.value = file;
   showCropper.value = true;
   event.target.value = '';
 };
 
 const handleCroppedImage = async (croppedFile) => {
+  // Set pratinjau instan foto yang telah dipotong
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    form.gambar = e.target.result;
+  };
+  reader.readAsDataURL(croppedFile);
+
   uploading.value = true;
   try {
     const res = await AdminService.uploadFile(croppedFile, 'image');
@@ -451,7 +465,7 @@ const handleCroppedImage = async (croppedFile) => {
       toast.success('Foto artikel berhasil disesuaikan dan diunggah.');
     }
   } catch (err) {
-    toast.error('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
+    toast.warning('Pratinjau foto siap disimpan: ' + (err.response?.data?.message || err.message));
   } finally {
     uploading.value = false;
   }

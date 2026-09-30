@@ -471,6 +471,14 @@ const onSelectImage = (e, target = 'banner') => {
 
   cropTarget.value = target;
   cropperAspectRatio.value = target === 'banner' ? (16 / 9) : (1 / 1);
+
+  // Set pratinjau instan langsung di form
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    form[target] = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+
   selectedImageFile.value = file;
   showCropper.value = true;
   e.target.value = '';
@@ -483,6 +491,17 @@ const handleCroppedImage = async (croppedFile) => {
   } else {
     uploadingThumbnail.value = true;
   }
+
+  // Update pratinjau instan dengan hasil potongan (crop)
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    if (isBanner) {
+      form.banner = ev.target.result;
+    } else {
+      form.thumbnail = ev.target.result;
+    }
+  };
+  reader.readAsDataURL(croppedFile);
 
   try {
     const res = await AdminService.uploadFile(croppedFile, 'image');
@@ -497,7 +516,7 @@ const handleCroppedImage = async (croppedFile) => {
       }
     }
   } catch (err) {
-    toast.error('Gagal mengunggah foto: ' + (err.response?.data?.message || err.message));
+    toast.warning('Pratinjau gambar siap disimpan: ' + (err.response?.data?.message || err.message));
   } finally {
     if (isBanner) {
       uploadingBanner.value = false;

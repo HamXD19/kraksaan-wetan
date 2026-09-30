@@ -259,6 +259,69 @@ class AdminController extends Controller
     public function upload(Request $request): JsonResponse
     {
         $type = $request->input('type', 'image');
+        $base64Input = $request->input('base64') ?: (is_string($request->input('file')) && str_starts_with($request->input('file'), 'data:') ? $request->input('file') : null);
+
+        if ($base64Input) {
+            if (! preg_match('/^data:([a-zA-Z0-9_\-\/]+);base64,(.+)$/s', $base64Input, $matches)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Format berkas Base64 tidak valid.',
+                ], 422);
+            }
+
+            $mime = strtolower($matches[1]);
+            $base64Data = $matches[2];
+            $binary = base64_decode($base64Data);
+
+            if ($binary === false) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal membaca data berkas unggahan.',
+                ], 422);
+            }
+
+            $allowedMimes = [
+                'image/jpeg' => 'jpg',
+                'image/jpg' => 'jpg',
+                'image/png' => 'png',
+                'image/webp' => 'webp',
+                'image/svg+xml' => 'svg',
+                'image/gif' => 'gif',
+                'application/pdf' => 'pdf',
+            ];
+
+            if ($type === 'image' && ! isset($allowedMimes[$mime])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Format file gambar tidak didukung. Gunakan JPG, PNG, WebP, atau SVG.',
+                ], 422);
+            }
+
+            $ext = $allowedMimes[$mime] ?? 'bin';
+            $filename = Str::random(24).'.'.$ext;
+            $path = 'uploads/'.$filename;
+            Storage::disk('public')->put($path, $binary);
+
+            $originalName = $request->input('filename') ?: $filename;
+
+            ActivityLog::record(
+                action: 'upload',
+                module: 'media',
+                description: "Mengunggah file {$originalName}",
+                properties: ['filename' => $originalName, 'path' => $path, 'type' => $type],
+                user: $request->user()
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'File berhasil diunggah.',
+                'data' => [
+                    'url' => '/storage/'.$path,
+                    'path' => $path,
+                    'filename' => $originalName,
+                ],
+            ]);
+        }
 
         if ($type === 'image') {
             $request->validate([
@@ -399,6 +462,10 @@ class AdminController extends Controller
             $slug = "{$slug}-".($count + 1);
         }
 
+        if (! empty($validated['gambar'])) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+        }
+
         $berita = Berita::create([
             'slug' => $slug,
             'judul' => $validated['judul'],
@@ -447,8 +514,11 @@ class AdminController extends Controller
             'tampil_running_text' => 'nullable|boolean',
         ]);
 
-        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $berita->gambar) {
-            FileStorageHelper::deleteFileIfLocal($berita->gambar);
+        if (array_key_exists('gambar', $validated)) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+            if ($validated['gambar'] !== $berita->gambar) {
+                FileStorageHelper::deleteFileIfLocal($berita->gambar);
+            }
         }
 
         $berita->update($validated);
@@ -573,6 +643,12 @@ class AdminController extends Controller
         ]);
 
         $validated['tanggal'] = $validated['tanggal'] ?? now()->translatedFormat('d F Y');
+        if (! empty($validated['banner'])) {
+            $validated['banner'] = FileStorageHelper::saveBase64ImageIfPresent($validated['banner']);
+        }
+        if (! empty($validated['thumbnail'])) {
+            $validated['thumbnail'] = FileStorageHelper::saveBase64ImageIfPresent($validated['thumbnail']);
+        }
 
         $pengumuman = Pengumuman::create($validated);
         $this->ensureMasterKategori('pengumuman', $validated['kategori'] ?? null);
@@ -611,11 +687,17 @@ class AdminController extends Controller
         if (array_key_exists('file', $validated) && $validated['file'] !== $pengumuman->file) {
             FileStorageHelper::deleteFileIfLocal($pengumuman->file);
         }
-        if (array_key_exists('banner', $validated) && $validated['banner'] !== $pengumuman->banner) {
-            FileStorageHelper::deleteFileIfLocal($pengumuman->banner);
+        if (array_key_exists('banner', $validated)) {
+            $validated['banner'] = FileStorageHelper::saveBase64ImageIfPresent($validated['banner']);
+            if ($validated['banner'] !== $pengumuman->banner) {
+                FileStorageHelper::deleteFileIfLocal($pengumuman->banner);
+            }
         }
-        if (array_key_exists('thumbnail', $validated) && $validated['thumbnail'] !== $pengumuman->thumbnail) {
-            FileStorageHelper::deleteFileIfLocal($pengumuman->thumbnail);
+        if (array_key_exists('thumbnail', $validated)) {
+            $validated['thumbnail'] = FileStorageHelper::saveBase64ImageIfPresent($validated['thumbnail']);
+            if ($validated['thumbnail'] !== $pengumuman->thumbnail) {
+                FileStorageHelper::deleteFileIfLocal($pengumuman->thumbnail);
+            }
         }
 
         $pengumuman->update($validated);
@@ -1035,6 +1117,10 @@ class AdminController extends Controller
             }
         }
 
+        if (! empty($validated['gambar'])) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+        }
+
         $galeri = Galeri::create($validated);
         $this->ensureMasterKategori('galeri', $validated['kategori'] ?? null);
 
@@ -1092,8 +1178,11 @@ class AdminController extends Controller
             }
         }
 
-        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $galeri->gambar) {
-            FileStorageHelper::deleteFileIfLocal($galeri->gambar);
+        if (array_key_exists('gambar', $validated)) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+            if ($validated['gambar'] !== $galeri->gambar) {
+                FileStorageHelper::deleteFileIfLocal($galeri->gambar);
+            }
         }
 
         $galeri->update($validated);
@@ -1248,6 +1337,10 @@ class AdminController extends Controller
             'urutan' => 'nullable|integer',
         ]);
 
+        if (! empty($validated['foto'])) {
+            $validated['foto'] = FileStorageHelper::saveBase64ImageIfPresent($validated['foto']);
+        }
+
         $p = PerangkatKelurahan::create($validated);
 
         ActivityLog::record(
@@ -1277,8 +1370,11 @@ class AdminController extends Controller
             'urutan' => 'nullable|integer',
         ]);
 
-        if (array_key_exists('foto', $validated) && $validated['foto'] !== $p->foto) {
-            FileStorageHelper::deleteFileIfLocal($p->foto);
+        if (array_key_exists('foto', $validated)) {
+            $validated['foto'] = FileStorageHelper::saveBase64ImageIfPresent($validated['foto']);
+            if ($validated['foto'] !== $p->foto) {
+                FileStorageHelper::deleteFileIfLocal($p->foto);
+            }
         }
 
         $p->update($validated);
@@ -1719,6 +1815,10 @@ class AdminController extends Controller
                 ], 422);
             }
 
+            if (! empty($validated['gambar'])) {
+                $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+            }
+
             return DB::transaction(function () use ($validated, $request) {
                 // Buat header anggaran
                 $header = AnggaranRealisasi::create([
@@ -1856,6 +1956,13 @@ class AdminController extends Controller
                     'message' => "Tahun anggaran {$validated['tahun']} telah digunakan pada entri APBD lainnya.",
                     'errors' => ['tahun' => ["Tahun anggaran {$validated['tahun']} sudah terdaftar."]],
                 ], 422);
+            }
+
+            if (array_key_exists('gambar', $validated)) {
+                $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+                if ($validated['gambar'] !== $header->gambar) {
+                    FileStorageHelper::deleteFileIfLocal($header->gambar);
+                }
             }
 
             return DB::transaction(function () use ($header, $validated, $request) {
@@ -2643,6 +2750,9 @@ class AdminController extends Controller
         $validated['slug'] = $slug;
         $validated['is_aktif'] = $request->has('is_aktif') ? (bool) $request->is_aktif : true;
         $validated['kategori'] = $validated['kategori'] ?: 'Umum';
+        if (! empty($validated['foto'])) {
+            $validated['foto'] = FileStorageHelper::saveBase64ImageIfPresent($validated['foto']);
+        }
 
         $agenda = AgendaKegiatan::create($validated);
         $this->ensureMasterKategori('agenda', $agenda->kategori);
@@ -2692,8 +2802,11 @@ class AdminController extends Controller
         $validated['is_aktif'] = $request->has('is_aktif') ? (bool) $request->is_aktif : $agenda->is_aktif;
         $validated['kategori'] = $validated['kategori'] ?: 'Umum';
 
-        if (array_key_exists('foto', $validated) && $validated['foto'] !== $agenda->foto) {
-            FileStorageHelper::deleteFileIfLocal($agenda->foto);
+        if (array_key_exists('foto', $validated)) {
+            $validated['foto'] = FileStorageHelper::saveBase64ImageIfPresent($validated['foto']);
+            if ($validated['foto'] !== $agenda->foto) {
+                FileStorageHelper::deleteFileIfLocal($agenda->foto);
+            }
         }
 
         $agenda->update($validated);
@@ -2813,6 +2926,9 @@ class AdminController extends Controller
 
         $validated['aktif'] = $request->boolean('aktif', true);
         $validated['urutan'] = $validated['urutan'] ?? 0;
+        if (! empty($validated['gambar'])) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+        }
 
         $halaman = HalamanKustom::create($validated);
 
@@ -2859,8 +2975,11 @@ class AdminController extends Controller
             $validated['slug'] = Str::slug($validated['slug']);
         }
 
-        if (array_key_exists('gambar', $validated) && $validated['gambar'] !== $halaman->gambar) {
-            FileStorageHelper::deleteFileIfLocal($halaman->gambar);
+        if (array_key_exists('gambar', $validated)) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+            if ($validated['gambar'] !== $halaman->gambar) {
+                FileStorageHelper::deleteFileIfLocal($halaman->gambar);
+            }
         }
 
         $validated['aktif'] = $request->boolean('aktif', true);

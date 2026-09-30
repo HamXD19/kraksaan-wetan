@@ -1249,12 +1249,27 @@ const handleMaklumatImageUpload = (event) => {
   }
 
   cropperAspectRatio.value = 3 / 4;
+
+  // Pratinjau instan seketika
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    maklumatForm.gambar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   selectedImageFile.value = file;
   showCropper.value = true;
   event.target.value = '';
 };
 
 const handleCroppedPoster = async (croppedFile) => {
+  // Pratinjau instan poster yang telah dipotong
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    maklumatForm.gambar = e.target.result;
+  };
+  reader.readAsDataURL(croppedFile);
+
   uploadingPoster.value = true;
   try {
     const res = await AdminService.uploadFile(croppedFile, 'image');
@@ -1264,7 +1279,7 @@ const handleCroppedPoster = async (croppedFile) => {
       toast.success('Poster maklumat berhasil disesuaikan dan diunggah.');
     }
   } catch (err) {
-    toast.error('Gagal mengunggah poster maklumat: ' + (err.response?.data?.message || err.message));
+    toast.warning('Pratinjau poster siap disimpan: ' + (err.response?.data?.message || err.message));
   } finally {
     uploadingPoster.value = false;
   }

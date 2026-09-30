@@ -119,4 +119,53 @@ class SystemSettingTest extends TestCase
             ->assertJsonPath('data.logo', 'https://example.com/logo-baru.png')
             ->assertJsonPath('data.hero_image', 'https://example.com/hero-baru.jpg');
     }
+
+    public function test_admin_can_upload_image_via_json_base64(): void
+    {
+        $token = $this->getUserToken('super_admin');
+
+        // 1x1 transparent PNG data URI
+        $base64Png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        $response = $this->withHeader('Authorization', "Bearer {$token}")
+            ->postJson('/api/admin/upload', [
+                'base64' => $base64Png,
+                'filename' => 'test-logo.png',
+                'type' => 'image',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success')
+            ->assertJsonStructure([
+                'status',
+                'message',
+                'data' => ['url', 'path', 'filename'],
+            ]);
+
+        $this->assertStringStartsWith('/storage/uploads/', $response->json('data.url'));
+    }
+
+    public function test_store_berita_converts_base64_image_to_storage_file(): void
+    {
+        $token = $this->getUserToken('super_admin');
+
+        $base64Png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+
+        $response = $this->withHeader('Authorization', "Bearer {$token}")
+            ->postJson('/api/admin/berita', [
+                'judul' => 'Uji Coba Berita Base64',
+                'kategori' => 'Pemerintahan',
+                'ringkasan' => 'Ringkasan uji coba base64.',
+                'konten' => '<p>Konten berita uji coba base64.</p>',
+                'gambar' => $base64Png,
+                'status' => 'published',
+            ]);
+
+        $response->assertStatus(200)
+            ->assertJsonPath('status', 'success');
+
+        $gambar = $response->json('data.gambar');
+        $this->assertStringStartsWith('/storage/uploads/', $gambar);
+        $this->assertStringEndsWith('.png', $gambar);
+    }
 }

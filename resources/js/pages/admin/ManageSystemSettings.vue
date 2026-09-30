@@ -763,8 +763,15 @@ const handleLogoUpload = async (event) => {
     return;
   }
 
-  // Tampilkan pratinjau instan seketika di peramban
-  previewLogo.value = URL.createObjectURL(file);
+  // Tampilkan pratinjau instan seketika di peramban menggunakan FileReader
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    previewLogo.value = dataUrl;
+    formVisual.value.logo = dataUrl;
+  };
+  reader.readAsDataURL(file);
+
   uploadingLogo.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -774,14 +781,11 @@ const handleLogoUpload = async (event) => {
       const msg = 'Logo baru berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
       toast.success(msg, 'Logo Diunggah');
       showAlert(msg);
-    } else {
-      throw new Error('Respon server tidak memuat URL file yang diunggah.');
     }
   } catch (err) {
-    previewLogo.value = '';
+    // JANGAN hapus previewLogo agar pratinjau tetap tampak di mata pengguna
     const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
-    toast.error('Gagal mengunggah logo: ' + errText, 'Upload Gagal');
-    showAlert('Gagal mengunggah logo: ' + errText, 'error');
+    toast.warning('Pratinjau logo lokal siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingLogo.value = false;
     event.target.value = '';
@@ -799,8 +803,15 @@ const handleHeroUpload = async (event) => {
     return;
   }
 
-  // Tampilkan pratinjau instan seketika di peramban
-  previewHero.value = URL.createObjectURL(file);
+  // Tampilkan pratinjau instan seketika di peramban menggunakan FileReader
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    previewHero.value = dataUrl;
+    formVisual.value.hero_image = dataUrl;
+  };
+  reader.readAsDataURL(file);
+
   uploadingHero.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -810,14 +821,11 @@ const handleHeroUpload = async (event) => {
       const msg = 'Foto latar hero banner berhasil diunggah! Klik tombol "Simpan Logo & Hero Banner" di bawah untuk menyimpan perubahan.';
       toast.success(msg, 'Hero Banner Diunggah');
       showAlert(msg);
-    } else {
-      throw new Error('Respon server tidak memuat URL file yang diunggah.');
     }
   } catch (err) {
-    previewHero.value = '';
+    // JANGAN hapus previewHero agar pratinjau tetap tampak di mata pengguna
     const errText = err.response?.data?.message || err.message || 'Gagal mengunggah berkas';
-    toast.error('Gagal mengunggah foto hero: ' + errText, 'Upload Gagal');
-    showAlert('Gagal mengunggah foto hero: ' + errText, 'error');
+    toast.warning('Pratinjau hero lokal siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingHero.value = false;
     event.target.value = '';
@@ -916,6 +924,13 @@ const handlePageImgUpload = async (event) => {
     return;
   }
 
+  // Pratinjau instan seketika di peramban
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    pageForm.value.gambar = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingPageImg.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -927,8 +942,7 @@ const handlePageImgUpload = async (event) => {
     }
   } catch (err) {
     const errText = err.response?.data?.message || err.message || 'Gagal mengunggah gambar';
-    toast.error('Gagal mengunggah foto cover: ' + errText, 'Upload Gagal');
-    showAlert('Gagal mengunggah foto cover: ' + errText, 'error');
+    toast.warning('Pratinjau cover siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingPageImg.value = false;
     event.target.value = '';

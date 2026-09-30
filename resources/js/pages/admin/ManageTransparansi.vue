@@ -981,6 +981,13 @@ const onSelectImage = (e) => {
 };
 
 const handleCroppedImage = async (blob) => {
+  // Pratinjau instan seketika
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    form.gambar = e.target.result;
+  };
+  reader.readAsDataURL(blob);
+
   try {
     const file = new File([blob], `apbd_${form.tahun}_${Date.now()}.jpg`, { type: 'image/jpeg' });
     const res = await AdminService.uploadFile(file, 'image');
@@ -989,7 +996,7 @@ const handleCroppedImage = async (blob) => {
       toast.success('Gambar sampul APBD berhasil diunggah.');
     }
   } catch (err) {
-    toast.error('Gagal mengunggah foto sampul: ' + (err.message || err));
+    toast.warning('Pratinjau sampul siap disimpan: ' + (err.message || err));
   }
 };
 

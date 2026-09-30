@@ -66,25 +66,33 @@ foreach ($subDirs as $dir) {
     }
 }
 
-// Salin database bawaan ke /tmp jika menggunakan SQLite di lingkungan serverless
-$tmpDb = '/tmp/database.sqlite';
-$bundledDb = __DIR__.'/database.sqlite';
-if (! file_exists($bundledDb)) {
-    $bundledDb = __DIR__.'/../database/database.sqlite';
-}
-if ((! file_exists($tmpDb) || filesize($tmpDb) < 500000) && file_exists($bundledDb)) {
-    @copy($bundledDb, $tmpDb);
-    @chmod($tmpDb, 0666);
+// Cek apakah ada konfigurasi remote database (misal MySQL / PostgreSQL)
+$dbConn = getenv('DB_CONNECTION') ?: ($_ENV['DB_CONNECTION'] ?? ($_SERVER['DB_CONNECTION'] ?? ''));
+$dbHost = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? ($_SERVER['DB_HOST'] ?? ''));
+$isRemoteDb = (! empty($dbConn) && $dbConn !== 'sqlite') || ! empty($dbHost);
+
+if (! $isRemoteDb) {
+    // Salin database bawaan ke /tmp jika menggunakan SQLite di lingkungan serverless
+    $tmpDb = '/tmp/database.sqlite';
+    $bundledDb = __DIR__.'/database.sqlite';
+    if (! file_exists($bundledDb)) {
+        $bundledDb = __DIR__.'/../database/database.sqlite';
+    }
+    if ((! file_exists($tmpDb) || filesize($tmpDb) < 500000) && file_exists($bundledDb)) {
+        @copy($bundledDb, $tmpDb);
+        @chmod($tmpDb, 0666);
+    }
+
+    putenv('DB_CONNECTION=sqlite');
+    putenv('DB_DATABASE='.$tmpDb);
+    $_ENV['DB_CONNECTION'] = 'sqlite';
+    $_ENV['DB_DATABASE'] = $tmpDb;
+    $_SERVER['DB_CONNECTION'] = 'sqlite';
+    $_SERVER['DB_DATABASE'] = $tmpDb;
 }
 
-putenv('DB_CONNECTION=sqlite');
-putenv('DB_DATABASE='.$tmpDb);
 putenv('CACHE_STORE=file');
-$_ENV['DB_CONNECTION'] = 'sqlite';
-$_ENV['DB_DATABASE'] = $tmpDb;
 $_ENV['CACHE_STORE'] = 'file';
-$_SERVER['DB_CONNECTION'] = 'sqlite';
-$_SERVER['DB_DATABASE'] = $tmpDb;
 $_SERVER['CACHE_STORE'] = 'file';
 
 // Register autoloader & bootstrap Laravel

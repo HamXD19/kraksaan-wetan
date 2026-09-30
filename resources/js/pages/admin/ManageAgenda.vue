@@ -613,6 +613,13 @@ const handlePhotoUpload = async (event) => {
     return;
   }
 
+  // Pratinjau instan seketika
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    form.foto = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingPhoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -623,7 +630,7 @@ const handlePhotoUpload = async (event) => {
     }
   } catch (err) {
     const errText = err.response?.data?.message || err.message;
-    toast.error('Gagal mengunggah foto: ' + errText, 'Upload Gagal');
+    toast.warning('Pratinjau foto siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingPhoto.value = false;
     event.target.value = '';

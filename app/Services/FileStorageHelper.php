@@ -20,6 +20,36 @@ use Illuminate\Support\Str;
 class FileStorageHelper
 {
     /**
+     * Decode and store base64 Data URI to public storage disk.
+     * Returns relative web path '/storage/uploads/xxxx.ext' or the original value if not base64.
+     */
+    public static function saveBase64ImageIfPresent(?string $dataUri): ?string
+    {
+        if (empty($dataUri) || ! is_string($dataUri)) {
+            return $dataUri;
+        }
+
+        if (preg_match('/^data:image\/(\w+);base64,(.+)$/s', $dataUri, $matches)) {
+            $rawExt = strtolower($matches[1]);
+            $ext = match ($rawExt) {
+                'jpeg' => 'jpg',
+                'svg+xml' => 'svg',
+                default => $rawExt,
+            };
+            $base64Content = $matches[2];
+            $decoded = base64_decode($base64Content);
+            if ($decoded !== false) {
+                $filename = Str::random(24).'.'.$ext;
+                Storage::disk('public')->put('uploads/'.$filename, $decoded);
+
+                return '/storage/uploads/'.$filename;
+            }
+        }
+
+        return $dataUri;
+    }
+
+    /**
      * Ekstrak relative path berkas yang berada di storage disk public.
      * Menerima format:
      * - "uploads/abc.jpg"

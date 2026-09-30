@@ -17,6 +17,9 @@ apiClient.interceptors.request.use((config) => {
     if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
     }
+    if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
+    }
     return config;
 });
 
@@ -328,6 +331,29 @@ export const AdminService = {
     },
 
     async uploadFile(file, type = 'image') {
+        // Jika file berupa File atau Blob gambar, utamakan JSON Base64 agar tahan terhadap restriksi multipart Vercel
+        if ((file instanceof File || file instanceof Blob) && (type === 'image' || file.type?.startsWith('image/'))) {
+            try {
+                const base64Data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                if (base64Data && typeof base64Data === 'string' && base64Data.length < 5 * 1024 * 1024) {
+                    const res = await apiClient.post('/admin/upload', {
+                        base64: base64Data,
+                        filename: file.name || 'image.jpg',
+                        type: 'image'
+                    }, { timeout: 60000 });
+                    return res.data;
+                }
+            } catch (err) {
+                console.warn('Upload via Base64 JSON gagal, mencoba via FormData:', err);
+            }
+        }
+
         const formData = new FormData();
         formData.append('file', file);
         formData.append('type', type);

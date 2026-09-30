@@ -87,6 +87,10 @@ class AdminPelayananController extends Controller
         $isNewVersion = $request->boolean('is_new_version');
         $id = $request->input('id');
 
+        if (isset($validated['gambar'])) {
+            $validated['gambar'] = FileStorageHelper::saveBase64ImageIfPresent($validated['gambar']);
+        }
+
         // Jika dibuat sebagai versi baru atau belum ada id
         if ($isNewVersion || ! $id) {
             $validated['aktif'] = $request->has('aktif') ? $request->boolean('aktif') : true;

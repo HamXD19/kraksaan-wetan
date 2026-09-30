@@ -311,8 +311,8 @@
                 <!-- Preview Foto Lurah -->
                 <div class="w-16 h-20 sm:w-20 sm:h-24 rounded-xl border border-slate-200 bg-white overflow-hidden flex items-center justify-center shrink-0 shadow-xs">
                   <img 
-                    v-if="profilForm.lurah_foto" 
-                    :src="profilForm.lurah_foto" 
+                    v-if="previewLurahFoto || profilForm.lurah_foto" 
+                    :src="previewLurahFoto || profilForm.lurah_foto" 
                     alt="Foto Lurah" 
                     class="w-full h-full object-cover object-top"
                   />
@@ -493,7 +493,7 @@
             <label class="block font-bold text-slate-700 mb-1">Foto Aparatur (Opsional)</label>
             <div class="flex items-center gap-3">
               <div class="w-12 h-14 rounded-xl border border-slate-200 bg-slate-100 overflow-hidden flex items-center justify-center shrink-0">
-                <img v-if="perangkatForm.foto" :src="perangkatForm.foto" alt="Preview" class="w-full h-full object-cover object-top" />
+                <img v-if="previewPerangkatFoto || perangkatForm.foto" :src="previewPerangkatFoto || perangkatForm.foto" alt="Preview" class="w-full h-full object-cover object-top" />
                 <span v-else class="text-slate-400 text-xs">Foto</span>
               </div>
               <div class="flex-1 space-y-1.5">
@@ -548,6 +548,8 @@ const uploadingLogo = ref(false);
 const uploadingHero = ref(false);
 const uploadingLurahFoto = ref(false);
 const uploadingPerangkatFoto = ref(false);
+const previewLurahFoto = ref('');
+const previewPerangkatFoto = ref('');
 const successMsg = ref('');
 const misiText = ref('');
 const perangkatList = ref([]);
@@ -645,6 +647,14 @@ const handleLurahFotoUpload = async (event) => {
     return;
   }
 
+  // Pratinjau instan seketika
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    previewLurahFoto.value = e.target.result;
+    profilForm.lurah_foto = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingLurahFoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -657,7 +667,7 @@ const handleLurahFotoUpload = async (event) => {
     }
   } catch (err) {
     const errText = err.response?.data?.message || err.message;
-    toast.error('Gagal mengunggah foto Lurah: ' + errText, 'Upload Gagal');
+    toast.warning('Pratinjau foto Lurah siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingLurahFoto.value = false;
     event.target.value = '';
@@ -679,6 +689,14 @@ const handlePerangkatFotoUpload = async (event) => {
     return;
   }
 
+  // Pratinjau instan seketika
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    previewPerangkatFoto.value = e.target.result;
+    perangkatForm.foto = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingPerangkatFoto.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
@@ -689,7 +707,7 @@ const handlePerangkatFotoUpload = async (event) => {
     }
   } catch (err) {
     const errText = err.response?.data?.message || err.message;
-    toast.error('Gagal mengunggah foto aparatur: ' + errText, 'Upload Gagal');
+    toast.warning('Pratinjau foto aparatur siap disimpan: ' + errText, 'Pratinjau Lokal');
   } finally {
     uploadingPerangkatFoto.value = false;
     event.target.value = '';
@@ -857,6 +875,7 @@ const saveProfil = async () => {
 };
 
 const openPerangkatModal = (item = null) => {
+  previewPerangkatFoto.value = '';
   if (item) {
     perangkatEditId.value = item.id;
     perangkatForm.nama = item.nama;
