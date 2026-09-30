@@ -49,8 +49,11 @@ if (! empty(env('VERCEL')) || ! empty(env('APP_STORAGE')) || isset($_ENV['VERCEL
 
     // Pastikan database sqlite di /tmp selalu digunakan di Vercel
     $tmpDb = '/tmp/database.sqlite';
-    $bundledDb = dirname(__DIR__).'/database/database.sqlite';
-    if ((! file_exists($tmpDb) || filesize($tmpDb) < 1000) && file_exists($bundledDb)) {
+    $bundledDb = dirname(__DIR__).'/api/database.sqlite';
+    if (! file_exists($bundledDb)) {
+        $bundledDb = dirname(__DIR__).'/database/database.sqlite';
+    }
+    if ((! file_exists($tmpDb) || filesize($tmpDb) < 500000) && file_exists($bundledDb)) {
         @copy($bundledDb, $tmpDb);
         @chmod($tmpDb, 0666);
     }
