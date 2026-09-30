@@ -10,7 +10,7 @@
   },
   "routes": [
     {
-      "src": "^/(assets|build|images|storage)/(.*)$",
+      "src": "^/(assets|build|images)/(.*)$",
       "dest": "/$1/$2"
     },
     {

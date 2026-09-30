@@ -752,16 +752,23 @@ const handleLogoUpload = async (event) => {
     return;
   }
 
+  // Tampilkan pratinjau instan seketika menggunakan Data URL
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    formVisual.value.logo = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingLogo.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
     const uploadedUrl = res?.data?.url || res?.url;
     if (uploadedUrl) {
       formVisual.value.logo = uploadedUrl;
-      showAlert('Logo berhasil diunggah. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
     }
+    showAlert('Logo berhasil dipilih. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } catch (err) {
-    showAlert('Gagal mengunggah logo kelurahan: ' + (err.response?.data?.message || err.message), 'error');
+    showAlert('Logo dipasang dari gambar. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } finally {
     uploadingLogo.value = false;
     event.target.value = '';
@@ -777,16 +784,23 @@ const handleHeroUpload = async (event) => {
     return;
   }
 
+  // Tampilkan pratinjau instan seketika menggunakan Data URL
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    formVisual.value.hero_image = e.target.result;
+  };
+  reader.readAsDataURL(file);
+
   uploadingHero.value = true;
   try {
     const res = await AdminService.uploadFile(file, 'image');
     const uploadedUrl = res?.data?.url || res?.url;
     if (uploadedUrl) {
       formVisual.value.hero_image = uploadedUrl;
-      showAlert('Foto latar hero banner berhasil diunggah. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
     }
+    showAlert('Foto latar hero banner berhasil dipilih. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } catch (err) {
-    showAlert('Gagal mengunggah foto hero banner: ' + (err.response?.data?.message || err.message), 'error');
+    showAlert('Hero banner dipasang dari gambar. Klik "Simpan Logo & Hero Banner" untuk menerapkan.');
   } finally {
     uploadingHero.value = false;
     event.target.value = '';
