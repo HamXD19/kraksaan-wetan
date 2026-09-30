@@ -5,6 +5,7 @@ use App\Http\Middleware\AdminRoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\SetCacheHeaders;
 use Illuminate\Http\Request;
 
 $app = Application::configure(basePath: dirname(__DIR__))
@@ -19,6 +20,9 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => AdminAuthMiddleware::class,
             'admin.role' => AdminRoleMiddleware::class,
+        ]);
+        $middleware->api(append: [
+            SetCacheHeaders::class.':no_cache;no_store;must_revalidate',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -55,13 +59,23 @@ if (! empty(env('VERCEL')) || ! empty(env('APP_STORAGE')) || isset($_ENV['VERCEL
     if (! $isRemoteDb) {
         // Fallback SQLite di /tmp jika tidak ada database remote yang dikonfigurasi
         $tmpDb = '/tmp/database.sqlite';
+        $versionFile = '/tmp/database.version';
         $bundledDb = dirname(__DIR__).'/api/database.sqlite';
         if (! file_exists($bundledDb)) {
             $bundledDb = dirname(__DIR__).'/database/database.sqlite';
         }
-        if ((! file_exists($tmpDb) || filesize($tmpDb) < 500000) && file_exists($bundledDb)) {
-            @copy($bundledDb, $tmpDb);
-            @chmod($tmpDb, 0666);
+        if (file_exists($bundledDb)) {
+            $bundledHash = md5_file($bundledDb);
+            $needsCopy = ! file_exists($tmpDb)
+                || ! file_exists($versionFile)
+                || @file_get_contents($versionFile) !== $bundledHash
+                || filesize($tmpDb) !== filesize($bundledDb);
+
+            if ($needsCopy) {
+                @copy($bundledDb, $tmpDb);
+                @chmod($tmpDb, 0666);
+                @file_put_contents($versionFile, $bundledHash);
+            }
         }
         $app->booting(function () use ($tmpDb, $storage): void {
             config([

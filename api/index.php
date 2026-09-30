@@ -74,13 +74,23 @@ $isRemoteDb = (! empty($dbConn) && $dbConn !== 'sqlite') || ! empty($dbHost);
 if (! $isRemoteDb) {
     // Salin database bawaan ke /tmp jika menggunakan SQLite di lingkungan serverless
     $tmpDb = '/tmp/database.sqlite';
+    $versionFile = '/tmp/database.version';
     $bundledDb = __DIR__.'/database.sqlite';
     if (! file_exists($bundledDb)) {
         $bundledDb = __DIR__.'/../database/database.sqlite';
     }
-    if ((! file_exists($tmpDb) || filesize($tmpDb) < 500000) && file_exists($bundledDb)) {
-        @copy($bundledDb, $tmpDb);
-        @chmod($tmpDb, 0666);
+    if (file_exists($bundledDb)) {
+        $bundledHash = md5_file($bundledDb);
+        $needsCopy = ! file_exists($tmpDb)
+            || ! file_exists($versionFile)
+            || @file_get_contents($versionFile) !== $bundledHash
+            || filesize($tmpDb) !== filesize($bundledDb);
+
+        if ($needsCopy) {
+            @copy($bundledDb, $tmpDb);
+            @chmod($tmpDb, 0666);
+            @file_put_contents($versionFile, $bundledHash);
+        }
     }
 
     putenv('DB_CONNECTION=sqlite');
