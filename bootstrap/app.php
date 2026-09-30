@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin.auth' => AdminAuthMiddleware::class,
             'admin.role' => AdminRoleMiddleware::class,
@@ -26,8 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
         );
     })->create();
 
-if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('VERCEL') || env('APP_STORAGE')) {
+if (isset($_ENV['VERCEL']) || isset($_SERVER['VERCEL']) || env('VERCEL') || env('APP_STORAGE') || is_dir('/tmp/storage')) {
     $storage = env('APP_STORAGE', '/tmp/storage');
+    if (! is_dir($storage)) {
+        @mkdir($storage, 0755, true);
+    }
     $app->useStoragePath($storage);
 }
 

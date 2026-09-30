@@ -1,5 +1,13 @@
 <?php
 
+// Konfigurasi lingkungan serverless Vercel
+putenv('APP_STORAGE=/tmp/storage');
+putenv('VERCEL=1');
+$_ENV['APP_STORAGE'] = '/tmp/storage';
+$_ENV['VERCEL'] = '1';
+$_SERVER['APP_STORAGE'] = '/tmp/storage';
+$_SERVER['VERCEL'] = '1';
+
 // Pastikan direktori storage di /tmp dibuat untuk lingkungan serverless Vercel
 $storagePath = '/tmp/storage';
 $subDirs = [
