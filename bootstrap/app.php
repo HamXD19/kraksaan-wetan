@@ -46,6 +46,22 @@ if (! empty(env('VERCEL')) || ! empty(env('APP_STORAGE')) || isset($_ENV['VERCEL
         }
     }
     $app->useStoragePath($storage);
+
+    // Pastikan database sqlite di /tmp selalu digunakan di Vercel
+    $tmpDb = '/tmp/database.sqlite';
+    $bundledDb = dirname(__DIR__).'/database/database.sqlite';
+    if ((! file_exists($tmpDb) || filesize($tmpDb) < 1000) && file_exists($bundledDb)) {
+        @copy($bundledDb, $tmpDb);
+        @chmod($tmpDb, 0666);
+    }
+    $app->booting(function () use ($tmpDb, $storage): void {
+        config([
+            'database.default' => 'sqlite',
+            'database.connections.sqlite.database' => $tmpDb,
+            'cache.default' => 'file',
+            'cache.stores.file.path' => $storage.'/framework/cache/data',
+        ]);
+    });
 }
 
 return $app;

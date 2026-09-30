@@ -7,6 +7,19 @@ if (! defined('LARAVEL_START')) {
     define('LARAVEL_START', microtime(true));
 }
 
+// Tangani routing Vercel: pastikan REQUEST_URI dan PATH_INFO mencerminkan URL asli
+if (isset($_GET['__route__'])) {
+    $originalPath = '/'.ltrim($_GET['__route__'], '/');
+    unset($_GET['__route__']);
+    $queryString = http_build_query($_GET);
+    $_SERVER['REQUEST_URI'] = $originalPath.($queryString !== '' ? '?'.$queryString : '');
+    $_SERVER['PATH_INFO'] = $originalPath;
+} elseif (! empty($_SERVER['HTTP_X_MATCHED_PATH']) && $_SERVER['HTTP_X_MATCHED_PATH'] !== '/api/index.php') {
+    $queryString = ! empty($_SERVER['QUERY_STRING']) ? '?'.$_SERVER['QUERY_STRING'] : '';
+    $_SERVER['REQUEST_URI'] = $_SERVER['HTTP_X_MATCHED_PATH'].($queryString !== '' ? '?'.$queryString : '');
+    $_SERVER['PATH_INFO'] = $_SERVER['HTTP_X_MATCHED_PATH'];
+}
+
 // Konfigurasi lingkungan serverless Vercel
 putenv('APP_STORAGE=/tmp/storage');
 putenv('VERCEL=1');
@@ -38,9 +51,17 @@ foreach ($subDirs as $dir) {
 // Salin database bawaan ke /tmp jika menggunakan SQLite di lingkungan serverless
 $tmpDb = '/tmp/database.sqlite';
 $bundledDb = __DIR__.'/../database/database.sqlite';
-if (! file_exists($tmpDb) && file_exists($bundledDb)) {
+if ((! file_exists($tmpDb) || filesize($tmpDb) < 1000) && file_exists($bundledDb)) {
     @copy($bundledDb, $tmpDb);
+    @chmod($tmpDb, 0666);
 }
+
+putenv('DB_CONNECTION=sqlite');
+putenv('DB_DATABASE='.$tmpDb);
+$_ENV['DB_CONNECTION'] = 'sqlite';
+$_ENV['DB_DATABASE'] = $tmpDb;
+$_SERVER['DB_CONNECTION'] = 'sqlite';
+$_SERVER['DB_DATABASE'] = $tmpDb;
 
 // Register autoloader & bootstrap Laravel
 require __DIR__.'/../vendor/autoload.php';
