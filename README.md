@@ -57,6 +57,18 @@ npm run dev
 
 Aplikasi sekarang dapat diakses melalui browser di alamat yang tertera pada terminal Anda.
 
+## 📖 Buku Panduan Penggunaan (Manual Book)
+
+Untuk panduan lengkap pengoperasian website bagi warga masyarakat maupun staf administrator kelurahan, silakan baca:
+
+👉 **[BUKU PANDUAN PENGGUNAAN LENGKAP (MANUAL_BOOK.md)](MANUAL_BOOK.md)**
+
+Panduan tersebut mencakup:
+* **Panduan Pengunjung (Portal Publik):** Navigasi suara aksesibilitas, profil kelurahan, pengajuan surat online, transparansi anggaran, cek pengumuman & berita, serta tampilan mobile smartphone.
+* **Panduan Administrator (CMS):** Prosedur login, kelola logo & hero banner, berita & foto cropper, pengumuman & lampiran PDF, agenda, galeri, aparatur & LKK, master kategori, serta manajemen staf & audit log.
+* **SOP Konten & Media:** Ketentuan resolusi gambar, rasio aspek, kompresi otomatis, dan standar dokumen PDF.
+* **Troubleshooting:** Pembersihan cache browser, backup database phpMyAdmin, dan solusi kendala teknis umum.
+
 ---
 
 ## 🌐 Panduan Hosting di cPanel
