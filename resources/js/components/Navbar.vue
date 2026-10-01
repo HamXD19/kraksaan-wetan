@@ -400,77 +400,81 @@
       </div>
     </nav>
 
-    <!-- Mobile Drawer Navigation (Backdrop + Accordion) -->
-    <Teleport to="body">
+    <!-- Mobile Floating Card Dropdown Menu (AMIK Taruna Style) -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="transform -translate-y-3 opacity-0 scale-[0.98]"
+      enter-to-class="transform translate-y-0 opacity-100 scale-100"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="transform translate-y-0 opacity-100 scale-100"
+      leave-to-class="transform -translate-y-3 opacity-0 scale-[0.98]"
+    >
       <div 
-        v-if="isMobileMenuOpen" 
-        class="fixed inset-0 z-50 lg:hidden flex"
+        v-if="isMobileMenuOpen"
+        class="lg:hidden absolute top-full inset-x-0 px-3.5 py-2 max-h-[calc(100vh-75px)] overflow-y-auto z-50 pointer-events-auto"
       >
-        <!-- Backdrop -->
-        <div 
-          class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" 
-          @click="isMobileMenuOpen = false"
-        ></div>
-
-        <!-- Drawer Content Panel -->
-        <div class="relative ml-auto w-4/5 max-w-sm bg-white h-full shadow-2xl flex flex-col overflow-y-auto">
-          <!-- Drawer Header -->
-          <div class="p-4 bg-emerald-800 text-white flex items-center justify-between">
+        <!-- Floating Card Container -->
+        <div class="max-w-lg mx-auto bg-white/98 backdrop-blur-xl rounded-[22px] shadow-2xl border border-slate-200/90 p-4 sm:p-5 space-y-3">
+          <!-- Mobile Menu Header / Status Badge -->
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
             <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
-              <span class="font-bold text-sm tracking-wide">MENU KELURAHAN</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span class="font-bold text-xs tracking-wider text-slate-800 uppercase">Navigasi Kelurahan</span>
             </div>
-            <div class="flex items-center gap-2">
-              <button 
-                type="button"
-                data-sound-toggle="true"
-                @click="toggleSound" 
-                :title="isSoundEnabled ? 'Suara Navigasi: Aktif' : 'Suara Navigasi: Nonaktif'"
-                class="p-1.5 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 cursor-pointer"
-              >
-                <svg v-if="isSoundEnabled" class="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 24 24"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-2.5-2.23l-5.5 5h-4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h4l5.5 5c.66.6 1.5.15 1.5-.75v-18.5c0-.9-.84-1.35-1.5-.75zm9 11c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-                <svg v-else class="w-5 h-5 text-white/50" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51c.66-1.24 1.03-2.65 1.03-4.15 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zm-15.5-8.5l1.27-1.27 18 18-1.27 1.27-5.18-5.18c-.58.43-1.23.77-1.93.98v-2.06c.39-.14.75-.34 1.07-.6l-4.46-4.46v5.82c0 .9-.84 1.35-1.5.75l-5.5-5h-4c-.55 0-1-.45-1-1v-8c0-.55.45-1 1-1h4l2.18-1.98-4.68-4.68zm8.5 2.7l-3.32 3.02 3.32 3.32v-6.34z"/></svg>
-              </button>
-              <button @click="isMobileMenuOpen = false" class="p-1 rounded-md text-emerald-200 hover:text-white hover:bg-emerald-700 cursor-pointer">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-              </button>
-            </div>
+            
+            <!-- Sound Toggle Button in Menu -->
+            <button 
+              type="button"
+              data-sound-toggle="true"
+              @click="toggleSound" 
+              :title="isSoundEnabled ? 'Suara Navigasi: Aktif' : 'Suara Navigasi: Nonaktif'"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition border cursor-pointer"
+              :class="isSoundEnabled ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-slate-50 text-slate-500 border-slate-200'"
+            >
+              <svg v-if="isSoundEnabled" class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 24 24"><path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-2.5-2.23l-5.5 5h-4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h4l5.5 5c.66.6 1.5.15 1.5-.75v-18.5c0-.9-.84-1.35-1.5-.75zm9 11c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              <svg v-else class="w-3.5 h-3.5 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51c.66-1.24 1.03-2.65 1.03-4.15 0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zm-15.5-8.5l1.27-1.27 18 18-1.27 1.27-5.18-5.18c-.58.43-1.23.77-1.93.98v-2.06c.39-.14.75-.34 1.07-.6l-4.46-4.46v5.82c0 .9-.84 1.35-1.5.75l-5.5-5h-4c-.55 0-1-.45-1-1v-8c0-.55.45-1 1-1h4l2.18-1.98-4.68-4.68zm8.5 2.7l-3.32 3.02 3.32 3.32v-6.34z"/></svg>
+              <span>{{ isSoundEnabled ? 'Suara On' : 'Suara Off' }}</span>
+            </button>
           </div>
 
-          <!-- Drawer Accordion Navigation -->
-          <div class="p-4 space-y-1 text-sm font-medium text-slate-700">
+          <!-- Main Navigation Links List -->
+          <div class="space-y-1 text-sm font-semibold text-slate-700">
+            <!-- BERANDA -->
             <router-link 
               to="/" 
               data-speech="Beranda"
               @click="isMobileMenuOpen = false"
-              class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 font-semibold"
+              class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition"
+              :class="$route.path === '/' ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
             >
-              Beranda
+              <span>Beranda</span>
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             </router-link>
 
-            <!-- Accordion: Profil -->
+            <!-- PROFIL (Accordion) -->
             <div>
               <button 
                 @click="toggleMobileSubmenu('profil')" 
                 data-speech="Menu Profil"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
+                class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition cursor-pointer"
+                :class="$route.path.startsWith('/profil') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
               >
-                <span>Profil</span>
+                <span>Profil Kelurahan</span>
                 <svg :class="{ 'rotate-180': mobileSubmenus.profil }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </button>
-              <div v-show="mobileSubmenus.profil" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-                <router-link to="/profil" data-speech="Tentang Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Tentang Kelurahan</router-link>
-                <router-link to="/profil/sejarah" data-speech="Sejarah Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Sejarah Kelurahan</router-link>
-                <router-link to="/profil/visi-misi" data-speech="Visi dan Misi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Visi dan Misi</router-link>
-                <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Struktur Organisasi</router-link>
+              <div v-show="mobileSubmenus.profil" class="pl-3 pr-2 py-1.5 space-y-1 bg-slate-50/80 rounded-xl text-xs mt-1 border border-slate-100">
+                <router-link to="/profil" data-speech="Tentang Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Tentang Kelurahan</router-link>
+                <router-link to="/profil/sejarah" data-speech="Sejarah Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Sejarah Kelurahan</router-link>
+                <router-link to="/profil/visi-misi" data-speech="Visi dan Misi" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Visi dan Misi</router-link>
+                <router-link to="/profil/struktur-organisasi" data-speech="Struktur Organisasi" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Struktur Organisasi</router-link>
                 <!-- Custom Submenus Profil -->
-                <template v-for="(sub, sIdx) in customMenus.profil" :key="'mob-prof-' + sIdx">
+                <template v-for="(sub, sIdx) in (customMenus.profil || [])" :key="'mob-prof-' + sIdx">
                   <a 
                     v-if="isExternalUrl(sub.url)" 
                     :href="sub.url" 
                     :target="sub.target || '_self'" 
                     @click="isMobileMenuOpen = false" 
-                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                    class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     <span>{{ sub.label }}</span>
                     <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -479,7 +483,7 @@
                     v-else 
                     :to="sub.url" 
                     @click="isMobileMenuOpen = false" 
-                    class="block py-2 px-2 hover:text-emerald-700"
+                    class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     {{ sub.label }}
                   </router-link>
@@ -487,29 +491,30 @@
               </div>
             </div>
 
-            <!-- Accordion: Pemerintahan -->
+            <!-- PEMERINTAHAN (Accordion) -->
             <div>
               <button 
                 @click="toggleMobileSubmenu('pemerintahan')" 
                 data-speech="Menu Pemerintahan"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
+                class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition cursor-pointer"
+                :class="$route.path.startsWith('/pemerintahan') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
               >
                 <span>Pemerintahan</span>
                 <svg :class="{ 'rotate-180': mobileSubmenus.pemerintahan }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </button>
-              <div v-show="mobileSubmenus.pemerintahan" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-                <router-link to="/pemerintahan" data-speech="Pemerintahan Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Pemerintahan Kelurahan</router-link>
-                <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Perangkat Kelurahan</router-link>
-                <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">RT / RW</router-link>
-                <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Lembaga Kemasyarakatan</router-link>
+              <div v-show="mobileSubmenus.pemerintahan" class="pl-3 pr-2 py-1.5 space-y-1 bg-slate-50/80 rounded-xl text-xs mt-1 border border-slate-100">
+                <router-link to="/pemerintahan" data-speech="Pemerintahan Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Pemerintahan Kelurahan</router-link>
+                <router-link to="/pemerintahan#perangkat" data-speech="Perangkat Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Perangkat Kelurahan</router-link>
+                <router-link to="/pemerintahan#rtrw" data-speech="Rukun Tetangga dan Rukun Warga" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">RT / RW</router-link>
+                <router-link to="/lembaga" data-speech="Lembaga Kemasyarakatan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Lembaga Kemasyarakatan (LKK)</router-link>
                 <!-- Custom Submenus Pemerintahan -->
-                <template v-for="(sub, sIdx) in customMenus.pemerintahan" :key="'mob-pem-' + sIdx">
+                <template v-for="(sub, sIdx) in (customMenus.pemerintahan || [])" :key="'mob-pem-' + sIdx">
                   <a 
                     v-if="isExternalUrl(sub.url)" 
                     :href="sub.url" 
                     :target="sub.target || '_self'" 
                     @click="isMobileMenuOpen = false" 
-                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                    class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     <span>{{ sub.label }}</span>
                     <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -518,7 +523,7 @@
                     v-else 
                     :to="sub.url" 
                     @click="isMobileMenuOpen = false" 
-                    class="block py-2 px-2 hover:text-emerald-700"
+                    class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     {{ sub.label }}
                   </router-link>
@@ -526,31 +531,32 @@
               </div>
             </div>
 
-            <!-- Accordion: Informasi Publik -->
+            <!-- INFORMASI PUBLIK (Accordion) -->
             <div>
               <button 
                 @click="toggleMobileSubmenu('informasi')" 
                 data-speech="Menu Informasi Publik"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
+                class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition cursor-pointer"
+                :class="$route.path.startsWith('/informasi-publik') || $route.path.startsWith('/transparansi') || $route.path.startsWith('/pelayanan') || $route.path.startsWith('/survei-skm') || $route.path.startsWith('/agenda') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
               >
                 <span>Informasi Publik</span>
                 <svg :class="{ 'rotate-180': mobileSubmenus.informasi }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </button>
-              <div v-show="mobileSubmenus.informasi" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-                <router-link to="/informasi-publik" data-speech="Data dan Statistik Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Data & Statistik Kelurahan</router-link>
-                <router-link to="/agenda" data-speech="Agenda Kegiatan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Agenda Kegiatan</router-link>
-                <router-link to="/pelayanan" data-speech="Informasi Pelayanan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Informasi Pelayanan</router-link>
-                <router-link to="/survei-skm" data-speech="Survei Kepuasan Masyarakat" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Survei Kepuasan Masyarakat (SKM)</router-link>
-                <router-link to="/dokumen" data-speech="Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Dokumen</router-link>
-                <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Transparansi & Akuntabilitas</router-link>
+              <div v-show="mobileSubmenus.informasi" class="pl-3 pr-2 py-1.5 space-y-1 bg-slate-50/80 rounded-xl text-xs mt-1 border border-slate-100">
+                <router-link to="/informasi-publik" data-speech="Data dan Statistik Kelurahan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Data & Statistik Kelurahan</router-link>
+                <router-link to="/agenda" data-speech="Agenda Kegiatan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Agenda Kegiatan</router-link>
+                <router-link to="/pelayanan" data-speech="Informasi Pelayanan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Informasi Pelayanan</router-link>
+                <router-link to="/survei-skm" data-speech="Survei Kepuasan Masyarakat" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Survei Kepuasan Masyarakat (SKM)</router-link>
+                <router-link to="/dokumen" data-speech="Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Dokumen Publik</router-link>
+                <router-link to="/transparansi" data-speech="Transparansi dan Akuntabilitas" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Transparansi & Akuntabilitas</router-link>
                 <!-- Custom Submenus Informasi Publik -->
-                <template v-for="(sub, sIdx) in customMenus.informasi" :key="'mob-info-' + sIdx">
+                <template v-for="(sub, sIdx) in (customMenus.informasi || [])" :key="'mob-info-' + sIdx">
                   <a 
                     v-if="isExternalUrl(sub.url)" 
                     :href="sub.url" 
                     :target="sub.target || '_self'" 
                     @click="isMobileMenuOpen = false" 
-                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
+                    class="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     <span>{{ sub.label }}</span>
                     <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
@@ -559,7 +565,7 @@
                     v-else 
                     :to="sub.url" 
                     @click="isMobileMenuOpen = false" 
-                    class="block py-2 px-2 hover:text-emerald-700"
+                    class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium"
                   >
                     {{ sub.label }}
                   </router-link>
@@ -567,115 +573,106 @@
               </div>
             </div>
 
+            <!-- BERITA & PENGUMUMAN -->
             <router-link 
               to="/berita" 
               data-speech="Berita dan Pengumuman"
               @click="isMobileMenuOpen = false"
-              class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition"
+              :class="$route.path.startsWith('/berita') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
             >
-              Berita & Pengumuman
+              <span>Berita & Pengumuman</span>
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
             </router-link>
 
+            <!-- GALERI KEGIATAN -->
             <router-link 
               to="/galeri" 
               data-speech="Galeri Dokumentasi"
               @click="isMobileMenuOpen = false"
-              class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition"
+              :class="$route.path.startsWith('/galeri') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
             >
-              Galeri Kegiatan
+              <span>Galeri Kegiatan</span>
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </router-link>
 
-            <!-- Accordion: Dokumen -->
+            <!-- DOKUMEN (Accordion) -->
             <div>
               <button 
                 @click="toggleMobileSubmenu('dokumen')" 
                 data-speech="Menu Dokumen"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800 cursor-pointer"
-                :class="$route.path.startsWith('/dokumen') ? 'text-emerald-800 font-bold bg-emerald-50/50' : ''"
+                class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition cursor-pointer"
+                :class="$route.path.startsWith('/dokumen') ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
               >
-                <span>Dokumen</span>
+                <span>Dokumen Publik</span>
                 <svg :class="{ 'rotate-180': mobileSubmenus.dokumen }" class="w-4 h-4 transition-transform text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
               </button>
-              <div v-show="mobileSubmenus.dokumen" class="pl-4 pr-2 py-1 space-y-1 bg-slate-50 rounded-lg text-xs">
-                <router-link to="/dokumen" data-speech="Semua Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Semua Dokumen</router-link>
-                <router-link to="/dokumen?kategori=Musrenbang" data-speech="Musrenbang" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Musrenbang</router-link>
-                <router-link to="/dokumen?kategori=UMKM" data-speech="UMKM" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">UMKM</router-link>
-                <router-link :to="{ path: '/dokumen', query: { kategori: 'Renstra & Renja' } }" data-speech="Renstra dan Renja" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Renstra & Renja</router-link>
-                <router-link to="/dokumen?kategori=SK+Kelembagaan" data-speech="SK Kelembagaan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">SK Kelembagaan</router-link>
-                <router-link :to="{ path: '/dokumen', query: { kategori: 'Regulasi & Kebijakan' } }" data-speech="Regulasi dan Kebijakan" @click="isMobileMenuOpen = false" class="block py-2 px-2 hover:text-emerald-700">Regulasi & Kebijakan</router-link>
-
-                <!-- Custom Submenus Dokumen -->
-                <template v-for="(sub, sIdx) in (customMenus.dokumen || [])" :key="'mob-dok-' + sIdx">
-                  <a 
-                    v-if="isExternalUrl(sub.url)" 
-                    :href="sub.url" 
-                    :target="sub.target || '_self'" 
-                    @click="isMobileMenuOpen = false" 
-                    class="flex items-center justify-between py-2 px-2 hover:text-emerald-700"
-                  >
-                    <span>{{ sub.label }}</span>
-                    <svg v-if="sub.target === '_blank'" class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                  </a>
-                  <router-link 
-                    v-else 
-                    :to="sub.url" 
-                    @click="isMobileMenuOpen = false" 
-                    class="block py-2 px-2 hover:text-emerald-700"
-                  >
-                    {{ sub.label }}
-                  </router-link>
-                </template>
+              <div v-show="mobileSubmenus.dokumen" class="pl-3 pr-2 py-1.5 space-y-1 bg-slate-50/80 rounded-xl text-xs mt-1 border border-slate-100">
+                <router-link to="/dokumen" data-speech="Semua Dokumen" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Semua Dokumen</router-link>
+                <router-link to="/dokumen?kategori=Musrenbang" data-speech="Musrenbang" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Musrenbang</router-link>
+                <router-link to="/dokumen?kategori=UMKM" data-speech="UMKM" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">UMKM</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Renstra & Renja' } }" data-speech="Renstra dan Renja" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Renstra & Renja</router-link>
+                <router-link to="/dokumen?kategori=SK+Kelembagaan" data-speech="SK Kelembagaan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">SK Kelembagaan</router-link>
+                <router-link :to="{ path: '/dokumen', query: { kategori: 'Regulasi & Kebijakan' } }" data-speech="Regulasi dan Kebijakan" @click="isMobileMenuOpen = false" class="block py-2 px-3 rounded-lg hover:bg-white hover:text-emerald-700 font-medium">Regulasi & Kebijakan</router-link>
               </div>
             </div>
 
+            <!-- KONTAK & PENGADUAN -->
             <router-link 
               to="/kontak" 
               data-speech="Kontak dan Pengaduan"
               @click="isMobileMenuOpen = false"
-              class="block px-3 py-2.5 rounded-lg hover:bg-emerald-50 hover:text-emerald-800"
+              class="flex items-center justify-between px-3.5 py-2.5 rounded-xl transition"
+              :class="$route.path === '/kontak' ? 'bg-emerald-50 text-emerald-800 font-bold' : 'hover:bg-slate-50 hover:text-emerald-700'"
             >
-              Kontak & Pengaduan
+              <span>Kontak & Pengaduan</span>
+              <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             </router-link>
+          </div>
 
-            <!-- Mobile Drawer Login / Admin Item -->
-            <div class="pt-2 border-t border-slate-100 mt-2">
+          <!-- Quick Action Buttons on Mobile Menu (AMIK Taruna Pill Style) -->
+          <div class="pt-3 border-t border-slate-100 space-y-2">
+            <div class="grid grid-cols-2 gap-2">
               <router-link 
-                :to="isLoggedIn ? '/admin' : '/admin/login'" 
-                data-no-sound="true"
+                to="/pelayanan" 
                 @click="isMobileMenuOpen = false"
-                class="flex items-center justify-between px-3 py-2.5 rounded-xl font-bold transition"
-                :class="isLoggedIn ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-amber-50 text-amber-950 border border-amber-200'"
+                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition shadow-2xs"
               >
-                <div class="flex items-center gap-2 text-xs">
-                  <svg class="w-4 h-4" :class="isLoggedIn ? 'text-emerald-600' : 'text-amber-600'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                  </svg>
-                  <span>{{ isLoggedIn ? 'Panel Admin Kelurahan' : 'Login Administrator' }}</span>
-                </div>
-                <span 
-                  class="text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider" 
-                  :class="isLoggedIn ? 'bg-emerald-200/80 text-emerald-900' : 'bg-amber-300 text-amber-950'"
-                >
-                  {{ isLoggedIn ? 'Aktif' : 'Masuk' }} &rsaquo;
-                </span>
+                <svg class="w-3.5 h-3.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Layanan</span>
+              </router-link>
+              <router-link 
+                to="/kontak" 
+                @click="isMobileMenuOpen = false"
+                class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold transition shadow-xs"
+              >
+                <svg class="w-3.5 h-3.5 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span>Aspirasi</span>
               </router-link>
             </div>
-          </div>
 
-          <!-- Drawer Quick Actions -->
-          <div class="mt-auto p-4 border-t border-slate-200 bg-slate-50 text-xs text-slate-500">
-            <p class="font-semibold text-slate-700 mb-1">Kelurahan Kraksaan Wetan</p>
-            <p class="mb-3">Kec. Kraksaan, Kab. Probolinggo</p>
-            <a 
-              href="tel:0335841234" 
-              class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-emerald-700 text-white font-medium hover:bg-emerald-800"
+            <!-- Login Admin Pill Button -->
+            <router-link 
+              :to="isLoggedIn ? '/admin' : '/admin/login'" 
+              data-no-sound="true"
+              @click="isMobileMenuOpen = false"
+              class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-full font-bold text-xs transition shadow-xs"
+              :class="isLoggedIn ? 'bg-emerald-800 text-amber-300 hover:bg-emerald-900 border border-emerald-700' : 'bg-amber-400 hover:bg-amber-300 text-slate-950'"
             >
-              Hubungi Kantor
-            </a>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+              <span>{{ isLoggedIn ? 'Buka Panel Admin' : 'Login Administrator' }}</span>
+            </router-link>
           </div>
         </div>
+
+        <!-- Backdrop overlay -->
+        <div 
+          class="fixed inset-0 top-0 bg-slate-900/50 backdrop-blur-xs -z-10" 
+          @click="isMobileMenuOpen = false"
+        ></div>
       </div>
-    </Teleport>
+    </Transition>
   </header>
 </template>
 
@@ -741,10 +738,11 @@ const handleProfilUpdate = (e) => {
   }
 };
 
-// Pantau perubahan rute untuk mengecek status auth & profil
+// Pantau perubahan rute untuk mengecek status auth, profil & tutup mobile menu
 watch(() => route.path, () => {
   checkAuth();
   loadProfil();
+  isMobileMenuOpen.value = false;
 });
 
 onMounted(() => {

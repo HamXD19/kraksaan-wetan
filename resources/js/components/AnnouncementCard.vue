@@ -1,5 +1,5 @@
 <template>
-  <div class="group bg-white rounded-3xl overflow-hidden border border-slate-200/90 shadow-xs hover:shadow-2xl hover:border-amber-400/50 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between">
+  <div class="group bg-white rounded-[22px] overflow-hidden border border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.06)] hover:shadow-2xl hover:border-amber-400/50 transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between">
     <!-- Optional Wide Banner -->
     <div v-if="pengumuman.banner" class="w-full h-44 sm:h-52 bg-slate-100 overflow-hidden relative">
       <img 
@@ -13,7 +13,7 @@
 
       <div class="absolute top-3 right-3 flex items-center gap-1.5 z-20">
         <span 
-          class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-xs"
+          class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-xs"
           :class="pengumuman.prioritas === 'Penting' ? 'bg-rose-600 text-white' : 'bg-amber-500 text-slate-950'"
         >
           {{ pengumuman.prioritas || 'Pengumuman' }}
@@ -27,12 +27,12 @@
         <div class="flex items-center gap-2">
           <span 
             v-if="!pengumuman.banner"
-            class="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
+            class="px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider"
             :class="pengumuman.prioritas === 'Penting' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'"
           >
             {{ pengumuman.prioritas || 'Pengumuman' }}
           </span>
-          <span v-if="pengumuman.kategori" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
+          <span v-if="pengumuman.kategori" class="px-3 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 uppercase tracking-wider">
             {{ pengumuman.kategori }}
           </span>
           <span class="text-xs text-slate-500 font-medium flex items-center gap-1">
@@ -41,7 +41,7 @@
           </span>
         </div>
 
-        <span v-if="pengumuman.penyelenggara" class="text-xs text-slate-500 font-medium bg-slate-100 px-2.5 py-0.5 rounded-md">
+        <span v-if="pengumuman.penyelenggara" class="text-xs text-slate-500 font-medium bg-slate-100 px-3 py-0.5 rounded-full">
           {{ pengumuman.penyelenggara }}
         </span>
       </div>
@@ -52,7 +52,7 @@
           v-if="pengumuman.thumbnail && !pengumuman.banner" 
           :src="pengumuman.thumbnail" 
           :alt="pengumuman.judul" 
-          class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-200 shrink-0 bg-slate-100"
+          class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-200 shrink-0 bg-slate-100" 
           loading="lazy"
         />
         <div class="flex-1 min-w-0">
@@ -82,7 +82,7 @@
           :download="getDownloadName(pengumuman)"
           target="_blank"
           rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 text-xs font-bold px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs hover:shadow-md active:scale-95 transition-all duration-200 shrink-0 cursor-pointer"
+          class="inline-flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs hover:shadow-md active:scale-95 transition-all duration-200 shrink-0 cursor-pointer"
           title="Unduh Berkas Resmi PDF"
         >
           <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>

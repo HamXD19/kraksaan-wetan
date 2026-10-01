@@ -1,10 +1,10 @@
 <template>
-  <footer class="bg-emerald-950 text-emerald-100 border-t-4 border-amber-500 mt-auto relative overflow-hidden">
+  <footer class="bg-[#0d2318] text-emerald-100 border-t-4 border-amber-500 mt-auto relative overflow-hidden rounded-t-[28px] sm:rounded-t-[40px] shadow-2xl">
     <!-- Subtle Government Grid Watermark Background -->
     <div class="absolute inset-0 opacity-5 pointer-events-none bg-[radial-gradient(#34d399_1px,transparent_1px)] [background-size:16px_16px]"></div>
 
     <!-- Main Footer Container -->
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
         
         <!-- Kolom 1: Identitas Resmi Kelurahan (lg:col-span-4) -->
@@ -32,11 +32,11 @@
 
           <!-- Administrative ID Badges -->
           <div class="flex flex-wrap gap-2 pt-1">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-900/90 border border-emerald-700/60 text-emerald-200 text-xs font-semibold">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-900/90 border border-emerald-700/60 text-emerald-200 text-xs font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
               Kode Pos: 67282
             </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-900/90 border border-emerald-700/60 text-emerald-200 text-xs font-semibold">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-900/90 border border-emerald-700/60 text-emerald-200 text-xs font-semibold">
               <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
               Kode Wilayah: 35.13.14.1001
             </span>

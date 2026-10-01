@@ -1,12 +1,12 @@
 <template>
-  <div class="space-y-16 sm:space-y-24 pb-16">
+  <div class="space-y-12 sm:space-y-20 pb-16">
     <!-- 1. Hero Section -->
     <HeroSection :profil="profil" class="reveal-fade" />
 
     <!-- 2. Quick Service Section -->
     <section id="layanan-masyarakat" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
-      <div class="text-center max-w-2xl mx-auto mb-12 reveal">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
+      <div class="text-center max-w-2xl mx-auto mb-10 reveal">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2.5">
           <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
           Layanan Cepat Warga
         </div>
@@ -32,7 +32,7 @@
       <div class="text-center mt-8 reveal delay-300">
         <router-link 
           to="/pelayanan" 
-          class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200"
+          class="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs sm:text-sm font-bold hover:bg-emerald-100 group active:scale-95 transition-all duration-200 shadow-2xs"
         >
           <span>Lihat Seluruh 6+ Panduan Layanan & Persyaratan</span>
           <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -109,11 +109,11 @@
               </div>
             </div>
 
-            <!-- Action buttons & SKM badge -->
-            <div class="pt-2 flex flex-wrap items-center gap-3">
+            <!-- Action buttons & SKM badge (AMIK Taruna Pill Style) -->
+            <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
               <router-link
                 to="/pelayanan"
-                class="px-5 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center gap-2 shadow-lg hover:shadow-amber-400/20 active:scale-95"
+                class="px-5 py-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 shadow-lg hover:shadow-amber-400/20 active:scale-95 text-center"
               >
                 <span>Lihat Standar SOP Pelayanan</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -121,7 +121,7 @@
 
               <router-link
                 to="/survei-skm"
-                class="px-5 py-2.5 rounded-xl bg-emerald-800/90 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center gap-2 border border-emerald-500/60 shadow-xs active:scale-95"
+                class="px-5 py-2.5 rounded-full bg-emerald-800/90 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 border border-emerald-500/60 shadow-xs active:scale-95 text-center"
               >
                 <span v-if="skmLatest">IKM {{ skmLatest.skor_ikm }} ({{ skmLatest.predikat }})</span>
                 <span v-else>Survei Kepuasan (SKM)</span>
@@ -132,7 +132,7 @@
                 v-if="maklumat.gambar"
                 type="button"
                 @click="showMaklumatModal = true"
-                class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center gap-2 border border-white/15 cursor-pointer shadow-xs active:scale-95"
+                class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition flex items-center justify-center gap-2 border border-white/15 cursor-pointer shadow-xs active:scale-95 text-center"
               >
                 <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 <span>Buka Piagam HD</span>
@@ -287,7 +287,7 @@
             <div class="pt-2">
               <router-link 
                 to="/profil" 
-                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer group"
+                class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-emerald-700 hover:bg-emerald-800 active:scale-95 text-white text-xs sm:text-sm font-bold shadow-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer group w-full sm:w-auto text-center"
               >
                 <span>Selengkapnya Tentang Kami</span>
                 <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -370,7 +370,7 @@
 
         <router-link 
           to="/berita" 
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200 self-start sm:self-auto"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white text-xs sm:text-sm font-bold group active:scale-95 transition-all duration-200 self-start sm:self-auto shadow-2xs"
         >
           <span>Lihat Semua Berita</span>
           <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -390,7 +390,7 @@
     </section>
 
     <!-- 6. Pengumuman Resmi Kelurahan -->
-    <section class="bg-amber-50/60 py-16 border-y border-amber-200/70">
+    <section class="bg-amber-50/60 py-12 sm:py-16 border-y border-amber-200/70">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 reveal">
           <div>
@@ -407,9 +407,10 @@
           </div>
           <router-link 
             to="/berita?tab=pengumuman" 
-            class="text-xs sm:text-sm font-bold text-amber-800 hover:text-amber-950 transition"
+            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-amber-200/80 hover:bg-amber-300 text-amber-950 text-xs sm:text-sm font-bold transition self-start sm:self-auto shadow-2xs"
           >
-            Arsip Pengumuman &rarr;
+            <span>Arsip Pengumuman</span>
+            <span>&rarr;</span>
           </router-link>
         </div>
 
@@ -443,7 +444,7 @@
 
         <router-link 
           to="/galeri" 
-          class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-700 hover:text-emerald-900 group active:scale-95 transition-all duration-200 self-start sm:self-auto"
+          class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white text-xs sm:text-sm font-bold group active:scale-95 transition-all duration-200 self-start sm:self-auto shadow-2xs"
         >
           <span>Buka Galeri Lengkap</span>
           <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>

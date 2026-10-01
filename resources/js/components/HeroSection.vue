@@ -1,5 +1,5 @@
 <template>
-  <section class="relative bg-emerald-950 text-white overflow-hidden py-10 sm:py-12 lg:py-16 min-h-[380px] lg:min-h-[440px] flex items-center">
+  <section class="relative bg-emerald-950 text-white overflow-hidden py-10 sm:py-14 lg:py-18 min-h-[380px] lg:min-h-[440px] flex items-center rounded-b-[28px] sm:rounded-b-[44px] shadow-xl">
     <!-- Background: Pemandangan Gunung Bromo Vektor Pilihan User -->
     <div class="absolute inset-0 z-0 overflow-hidden">
       <img 
@@ -19,40 +19,40 @@
 
     <!-- Permanent Decorative Landscape Silhouette Contour at Bottom -->
     <div class="absolute bottom-0 inset-x-0 z-3 pointer-events-none opacity-40">
-      <svg class="w-full h-12 sm:h-16 text-emerald-950 fill-current preserve-3d" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <svg class="w-full h-10 sm:h-16 text-emerald-950 fill-current preserve-3d" viewBox="0 0 1440 120" preserveAspectRatio="none">
         <path d="M0,32L60,42.7C120,53,240,75,360,69.3C480,64,600,32,720,32C840,32,960,64,1080,69.3C1200,75,1320,53,1380,42.7L1440,32L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
       </svg>
     </div>
 
     <!-- Main Content Container: Clean, Grand, Proportional & Unobstructed -->
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-      <div class="max-w-3xl space-y-5">
+      <div class="max-w-3xl space-y-4 sm:space-y-5">
         <!-- Official Government Badge with Gentle Float Animation -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-800/90 border border-emerald-500/40 text-emerald-200 text-xs font-semibold shadow-inner backdrop-blur-md animate-float">
+        <div class="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-emerald-900/90 border border-emerald-400/40 text-amber-300 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-inner backdrop-blur-md animate-float">
           <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
           <span>WEBSITE RESMI PEMERINTAH KELURAHAN</span>
         </div>
 
         <!-- Headline & Subheadline -->
-        <div class="space-y-3">
+        <div class="space-y-2 sm:space-y-3">
           <p class="text-xs sm:text-sm md:text-base font-bold text-emerald-300 tracking-wide flex items-center gap-2">
             <span>Selamat Datang di Portal Resmi</span>
           </p>
-          <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.14] drop-shadow-md">
+          <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.18] sm:leading-[1.14] drop-shadow-md">
             Kelurahan <br class="hidden sm:inline" />
             <span class="text-amber-400">Kraksaan Wetan</span>
           </h1>
 
-          <p class="text-sm sm:text-base md:text-lg text-emerald-100/95 leading-relaxed font-normal max-w-2xl drop-shadow-xs">
+          <p class="text-xs sm:text-base md:text-lg text-emerald-100/95 leading-relaxed font-normal max-w-2xl drop-shadow-xs">
             Media informasi keterbukaan publik, pelayanan administrasi kependudukan cepat, dan panduan kemasyarakatan Kelurahan Kraksaan Wetan, Kecamatan Kraksaan, Kabupaten Probolinggo.
           </p>
         </div>
 
-        <!-- Action Buttons (CTA) with Micro-Interactions -->
-        <div class="flex flex-wrap items-center gap-3 pt-1">
+        <!-- Action Buttons (CTA) with Mobile Stacked Pill Styling (AMIK Taruna Pattern) -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
           <a 
             href="#layanan-masyarakat" 
-            class="inline-flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-black text-xs sm:text-sm shadow-lg hover:shadow-amber-500/30 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-full bg-amber-400 hover:bg-amber-300 active:scale-95 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-amber-500/25 transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer text-center"
           >
             <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
             <span>Layanan Masyarakat</span>
@@ -60,7 +60,7 @@
 
           <a 
             href="#profil-kelurahan" 
-            class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-900/80 hover:bg-emerald-800/90 active:scale-95 text-white font-bold text-xs sm:text-sm border border-emerald-500/40 backdrop-blur-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer shadow-sm hover:shadow-emerald-900/40"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-emerald-900/80 hover:bg-emerald-800 active:scale-95 text-white font-bold text-xs sm:text-sm border border-emerald-400/40 backdrop-blur-md transition-all duration-200 transform hover:-translate-y-0.5 cursor-pointer shadow-md hover:shadow-emerald-900/40 text-center"
           >
             <svg class="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             <span>Jelajahi Informasi</span>
@@ -68,20 +68,20 @@
         </div>
 
         <!-- Feature Highlights Bar -->
-        <div class="pt-4 border-t border-emerald-800/60 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs text-emerald-200/90">
-          <div class="flex items-center gap-2">
+        <div class="pt-3 sm:pt-4 border-t border-emerald-800/60 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs text-emerald-200/90">
+          <div class="flex items-center gap-2 p-1.5 sm:p-0 rounded-lg bg-emerald-900/40 sm:bg-transparent">
             <span class="p-1 rounded-md bg-emerald-800/80 text-amber-400 shrink-0">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </span>
             <span>Website Resmi</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 p-1.5 sm:p-0 rounded-lg bg-emerald-900/40 sm:bg-transparent">
             <span class="p-1 rounded-md bg-emerald-800/80 text-amber-400 shrink-0">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </span>
             <span>Pelayanan Cepat & Akurat</span>
           </div>
-          <div class="flex items-center gap-2 col-span-2 sm:col-span-1">
+          <div class="flex items-center gap-2 p-1.5 sm:p-0 rounded-lg bg-emerald-900/40 sm:bg-transparent">
             <span class="p-1 rounded-md bg-emerald-800/80 text-amber-400 shrink-0">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
             </span>
